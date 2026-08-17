@@ -313,20 +313,23 @@
   .talkbtn.plain::before{display:none}
 
   .details{display:grid;gap:1px;margin-top:10px;background:var(--hair2);border-radius:10px;overflow:hidden}
-  .fieldrow{
-    display:flex;gap:10px;align-items:baseline;
-    background:#fff;padding:9px 11px;min-width:0;
-  }
+  /* Подпись и кнопка сверху, значение под ними во всю ширину:
+     словом «копировать» строка съедалась наполовину. */
+  .fieldrow{background:#fff;padding:9px 11px;min-width:0}
+  .frow-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
   .fieldrow .fl{
-    flex:none;width:88px;font-family:var(--mono);font-size:9.5px;font-weight:700;
+    font-family:var(--mono);font-size:9.5px;font-weight:700;
     letter-spacing:.1em;text-transform:uppercase;color:var(--dim2);
+    min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   }
-  .fieldrow .fv{flex:1;min-width:0;font-size:13.5px;line-height:1.4;overflow-wrap:anywhere}
+  .fieldrow .fv{margin-top:3px;font-size:13.5px;line-height:1.4;overflow-wrap:anywhere}
   .copybtn{
-    flex:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;
-    text-transform:uppercase;color:var(--dim2);
+    flex:none;width:22px;height:22px;display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--edge);border-radius:6px;color:var(--dim2);
+    font-size:11px;line-height:1;transition:border-color .16s,color .16s,background .16s;
   }
-  .copybtn:hover{color:var(--acc)}
+  .copybtn:hover{border-color:#000;color:#000}
+  .copybtn.done{border-color:var(--acc);color:var(--acc)}
 
   .f-frow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) auto;gap:6px;margin-bottom:6px;align-items:center}
   .f-frow input{
@@ -509,8 +512,17 @@
     /* центр: шапка ленты и сетка карточек */
     .deskhead{display:flex;align-items:baseline;gap:12px;margin:24px 0 0;flex-wrap:wrap}
     .deskhead h3{font-family:var(--disp);font-weight:700;font-size:34px;text-transform:uppercase;line-height:1;margin:0}
-    .deskhead .sub{font-size:13px;color:var(--dim)}
+      .deskhead .sub{font-size:13px;color:var(--dim)}
+    .cols{display:flex;gap:4px;margin-left:auto}
+    .colbtn{
+      width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+      border:1px solid var(--edge);border-radius:8px;color:var(--dim2);font-size:13px;
+      transition:border-color .16s,color .16s,background .16s;
+    }
+    .colbtn:hover{border-color:#000;color:#000}
+    .colbtn.on{background:#000;border-color:#000;color:#fff}
     #cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;margin-top:16px}
+    #cards.one-col{grid-template-columns:minmax(0,1fr)}
     .card{margin:0}
     .cardwrap{display:flex}
     .cardwrap>.card{flex:1}
@@ -634,6 +646,10 @@
         <h3 id="filterTitle">Всё</h3>
         <span class="sub" id="filterSub"></span>
         <button class="rail-edit" id="clearFilter" hidden>Сбросить</button>
+        <div class="cols" role="group" aria-label="Раскладка ленты">
+          <button class="colbtn" data-cols="two" title="Две в ряд" aria-label="Две карточки в ряд">▥</button>
+          <button class="colbtn" data-cols="one" title="Одна в ряд" aria-label="Одна карточка в ряд">▤</button>
+        </div>
       </div>
 
       <div id="cards"></div>
@@ -684,6 +700,7 @@
       lastAuthor=null, lastAt=null, fromFile=false, localSaved=false, dirty=false;
   var tomb=Object.create(null), mineIds=Object.create(null), seenAt=0, seenSaved=false;
   var ogCache=Object.create(null), copied="", popId="", popKind="";
+  var feedCols="two";
   var draftPoints=[], filterPoint="all", trash=null, trashTimer=0;
 
   var SCREENS=["feed","points","log"];
@@ -758,6 +775,7 @@
   function loadSeen(){
     if(!LS) return;
     try{ me=LS.getItem(NAMEKEY)||me; }catch(e){}
+    try{ feedCols=LS.getItem("trip:cols")==="one"?"one":"two"; }catch(e){}
     try{
       seenAt=Number(LS.getItem(SEENKEY)||0)||0;
       var m=JSON.parse(LS.getItem(MINEKEY)||"[]");
@@ -1416,6 +1434,11 @@
 
   function renderCards(){
     var host=$("cards"); host.innerHTML="";
+    host.classList.toggle("one-col",feedCols==="one");
+    var cbs=document.querySelectorAll(".colbtn");
+    for(var ci=0;ci<cbs.length;ci++){
+      cbs[ci].classList.toggle("on",cbs[ci].getAttribute("data-cols")===feedCols);
+    }
     var list=(state.links||[]).filter(function(l){
       if(filterPoint==="all") return true;
       var ps=linkPoints(l);
@@ -1704,11 +1727,12 @@
           ? '<a href="'+esc(f.value)+'" target="_blank" rel="noopener noreferrer">'+esc(shortUrl(f.value))+'</a>'
           : (isTel?'<a href="tel:'+esc(String(f.value).replace(/[^0-9+]/g,""))+'">'+esc(f.value)+'</a>'
                   :linkify(esc(f.value)));
-        row.innerHTML='<span class="fl">'+esc(f.label||"поле")+'</span>'+
-          '<span class="fv">'+val+'</span>';
-        var cp=el("button","copybtn","копировать");
-        cp.addEventListener("click",function(){ copyVal(f.value); });
-        row.appendChild(cp);
+        var done=copied===f.value;
+        row.innerHTML='<div class="frow-top"><span class="fl">'+esc(f.label||"поле")+'</span>'+
+          '<button class="copybtn'+(done?" done":"")+'" title="'+(done?"Скопировано":"Копировать")+'" '+
+          'aria-label="Скопировать «'+esc(f.label||"поле")+'»">'+(done?"✓":"⧉")+'</button></div>'+
+          '<div class="fv">'+val+'</div>';
+        row.querySelector(".copybtn").addEventListener("click",function(){ copyVal(f.value); });
         details.appendChild(row);
       });
       card.appendChild(details);
@@ -2076,6 +2100,14 @@
     });
 
     $("whoBtn").addEventListener("click",openNameAsk);
+
+    document.addEventListener("click",function(e){
+      var b=e.target&&e.target.closest?e.target.closest(".colbtn"):null;
+      if(!b) return;
+      feedCols=b.getAttribute("data-cols");
+      if(LS){ try{ LS.setItem("trip:cols",feedCols); }catch(e2){} }
+      renderFeed();
+    });
 
     $("nameAsk").addEventListener("submit",function(e){
       e.preventDefault();
