@@ -294,9 +294,12 @@
     .rail-left .rail-filters{display:flex}
     .rail-left .rail-lab{display:flex}
     .rail-left .rail-new{display:block}
-    .rail-left{border-right:1px solid #000;padding:24px 20px;position:sticky;top:0;align-self:start;max-height:100vh;overflow-y:auto}
-    .rail-right{border-left:1px solid #000;padding:0 0 16px;position:sticky;top:0;align-self:start;max-height:100vh;overflow-y:auto}
-    .col-main{min-width:0;padding:26px 28px 60px}
+    .rail-left{padding:24px 20px;position:sticky;top:0;align-self:start;max-height:100vh;overflow-y:auto}
+    .rail-right{padding:0 0 16px;position:sticky;top:0;align-self:start;max-height:100vh;overflow-y:auto}
+    .col-main{
+      min-width:0;padding:26px 28px 60px;
+      border-left:1px solid #000;border-right:1px solid #000;
+    }
 
     .rail-h{font-family:var(--disp);font-weight:700;font-size:19px;text-transform:uppercase;line-height:1.1}
     .rail-sub{font-size:12px;color:var(--dim);margin-top:5px}
@@ -304,8 +307,15 @@
       display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:22px;
       font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
     }
-    .rail-lab.solo{display:block;color:#000;letter-spacing:.16em;padding:16px 16px 6px;margin:0}
-    .rail-lab.solo.sep{border-top:1px solid #000;margin-top:12px;padding-top:18px}
+    .rail-lab.solo{display:block;color:#000;letter-spacing:.16em;padding:16px 16px 8px;margin:0}
+    .rail-lab.solo.sep{border-top:1px solid #000;margin-top:14px;padding-top:16px}
+
+    /* Заглушки в рельсе живут по той же сетке, что и подписи над ними,
+       иначе текст прилипает к разделительной линии. */
+    .rail-empty,.rail-right .intro{
+      margin:0;padding:0 16px 14px;
+      font-size:13px;line-height:1.45;color:var(--dim);
+    }
     .rail-edit{
       font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
       color:var(--acc);background:none;border:none;
