@@ -61,9 +61,10 @@
   /* ── блок управления (бывшая шапка) ───────── */
   .rail-live{
     display:flex;align-items:center;gap:8px;
-    font-size:11px;color:var(--dim);margin-top:14px;
+    font-size:11px;color:var(--dim);
   }
-  .rail-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .rail-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .rail-user{margin-top:18px}
   .gate{margin-top:16px;padding:14px;border:1.5px solid #000;border-radius:14px;background:#fff}
   .gate-h{font-family:var(--disp);font-weight:700;font-size:19px;text-transform:uppercase;line-height:1}
   .gate-p{margin:7px 0 0;font-size:12.5px;line-height:1.45;color:var(--dim)}
@@ -434,10 +435,13 @@
      между собой — счётчик уезжал вслед за длиной названия. */
   .prow-top .kill{margin-left:12px}
   .prow-b{display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap}
-  .prow-b input{
-    width:118px;border:1px solid var(--hair);border-radius:999px;padding:6px 11px;
-    font-family:var(--mono);font-size:12px;background:#fff;
+  .daterange{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .daterange input{
+    border:1px solid var(--hair);border-radius:999px;padding:6px 11px;
+    font-family:var(--mono);font-size:12px;background:#fff;color:var(--ink);
   }
+  .daterange input:focus{border-color:#000;outline:none}
+  .daterange .dash{color:var(--dim2);font-family:var(--mono);font-size:12px}
   .prow-b .sample{font-size:12px;color:var(--dim);text-align:left}
   .addpoint{display:flex;gap:8px;margin-top:14px}
   .addpoint input{flex:1;min-width:0;border:1.5px solid #000;border-radius:12px;padding:12px 14px;font-size:15px;background:#fff}
@@ -505,7 +509,13 @@
     .rail-left .rail-filters{display:flex}
     .rail-left .rail-lab{display:flex}
     .rail-left .rail-new{display:block}
-    .rail-left{padding:24px 20px;position:sticky;top:0;align-self:start;max-height:100vh;overflow-y:auto}
+    .rail-left{
+      padding:24px 20px;position:sticky;top:0;align-self:start;
+      max-height:100vh;overflow-y:auto;
+      display:flex;flex-direction:column;min-height:100vh;
+    }
+    /* Блок «кто ты» внизу колонки — там его обычно и ищут. */
+    .rail-user{margin-top:auto;padding-top:20px}
     .rail-right{padding:0 0 16px;position:sticky;top:0;align-self:start;max-height:100vh;overflow-y:auto}
     .col-main{
       min-width:0;padding:26px 28px 60px;
@@ -605,10 +615,6 @@
       <a href="#log" data-screen="log">Кто что</a>
     </nav>
 
-    <div class="rail-live" id="liveLine" hidden>
-      <span class="bulb" aria-hidden="true"><span></span><span></span></span>
-      <span id="lastline"></span>
-    </div>
     <div class="gate" id="keyGate" hidden>
       <div class="gate-h">Нужен ключ</div>
       <p class="gate-p">Копилка общая и закрыта ключом. Обычно его вводить не надо: открой ссылку, которую прислал Андрей, — ключ в ней, и браузер запомнит его сам.</p>
@@ -629,15 +635,21 @@
       <div class="gate-known" id="knownNames"></div>
     </div>
 
-    <div class="rail-acts" id="railActs" hidden>
-      <button class="who me" id="whoBtn">Кто я</button>
-    </div>
 
     <div class="rail-lab">
       <span>Точки маршрута</span>
       <a href="#points" class="rail-edit">Править</a>
     </div>
     <div class="rail-filters" id="filtersDesk"></div>
+    <div class="rail-user">
+      <div class="rail-live" id="liveLine" hidden>
+        <span class="bulb" aria-hidden="true"><span></span><span></span></span>
+        <span id="lastline"></span>
+      </div>
+      <div class="rail-acts" id="railActs" hidden>
+        <button class="who me" id="whoBtn">Кто я</button>
+      </div>
+    </div>
   </aside>
 
   <div class="col-main">
@@ -736,6 +748,7 @@
   var tomb=Object.create(null), mineIds=Object.create(null), seenAt=0, seenSaved=false;
   var ogCache=Object.create(null), copied="", popId="", popKind="", pickTimer=0;
   var feedCols="two";
+  var filterTags=[];
   var draftPoints=[], filterPoint="all", trash=null, trashTimer=0;
 
   var SCREENS=["feed","points","log"];
@@ -1160,11 +1173,18 @@
     var src=(d&&d.final)||url||"";
     if(isMapLink(src)||isMapLink(url)){
       var place=mapPlace(src)||mapPlace(url);
+      var mbox=el("div","ogline map");
       if(place){
-        var mbox=el("div","ogline map");
-        mbox.innerHTML='<div class="card-note"><b>Точка на карте:</b> '+esc(place)+'</div>';
-        host.appendChild(mbox);
+        mbox.innerHTML='<div class="og-title">Точка на карте</div>'+
+          '<div class="og-desc">'+esc(place)+'</div>';
+      }else{
+        // Короткие ссылки Google подставляют адрес скриптом уже в браузере,
+        // на сервере его не видно. Название места достать неоткуда.
+        mbox.innerHTML='<div class="og-title">Точка на карте</div>'+
+          '<div class="og-desc">Короткая ссылка — название места не читается. '+
+          'Чтобы оно подтянулось, скопируй полный адрес из строки браузера.</div>';
       }
+      host.appendChild(mbox);
       return;
     }
 
@@ -1292,6 +1312,18 @@
       if(box.scrollIntoView) box.scrollIntoView({block:"center",behavior:"smooth"});
       box.focus(); renderDraft();
     },80);
+  }
+
+  var MONTHS=["янв","фев","мар","апр","мая","июн","июл","авг","сен","окт","ноя","дек"];
+  function fmtRange(from,to){
+    function one(v){ var d=new Date(v); return d.getDate()+" "+MONTHS[d.getMonth()]; }
+    if(from&&to){
+      var a=new Date(from), z=new Date(to);
+      if(a.getMonth()===z.getMonth()) return a.getDate()+" — "+z.getDate()+" "+MONTHS[z.getMonth()];
+      return one(from)+" — "+one(to);
+    }
+    if(from||to) return one(from||to);
+    return "";
   }
 
   function pointName(id){
@@ -1478,19 +1510,29 @@
     if($("clearFilter")) $("clearFilter").hidden=(filterPoint==="all");
   }
 
+  // Наверху показываем только теги: выбранный отрезок и так подсвечен слева.
   function renderActiveFilter(){
     var host=$("activeFilter");
     if(!host) return;
     host.innerHTML="";
-    if(filterPoint==="all"){ host.hidden=true; return; }
+    if(!filterTags.length){ host.hidden=true; return; }
     host.hidden=false;
-    var pt=(state.points||[]).filter(function(p){return p.id===filterPoint})[0];
-    var label=filterPoint===null?"Без точки":(pt?pt.title:"Точка");
-    host.appendChild(el("span","af-lab",(pt&&pt.tag)?"Тег":"Отрезок"));
-    var b=chip(label+" ×",true,{sm:true});
-    b.title="Снять фильтр";
-    b.addEventListener("click",function(){ filterPoint="all"; renderFeed(); });
-    host.appendChild(b);
+    host.appendChild(el("span","af-lab","Теги"));
+    filterTags.slice().forEach(function(id){
+      var pt=(state.points||[]).filter(function(p){return p.id===id})[0];
+      var b=chip((pt?pt.title:"тег")+" ×",true,{sm:true});
+      b.title="Снять тег";
+      b.addEventListener("click",function(){
+        filterTags=filterTags.filter(function(x){return x!==id});
+        renderFeed();
+      });
+      host.appendChild(b);
+    });
+    if(filterTags.length>1){
+      var all=el("button","rail-edit","снять все");
+      all.addEventListener("click",function(){ filterTags=[]; renderFeed(); });
+      host.appendChild(all);
+    }
   }
 
   function renderCards(){
@@ -1501,10 +1543,14 @@
     for(var ci=0;ci<cbs.length;ci++){
       cbs[ci].classList.toggle("on",cbs[ci].getAttribute("data-cols")===feedCols);
     }
+    // Точка и теги — разные фильтры и работают вместе.
     var list=(state.links||[]).filter(function(l){
-      if(filterPoint==="all") return true;
       var ps=linkPoints(l);
-      return filterPoint===null?!ps.length:ps.indexOf(filterPoint)>=0;
+      if(filterPoint!=="all"){
+        if(filterPoint===null?ps.length:ps.indexOf(filterPoint)<0) return false;
+      }
+      for(var i=0;i<filterTags.length;i++) if(ps.indexOf(filterTags[i])<0) return false;
+      return true;
     });
 
     // Порядок задаём здесь, а не порядком в массиве: слияние с сервером
@@ -1590,8 +1636,15 @@
         tags.appendChild(none);
       }else{
         ps.slice(0,3).forEach(function(pid){
-          var t=chip(pointName(pid),true,{sm:true});
-          t.addEventListener("click",function(){ filterPoint=pid; renderFeed(); });
+          var pt=(state.points||[]).filter(function(x){return x.id===pid})[0];
+          var isTag=pt&&pt.tag;
+          var t=chip(pointName(pid),isTag?filterTags.indexOf(pid)>=0:true,{sm:true});
+          t.addEventListener("click",function(){
+            if(!isTag){ filterPoint=pid; renderFeed(); return; }
+            if(filterTags.indexOf(pid)>=0) filterTags=filterTags.filter(function(x){return x!==pid});
+            else filterTags=filterTags.concat([pid]);
+            renderFeed();
+          });
           tags.appendChild(t);
         });
         if(ps.length>3){
@@ -1878,8 +1931,11 @@
   }
 
   function renderFeed(){
-    if(currentScreen()!=="feed") return;
-    renderDraft(); renderPinned(); renderFilters(); renderCards(); renderHead();
+    // Список отрезков слева виден всегда, поэтому обновляем его
+    // независимо от того, какой экран сейчас открыт.
+    renderFilters();
+    if(currentScreen()!=="feed"){ renderHead(); return; }
+    renderDraft(); renderPinned(); renderCards(); renderHead();
   }
 
   /* Перетаскивание точек. HTML5 drag&drop не работает пальцем, поэтому
@@ -1987,10 +2043,21 @@
       row.appendChild(top);
 
       var b=el("div","prow-b");
-      var d=el("input");
-      d.value=p.dates||""; d.placeholder="даты"; d.setAttribute("aria-label","Даты точки «"+p.title+"»");
-      d.addEventListener("change",function(){ p.dates=d.value.trim(); save(); renderAll(); });
-      b.appendChild(d);
+      var range=el("div","daterange");
+      range.innerHTML='<input type="date" class="d-from" aria-label="Начало отрезка «'+esc(p.title)+'»">'+
+        '<span class="dash">—</span>'+
+        '<input type="date" class="d-to" aria-label="Конец отрезка «'+esc(p.title)+'»">';
+      var dFrom=range.querySelector(".d-from"), dTo=range.querySelector(".d-to");
+      dFrom.value=p.from||""; dTo.value=p.to||"";
+      function applyDates(){
+        p.from=dFrom.value||""; p.to=dTo.value||"";
+        p.dates=fmtRange(p.from,p.to);
+        save(); renderAll();
+      }
+      dFrom.addEventListener("change",applyDates);
+      dTo.addEventListener("change",applyDates);
+      b.appendChild(range);
+      if(p.dates&&!p.from&&!p.to) b.appendChild(el("span","sample",esc(p.dates)));
       var s=el("button","sample",esc(countFor(p.id)?"смотреть "+countFor(p.id):"пока пусто"));
       s.addEventListener("click",function(){ filterPoint=p.id; location.hash="#feed"; });
       b.appendChild(s);
@@ -2035,7 +2102,9 @@
   function planItems(p){
     var out=Object.create(null);
     (p.links||[]).forEach(function(o){ out["l:"+o.id]={id:o.id,kind:"link",text:o.title||""}; });
-    (p.points||[]).forEach(function(o){ out["p:"+o.id]={id:o.id,kind:"point",text:o.title||""}; });
+    (p.points||[]).forEach(function(o){
+      out["p:"+o.id]={id:o.id,kind:o.tag?"tag":"point",text:o.title||""};
+    });
     return out;
   }
   /* Реакции и комментарии живут внутри карточек, поэтому их сравниваем
@@ -2082,6 +2151,7 @@
   var PLURAL_TAIL={
     add:    function(n){ return " — "+n+" "+plural(n,["новая ссылка","новые ссылки","новых ссылок"]); },
     point:  function(n){ return " — "+n+" "+plural(n,["новая точка","новые точки","новых точек"]); },
+    tag:    function(n){ return " — "+n+" "+plural(n,["новый тег","новых тега","новых тегов"]); },
     del:    function(n){ return " — убрано "+n; },
     chg:    function(n){ return " — правок: "+n; },
     react:  function(n){ return " — "+n+" "+plural(n,["новая реакция","новые реакции","новых реакций"]); },
@@ -2092,6 +2162,7 @@
     join:" теперь в поездке",
     add:" — новая ссылка",
     point:" — новая точка маршрута",
+    tag:" — новый тег",
     comment:" — новый комментарий",
     react:" — новая реакция",
     chg:" — правка",
@@ -2123,10 +2194,12 @@
                (items.length>3?" и ещё "+(items.length-3):"")});
       }
 
-      var links=d.add.filter(function(x){return x.kind!=="point"});
+      var links=d.add.filter(function(x){return x.kind==="link"});
       var pts=d.add.filter(function(x){return x.kind==="point"});
+      var tgs=d.add.filter(function(x){return x.kind==="tag"});
       push("add",links.map(function(x){return {text:x.text,id:x.id}}));
       push("point",pts.map(function(x){return {text:x.text}}));
+      push("tag",tgs.map(function(x){return {text:x.text}}));
       push("del",d.del.map(function(x){return {text:x.text}}));
       push("chg",d.chg.map(function(x){return {text:x.text,id:x.kind==="link"?x.id:null}}));
       push("react",(d.reacts||[]).map(function(x){

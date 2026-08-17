@@ -130,13 +130,24 @@ async function fetchOg(target) {
   try { await reader.cancel(); } catch {}
   const html = Buffer.concat(chunks.map(c => Buffer.from(c))).toString("utf8");
 
+  // Короткие ссылки Google отдают не редирект, а страницу с переходом
+  // внутри. Настоящий адрес достаём из тела — иначе места не узнать.
+  let finalUrl = res.url || target.toString();
+  const hop = /<meta[^>]+http-equiv=["']refresh["'][^>]+content=["'][^"']*url=([^"']+)["']/i.exec(html)
+    || /location\.replace\(\s*["']([^"']+)["']/i.exec(html)
+    || /<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i.exec(html)
+    || /(https:\/\/www\.google\.[a-z.]+\/maps\/[^"'<\s\\]+)/i.exec(html);
+  if (hop && hop[1]) {
+    try { finalUrl = new URL(hop[1].replace(/&amp;/g, "&"), finalUrl).toString(); } catch {}
+  }
+
   const m = metaMap(html);
   const image = m["og:image"] || m["twitter:image"] || "";
   const out = {
     url: target.toString(),
     // Короткие ссылки (maps.app.goo.gl и прочие) разворачиваем: клиенту
     // нужен конечный адрес, чтобы достать из него название места.
-    final: res.url || target.toString(),
+    final: finalUrl,
     title: (m["og:title"] || m["twitter:title"] || m.__title || "").slice(0, 180),
     description: (m["og:description"] || m["twitter:description"] || m.description || "").slice(0, 300),
     site: (m["og:site_name"] || target.hostname.replace(/^www\./, "")).slice(0, 80),
