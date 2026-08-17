@@ -1596,6 +1596,27 @@
     (p.points||[]).forEach(function(o){ out["p:"+o.id]={id:o.id,kind:"point",text:o.title||""}; });
     return out;
   }
+  /* Реакции и комментарии живут внутри карточек, поэтому их сравниваем
+     отдельно: иначе правка выглядит как «ничего не изменилось». */
+  function reactKeys(p){
+    var m=Object.create(null);
+    (p.links||[]).forEach(function(l){
+      (Array.isArray(l.react)?l.react:[]).forEach(function(r){
+        m["r:"+l.id+":"+(r.who||"")+":"+r.kind]={id:l.id,title:l.title||"",kind:r.kind};
+      });
+    });
+    return m;
+  }
+  function commentKeys(p){
+    var m=Object.create(null);
+    (p.links||[]).forEach(function(l){
+      (Array.isArray(l.comments)?l.comments:[]).forEach(function(c){
+        m["c:"+c.id]={id:l.id,title:l.title||"",text:c.text||""};
+      });
+    });
+    return m;
+  }
+
   function diffPlans(older,newer){
     var a=planItems(older||{}),b=planItems(newer||{}),add=[],del=[],chg=[],k;
     for(k in b){ if(!a[k]) add.push(b[k]); else if(a[k].text!==b[k].text) chg.push(b[k]); }
@@ -1606,14 +1627,22 @@
     var joined=((newer||{}).people||[]).filter(function(x){ return !had[x.id]; })
       .map(function(x){ return x.name||"без имени"; });
 
-    return {add:add,del:del,chg:chg,joined:joined};
+    var ra=reactKeys(older||{}), rb=reactKeys(newer||{}), reacts=[];
+    for(k in rb) if(!ra[k]) reacts.push(rb[k]);
+
+    var ca=commentKeys(older||{}), cb=commentKeys(newer||{}), comments=[];
+    for(k in cb) if(!ca[k]) comments.push(cb[k]);
+
+    return {add:add,del:del,chg:chg,joined:joined,reacts:reacts,comments:comments};
   }
   var EVENT_LABEL={
     join:"новый участник",
     add:"новая ссылка",
     del:"убрано",
     chg:"поправлено",
-    point:"точка маршрута"
+    point:"новая точка маршрута",
+    react:"новая реакция",
+    comment:"новый комментарий"
   };
 
   /* Из соседних снимков делаем понятные события. Ревизии, где менялись
@@ -1634,6 +1663,14 @@
       d.del.forEach(function(x){ out.push({kind:"del",who:who,when:when,text:x.text}); });
       d.chg.forEach(function(x){
         out.push({kind:"chg",who:who,when:when,text:x.text,id:x.kind==="link"?x.id:null});
+      });
+      (d.reacts||[]).forEach(function(x){
+        out.push({kind:"react",who:who,when:when,id:x.id,
+          text:(x.kind==="+1"?"за":"вопрос")+" · "+x.title});
+      });
+      (d.comments||[]).forEach(function(x){
+        out.push({kind:"comment",who:who,when:when,id:x.id,
+          text:x.text+" — "+x.title});
       });
     }
     return out;
