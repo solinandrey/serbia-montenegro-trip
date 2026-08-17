@@ -186,20 +186,21 @@
   .filterrow::-webkit-scrollbar{display:none}
 
   /* ── карточки ─────────────────────────────── */
-  .cardwrap{overflow:hidden;transition:max-height .22s ease,opacity .2s ease;max-height:1400px}
+  .cardwrap{overflow:hidden;transition:max-height .22s ease,opacity .2s ease;max-height:1400px;min-width:0}
   .cardwrap.gone{max-height:0;opacity:0}
   .cardwrap.fresh{animation:arrive .5s var(--ease)}
   .card{
     margin:12px 16px;border:1px solid rgba(0,0,0,.18);border-radius:16px;
     padding:13px 14px 12px;background:#fff;
-    display:flex;flex-direction:column;
+    display:flex;flex-direction:column;min-width:0;
   }
   .cardwrap.fresh .card{animation:flash 1.5s ease-out}
-  .card-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .card-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-width:0}
   .host{
     display:inline-flex;align-items:center;padding:4px 9px;border-radius:999px;
     background:var(--surf);border:1px solid transparent;
     font-family:var(--mono);font-size:11px;color:rgba(0,0,0,.6);
+    max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   }
   .host.note{background:#fff;border-color:var(--edge)}
   .newtag{
@@ -219,6 +220,7 @@
     object-fit:cover;background:repeating-linear-gradient(135deg,#f2f0ee 0 5px,#e7e4e1 5px 10px);
   }
   .card-main{min-width:0;flex:1}
+  .ogline{min-width:0}
   .card-title{font-family:var(--disp);font-weight:600;font-size:18px;line-height:1.15;text-wrap:pretty;word-break:break-word}
   .card-note{font-size:14px;line-height:1.42;color:rgba(0,0,0,.72);margin-top:6px;text-wrap:pretty;word-break:break-word}
   .num{display:flex;align-items:baseline;gap:10px;margin-top:7px}
@@ -228,9 +230,12 @@
   .card-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
   /* Голосовалка прижата к низу: в сетке карточки одной строки разной
      высоты, и без этого подвал болтался бы по середине. */
+  /* Подвал переносится, а не распирает карточку: в сетке колонка узкая,
+     а кнопок в нём стало больше. */
   .card-foot{
     display:flex;align-items:center;gap:8px;margin-top:auto;
     padding-top:12px;border-top:1px solid var(--hair2);
+    flex-wrap:wrap;row-gap:8px;min-width:0;
   }
   .card-tags{margin-bottom:2px}
   .react{
@@ -242,7 +247,10 @@
   .react.on{background:#000;border-color:#000;color:#fff}
   .react.on.doubt{background:var(--acc);border-color:var(--acc)}
   .react.pop{animation:pop .38s cubic-bezier(.3,1.7,.4,1)}
-  .byline{font-size:11px;color:var(--dim2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .byline{
+    font-size:11px;color:var(--dim2);min-width:0;flex:1 1 auto;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
   .kill{margin-left:auto;font-size:17px;color:var(--dim2);padding:0 4px;line-height:1}
   .kill:hover{color:var(--acc)}
 
@@ -338,6 +346,7 @@
   .logrow-line{
     font-size:13.5px;line-height:1.35;margin-top:4px;font-weight:600;
   }
+  .logrow-line b{color:var(--acc);font-weight:700}
   .logrow-text{
     font-size:13px;line-height:1.35;margin-top:3px;color:var(--dim);
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
@@ -1632,14 +1641,14 @@
   }
   /* Формулировки без рода: «Женя» — имя и мужское, и женское,
      а «присоединился» наугад через раз обращается к человеку неверно. */
-  var EVENT_LINE={
-    join:   function(w){ return w+" теперь в поездке"; },
-    add:    function(w){ return w+" — новая ссылка"; },
-    point:  function(w){ return w+" — новая точка маршрута"; },
-    comment:function(w){ return w+" — новый комментарий"; },
-    react:  function(w){ return w+" — новая реакция"; },
-    chg:    function(w){ return w+" — правка"; },
-    del:    function(w){ return w+" — убрано"; }
+  var EVENT_TAIL={
+    join:" теперь в поездке",
+    add:" — новая ссылка",
+    point:" — новая точка маршрута",
+    comment:" — новый комментарий",
+    react:" — новая реакция",
+    chg:" — правка",
+    del:" — убрано"
   };
 
   /* Из соседних снимков делаем понятные события. Ревизии, где менялись
@@ -1713,13 +1722,13 @@
 
       host.innerHTML="";
       events.slice(0,20).forEach(function(ev){
-        var line=(EVENT_LINE[ev.kind]||EVENT_LINE.chg)(ev.who);
+        var tail=EVENT_TAIL[ev.kind]||EVENT_TAIL.chg;
         // У «нового участника» объект и есть имя — второй раз его не повторяем.
         var body=(ev.kind==="join")?"":(/^https?:\/\//i.test(ev.text)?shortUrl(ev.text):ev.text);
         var row=el(ev.id?"button":"div","logrow"+(ev.id?" tap":""));
         row.innerHTML=
           '<div class="logrow-head"><span class="when">'+esc(ago(ev.when))+'</span></div>'+
-          '<div class="logrow-line">'+esc(line)+'</div>'+
+          '<div class="logrow-line"><b>'+esc(ev.who)+'</b>'+esc(tail)+'</div>'+
           (body?'<div class="logrow-text">'+esc(body)+'</div>':"");
         if(ev.id) row.addEventListener("click",function(){ jumpToCard(ev.id); });
         host.appendChild(row);
