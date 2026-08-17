@@ -515,10 +515,11 @@
       .deskhead .sub{font-size:13px;color:var(--dim)}
     .cols{display:flex;gap:4px;margin-left:auto}
     .colbtn{
-      width:28px;height:28px;display:flex;align-items:center;justify-content:center;
-      border:1px solid var(--edge);border-radius:8px;color:var(--dim2);font-size:13px;
+      width:30px;height:30px;display:flex;align-items:center;justify-content:center;
+      border:1px solid var(--edge);border-radius:8px;color:var(--dim2);
       transition:border-color .16s,color .16s,background .16s;
     }
+    .colbtn svg{width:15px;height:15px;display:block;fill:currentColor}
     .colbtn:hover{border-color:#000;color:#000}
     .colbtn.on{background:#000;border-color:#000;color:#fff}
     #cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;margin-top:16px}
@@ -647,8 +648,12 @@
         <span class="sub" id="filterSub"></span>
         <button class="rail-edit" id="clearFilter" hidden>Сбросить</button>
         <div class="cols" role="group" aria-label="Раскладка ленты">
-          <button class="colbtn" data-cols="two" title="Две в ряд" aria-label="Две карточки в ряд">▥</button>
-          <button class="colbtn" data-cols="one" title="Одна в ряд" aria-label="Одна карточка в ряд">▤</button>
+          <button class="colbtn" data-cols="two" title="Две в ряд" aria-label="Две карточки в ряд">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1" y="2.5" width="6" height="11" rx="1.5"/><rect x="9" y="2.5" width="6" height="11" rx="1.5"/></svg>
+          </button>
+          <button class="colbtn" data-cols="one" title="Одна в ряд" aria-label="Одна карточка в ряд">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1" y="2.5" width="14" height="4.5" rx="1.5"/><rect x="1" y="9" width="14" height="4.5" rx="1.5"/></svg>
+          </button>
         </div>
       </div>
 
