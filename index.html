@@ -281,6 +281,64 @@
   .toast .bar{height:2px;background:var(--acc);transform-origin:left;animation:bar 6s linear forwards}
 
   .status{padding:12px 16px;font-size:11.5px;color:var(--dim);border-top:1px solid var(--hair)}
+
+  /* ── ноутбук: три колонки в одной рамке ───── */
+  .rail,.deskhead{display:none}
+
+  @media (min-width:1040px){
+    .wrap{max-width:none;padding:28px 24px 60px}
+    .shell{
+      max-width:1300px;margin:0 auto;background:#fff;
+      border:1.5px solid #000;border-radius:18px;overflow:hidden;
+      display:grid;grid-template-columns:262px minmax(0,1fr) 310px;min-height:740px;
+    }
+    .rail{display:block;min-width:0}
+    .rail-left{border-right:1px solid #000;padding:20px 18px}
+    .rail-right{border-left:1px solid #000;padding:0 0 16px}
+    .col-main{min-width:0;padding:22px 24px 40px}
+
+    .rail-h{font-family:var(--disp);font-weight:700;font-size:19px;text-transform:uppercase;line-height:1.1}
+    .rail-sub{font-size:12px;color:var(--dim);margin-top:5px}
+    .rail-lab{
+      display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:22px;
+      font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
+    }
+    .rail-lab.solo{display:block;color:#000;letter-spacing:.16em;padding:16px 16px 6px;margin:0}
+    .rail-lab.solo.sep{border-top:1px solid #000;margin-top:12px;padding-top:18px}
+    .rail-edit{
+      font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+      color:var(--acc);background:none;border:none;
+    }
+    .rail-edit:hover{color:#000}
+    .rail-filters{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+    .rail-filters .chip{border-radius:12px;display:flex;justify-content:space-between;width:100%}
+    .rail-new{width:100%;margin-top:12px;border-radius:12px;padding:10px 13px}
+
+    /* центр: шапка ленты и сетка карточек */
+    .deskhead{display:flex;align-items:baseline;gap:12px;margin:24px 0 0;flex-wrap:wrap}
+    .deskhead h3{font-family:var(--disp);font-weight:700;font-size:34px;text-transform:uppercase;line-height:1;margin:0}
+    .deskhead .sub{font-size:13px;color:var(--dim)}
+    #cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;margin-top:16px}
+    .card{margin:0}
+    .cardwrap{display:flex}
+    .cardwrap>.card{flex:1}
+    .empty{margin:16px 0 0;max-width:520px}
+
+    /* то, что на телефоне идёт в ленте, на ноутбуке живёт в рельсах */
+    .head,.filters,#pinned{display:none}
+    .composer{background:transparent;border:none;padding:0}
+    .composer-top{padding:7px 7px 7px 14px}
+    .composer-top textarea{font-size:16px}
+    .points{padding:0;max-width:640px}
+    .log{display:none}
+    .status{padding:20px 0 0;border-top:none}
+
+    /* правая рельса */
+    .pincard{width:auto;margin:8px 14px;border-radius:12px;padding:11px 12px;display:block}
+    .logrow{padding:10px 16px;border-bottom:1px solid var(--hair2)}
+    .logrow .when{min-width:0}
+    .logrow .who{font-size:14px}
+  }
   .status b{color:#000;font-weight:600}
 
   @media (max-width:520px){
@@ -310,6 +368,20 @@
 </header>
 
 <div class="wrap">
+ <div class="shell">
+
+  <aside class="rail rail-left">
+    <div class="rail-h">Копилка поездки</div>
+    <div class="rail-sub" id="railSub"></div>
+    <div class="rail-lab">
+      <span>Точки маршрута</span>
+      <a href="#points" class="rail-edit">Править</a>
+    </div>
+    <div class="rail-filters" id="filtersDesk"></div>
+    <input class="newpoint rail-new" id="railNewPoint" placeholder="+ новая точка" autocomplete="off" aria-label="Новая точка маршрута">
+  </aside>
+
+  <div class="col-main">
 
   <div class="head">
     <div>
@@ -340,6 +412,12 @@
 
       <div class="filters"><div class="filterrow" id="filters"></div></div>
 
+      <div class="deskhead">
+        <h3 id="filterTitle">Всё</h3>
+        <span class="sub" id="filterSub"></span>
+        <button class="rail-edit" id="clearFilter" hidden>Сбросить</button>
+      </div>
+
       <div id="cards"></div>
     </section>
 
@@ -361,6 +439,17 @@
   </main>
 
   <div class="status" id="status">Проверяю общую память…</div>
+
+  </div>
+
+  <aside class="rail rail-right">
+    <div class="rail-lab solo">Под рукой</div>
+    <div id="pinnedDesk"></div>
+    <div class="rail-lab solo sep">Что менялось</div>
+    <div id="logDesk"></div>
+  </aside>
+
+ </div>
 </div>
 
 <div id="toast"></div>
@@ -380,6 +469,7 @@
   var draftPoint=null, filterPoint="all", trash=null, trashTimer=0;
 
   var SCREENS=["feed","points","log"];
+  function isDesk(){ return !!(window.matchMedia&&window.matchMedia("(min-width:1040px)").matches); }
 
   /* Точки по умолчанию — бывшие отрезки маршрута. */
   var DEFAULT_POINTS=[
@@ -804,9 +894,15 @@
 
   function route(){
     var k=currentScreen(),i;
-    var secs=document.querySelectorAll("[data-screen]");
+    var secs=document.querySelectorAll("section[data-screen]");
     for(i=0;i<secs.length;i++){
-      if(secs[i].tagName==="SECTION") secs[i].hidden=secs[i].getAttribute("data-screen")!==k;
+      var v=secs[i].getAttribute("data-screen");
+      if(isDesk()){
+        // Журнал живёт в правой рельсе, а лента и точки делят центр.
+        secs[i].hidden = (v==="log") || (v==="feed"?k==="points":k!=="points");
+      }else{
+        secs[i].hidden = v!==k;
+      }
     }
     var tabs=document.querySelectorAll(".screens a");
     for(i=0;i<tabs.length;i++){
@@ -830,8 +926,12 @@
   /* ── рендер ─────────────────────────────── */
   function renderHead(){
     var n=(state.links||[]).length, p=(state.points||[]).length;
-    $("screenSub").textContent=n+" "+plural(n,["ссылка","ссылки","ссылок"])+" · "+
+    var sub=n+" "+plural(n,["ссылка","ссылки","ссылок"])+" · "+
       p+" "+plural(p,["точка","точки","точек"])+" маршрута";
+    $("screenSub").textContent=sub;
+    if($("railSub")) $("railSub").textContent=sub;
+    var logTab=document.querySelector('.screens a[data-screen="log"]');
+    if(logTab) logTab.hidden=isDesk();
     var who=lastAuthor&&String(lastAuthor).trim()?lastAuthor:"без имени";
     $("lastline").textContent=lastAt?(who+" · "+ago(lastAt)):(shared?"общий план":"локально");
     var newCount=(state.links||[]).filter(isNew).length;
@@ -898,8 +998,25 @@
   }
 
   function renderPinned(){
-    var host=$("pinned"); host.innerHTML="";
     var pins=(state.links||[]).filter(function(l){return l.pin});
+
+    var deskHost=$("pinnedDesk");
+    if(deskHost){
+      deskHost.innerHTML="";
+      if(!pins.length) deskHost.appendChild(el("div","rail-empty","Ничего не закреплено. Жми «закрепить» на карточке с номером или кодом."));
+      pins.forEach(function(l){
+        var v=l.num||l.title;
+        var b=el("button","pincard");
+        b.innerHTML='<div class="t">'+esc(pointName(l.point))+'</div>'+
+          '<div class="v'+(l.num?" num":"")+'">'+esc(v)+'</div>'+
+          '<div class="b"><span>'+esc((l.by||"—")+(l.ts?" · "+ago(l.ts):""))+'</span>'+
+          '<span class="copied'+(copied===v?" on":"")+'">скопировано</span></div>';
+        b.addEventListener("click",function(){ copyVal(v); });
+        deskHost.appendChild(b);
+      });
+    }
+
+    var host=$("pinned"); host.innerHTML="";
     if(!pins.length) return;
     var box=el("div","pinned");
     box.appendChild(el("div","lab","Под рукой"));
@@ -919,18 +1036,31 @@
   }
 
   function renderFilters(){
-    var host=$("filters"); host.innerHTML="";
     var defs=[{v:"all",label:"Всё",count:(state.links||[]).length}]
       .concat((state.points||[]).map(function(p){return {v:p.id,label:p.title,count:countFor(p.id)}}))
       .concat([{v:null,label:"Без точки",count:countFor(null)}]);
-    defs.forEach(function(f){
-      var b=chip(f.label,filterPoint===f.v,{count:f.count});
-      b.addEventListener("click",function(){
-        filterPoint=(filterPoint===f.v&&f.v!=="all")?"all":f.v;
-        renderFeed();
+
+    ["filters","filtersDesk"].forEach(function(id){
+      var host=$(id); if(!host) return;
+      host.innerHTML="";
+      defs.forEach(function(f){
+        var b=chip(f.label,filterPoint===f.v,{count:f.count});
+        b.addEventListener("click",function(){
+          filterPoint=(filterPoint===f.v&&f.v!=="all")?"all":f.v;
+          if(currentScreen()!=="feed") location.hash="#feed"; else renderFeed();
+        });
+        host.appendChild(b);
       });
-      host.appendChild(b);
     });
+
+    // заголовок центра на ноутбуке
+    var title=filterPoint==="all"?"Всё":(filterPoint===null?"Без точки":pointName(filterPoint));
+    var n=(state.links||[]).filter(function(l){
+      return filterPoint==="all"?true:((l.point||null)===filterPoint);
+    }).length;
+    if($("filterTitle")) $("filterTitle").textContent=title;
+    if($("filterSub")) $("filterSub").textContent=n+" "+plural(n,["карточка","карточки","карточек"]);
+    if($("clearFilter")) $("clearFilter").hidden=(filterPoint==="all");
   }
 
   function renderCards(){
@@ -1108,7 +1238,7 @@
   }
 
   async function renderLog(){
-    var host=$("logRows");
+    var host=isDesk()&&$("logDesk")?$("logDesk"):$("logRows");
     if(!shared||!apiKey){ host.innerHTML='<p class="intro">Журнал живёт на сервере. Подключи общий план, чтобы его увидеть.</p>'; return; }
     host.innerHTML='<p class="intro">Загружаю…</p>';
     try{
@@ -1146,7 +1276,10 @@
     }
   }
 
-  function renderAll(){ renderFeed(); renderPoints(); renderStatus(); renderHead(); }
+  function renderAll(){
+    renderFeed(); renderPoints(); renderStatus(); renderHead();
+    if(isDesk()) renderLog();
+  }
 
   /* ── старт ──────────────────────────────── */
   (async function init(){
@@ -1191,6 +1324,23 @@
     });
     $("newPoint").addEventListener("keydown",function(e){
       if(e.key==="Enter") $("addPointBtn").click();
+    });
+
+    var railNew=$("railNewPoint");
+    if(railNew) railNew.addEventListener("keydown",function(e){
+      if(e.key!=="Enter") return;
+      var v=railNew.value.trim(); if(!v) return;
+      state.points.push({id:"p"+uid(),title:v,dates:""});
+      railNew.value=""; save(); renderAll();
+    });
+    if($("clearFilter")) $("clearFilter").addEventListener("click",function(){
+      filterPoint="all"; renderFeed();
+    });
+
+    var wide=isDesk();
+    window.addEventListener("resize",function(){
+      if(isDesk()===wide) return;
+      wide=isDesk(); route(); renderAll();
     });
 
     window.addEventListener("pagehide",saveSeen);
