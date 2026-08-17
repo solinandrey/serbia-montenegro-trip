@@ -204,6 +204,7 @@
     display:flex;flex-direction:column;min-width:0;
   }
   .cardwrap.fresh .card{animation:flash 1.5s ease-out}
+  .cardwrap.picked .card{border-width:2px;border-color:#000;padding:12px 13px 11px}
   .card-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-width:0}
   .host{
     display:inline-flex;align-items:center;padding:4px 9px;border-radius:999px;
@@ -384,6 +385,15 @@
   .thread-add input:focus{border-color:#000;outline:none}
   .react.talk{border-style:dashed}
 
+  .activefilter{
+    display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+    margin:14px 16px 0;
+  }
+  .af-lab{
+    font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--dim2);
+  }
+
   .empty{margin:18px 16px;border:1px dashed var(--dim2);border-radius:14px;padding:20px}
   .empty h3{font-family:var(--disp);font-weight:600;font-size:19px;text-transform:uppercase;margin:0}
   .empty p{font-size:13px;color:var(--dim);margin:7px 0 0;line-height:1.45}
@@ -541,6 +551,7 @@
     .colbtn.on{background:#000;border-color:#000;color:#fff}
     #cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;margin-top:16px}
     #cards.one-col{grid-template-columns:minmax(0,1fr)}
+    .activefilter{margin:16px 0 0}
     .card{margin:0}
     .cardwrap{display:flex}
     .cardwrap>.card{flex:1}
@@ -674,6 +685,8 @@
         </div>
       </div>
 
+      <div class="activefilter" id="activeFilter" hidden></div>
+
       <div id="cards"></div>
     </section>
 
@@ -721,7 +734,7 @@
   var state=null, me="", apiKey=null, shared=false, live=false, rev=0,
       lastAuthor=null, lastAt=null, fromFile=false, localSaved=false, dirty=false;
   var tomb=Object.create(null), mineIds=Object.create(null), seenAt=0, seenSaved=false;
-  var ogCache=Object.create(null), copied="", popId="", popKind="";
+  var ogCache=Object.create(null), copied="", popId="", popKind="", pickTimer=0;
   var feedCols="two";
   var draftPoints=[], filterPoint="all", trash=null, trashTimer=0;
 
@@ -1434,8 +1447,10 @@
   }
 
   function renderFilters(){
+    // Свои теги — отдельная сущность, в списке отрезков им не место.
     var defs=[{v:"all",label:"Всё",count:(state.links||[]).length}]
-      .concat((state.points||[]).map(function(p){return {v:p.id,label:p.title,count:countFor(p.id)}}))
+      .concat((state.points||[]).filter(function(p){return !p.tag})
+        .map(function(p){return {v:p.id,label:p.title,count:countFor(p.id)}}))
       .concat([{v:null,label:"Без точки",count:countFor(null)}]);
 
     ["filters","filtersDesk"].forEach(function(id){
@@ -1454,14 +1469,32 @@
     // заголовок центра на ноутбуке
     var title=filterPoint==="all"?"Всё":(filterPoint===null?"Без точки":pointName(filterPoint));
     var n=(state.links||[]).filter(function(l){
-      return filterPoint==="all"?true:((l.point||null)===filterPoint);
+      if(filterPoint==="all") return true;
+      var ps=linkPoints(l);
+      return filterPoint===null?!ps.length:ps.indexOf(filterPoint)>=0;
     }).length;
     if($("filterTitle")) $("filterTitle").textContent=title;
     if($("filterSub")) $("filterSub").textContent=n+" "+plural(n,["карточка","карточки","карточек"]);
     if($("clearFilter")) $("clearFilter").hidden=(filterPoint==="all");
   }
 
+  function renderActiveFilter(){
+    var host=$("activeFilter");
+    if(!host) return;
+    host.innerHTML="";
+    if(filterPoint==="all"){ host.hidden=true; return; }
+    host.hidden=false;
+    var pt=(state.points||[]).filter(function(p){return p.id===filterPoint})[0];
+    var label=filterPoint===null?"Без точки":(pt?pt.title:"Точка");
+    host.appendChild(el("span","af-lab",(pt&&pt.tag)?"Тег":"Отрезок"));
+    var b=chip(label+" ×",true,{sm:true});
+    b.title="Снять фильтр";
+    b.addEventListener("click",function(){ filterPoint="all"; renderFeed(); });
+    host.appendChild(b);
+  }
+
   function renderCards(){
+    renderActiveFilter();
     var host=$("cards"); host.innerHTML="";
     host.classList.toggle("one-col",feedCols==="one");
     var cbs=document.querySelectorAll(".colbtn");
@@ -2069,7 +2102,7 @@
      только реакции или порядок, в журнал не попадают вовсе. */
   function eventsFrom(list,snaps){
     var out=[];
-    for(var i=0;i<Math.min(12,snaps.length);i++){
+    for(var i=0;i<Math.min(30,snaps.length);i++){
       if(!snaps[i]) continue;
       var older=snaps[i+1]?snaps[i+1].plan:null;
       if(!older) continue;
@@ -2119,9 +2152,12 @@
         if(btn&&det&&det.hidden) btn.click();
       }
       if(card.scrollIntoView) card.scrollIntoView({block:"center",behavior:"smooth"});
-      card.classList.remove("fresh");
-      void card.offsetWidth;
-      card.classList.add("fresh");
+      // Не красная вспышка, как у новых, а просто жирная рамка:
+      // это переход к карточке, а не событие.
+      document.querySelectorAll("#cards .picked").forEach(function(n){ n.classList.remove("picked"); });
+      card.classList.add("picked");
+      clearTimeout(pickTimer);
+      pickTimer=setTimeout(function(){ card.classList.remove("picked"); },4000);
     },currentScreen()==="feed"?0:140);
   }
 
@@ -2135,7 +2171,9 @@
     try{
       var r=await apiReq("GET",null,"/history");
       if(r.status!==200||!r.data) throw new Error("нет истории");
-      var list=(r.data.history||[]).slice(0,13);
+      // Окно шире: одна активная сессия правок иначе вытесняет
+      // из журнала всё, что было до неё.
+      var list=(r.data.history||[]).slice(0,31);
       if(!list.length){ host.innerHTML='<p class="intro">Пока ничего не происходило.</p>'; return; }
 
       var snaps=await Promise.all(list.map(function(h){
@@ -2159,7 +2197,7 @@
       }
 
       host.innerHTML="";
-      events.slice(0,20).forEach(function(ev){
+      events.slice(0,25).forEach(function(ev){
         var tail=EVENT_TAIL[ev.kind]||EVENT_TAIL.chg;
         if(ev.count) tail=PLURAL_TAIL[ev.kind]?PLURAL_TAIL[ev.kind](ev.count):tail;
         // У «нового участника» объект и есть имя — второй раз его не повторяем.
