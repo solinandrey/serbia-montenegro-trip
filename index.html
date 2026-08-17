@@ -17,7 +17,7 @@
     color-scheme:light;
     --acc:#E8000D;
     --ink:#000;
-    --paper:#E6E4E1;
+    --paper:#FFF;
     --surf:#F5F3F1;
     --card:#FFF;
     --hair:rgba(0,0,0,.14);
@@ -58,40 +58,33 @@
   .skip{position:absolute;left:-9999px;top:0;z-index:900;background:#000;color:#fff;padding:10px 14px;font-family:var(--mono);font-size:12px}
   .skip:focus{left:0}
 
-  /* ── шапка ────────────────────────────────── */
-  .top{
-    position:sticky;top:0;z-index:200;background:#000;color:#fff;
-    display:flex;flex-wrap:wrap;gap:14px;align-items:center;
-    padding:12px 20px;border-bottom:2px solid var(--acc);
+  /* ── блок управления (бывшая шапка) ───────── */
+  .rail-live{
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+    font-size:11px;color:var(--dim);margin-top:12px;
   }
-  .top h1{
-    font-family:var(--disp);font-weight:700;font-size:15px;
-    letter-spacing:.16em;text-transform:uppercase;margin:0;
-  }
-  .live{display:flex;align-items:center;gap:7px;font-size:11px;color:rgba(255,255,255,.72);margin-left:auto}
-  .live .bulb{position:relative;display:inline-flex;width:7px;height:7px;flex:none}
-  .live .bulb span{position:absolute;inset:0;background:var(--acc);border-radius:50%}
-  .live .bulb span:last-child{animation:dot 2.2s infinite}
-  .top .who{
-    border:1px solid var(--acc);border-radius:9px;color:var(--acc);
-    padding:7px 12px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
-  }
-  .top .who:hover{background:var(--acc);color:#fff}
-
-  /* ── переключатель экранов ────────────────── */
-  .screens{
-    display:flex;gap:0;border:1px solid rgba(255,255,255,.35);border-radius:9px;overflow:hidden;
-  }
-  .screens a{
-    padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.12em;
-    text-transform:uppercase;color:rgba(255,255,255,.75);
+  .bulb{position:relative;display:inline-flex;width:7px;height:7px;flex:none}
+  .bulb span{position:absolute;inset:0;background:var(--acc);border-radius:50%}
+  .bulb span:last-child{animation:dot 2.2s infinite}
+  .who{
+    margin-left:auto;border:1px solid var(--acc);border-radius:9px;color:var(--acc);
+    padding:6px 11px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
     transition:background .16s,color .16s;
   }
-  .screens a:hover{color:#fff}
-  .screens a[aria-current="page"]{background:#fff;color:#000}
+  .who:hover{background:var(--acc);color:#fff}
+
+  .screens{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+  .screens a{
+    padding:7px 12px;border-radius:999px;border:1px solid var(--edge);
+    font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+    color:rgba(0,0,0,.6);transition:background .16s,color .16s,border-color .16s;
+  }
+  .screens a:hover{border-color:#000;color:#000}
+  .screens a[aria-current="page"]{background:#000;border-color:#000;color:#fff}
   .screens a i{font-style:normal;font-family:var(--mono);font-size:10px;opacity:.7;margin-left:5px}
 
   .wrap{max-width:760px;margin:0 auto;padding:0 0 140px}
+  .rail-head{display:none}
   .head{
     padding:20px 16px 14px;border-bottom:1px solid var(--hair);
     display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;
@@ -157,7 +150,7 @@
 
   /* ── фильтры ──────────────────────────────── */
   .filters{
-    position:sticky;top:53px;z-index:12;background:var(--paper);
+    position:sticky;top:0;z-index:12;background:var(--paper);
     border-bottom:1px solid var(--hair);padding:12px 0 11px;
   }
   .filterrow{display:flex;gap:7px;overflow-x:auto;padding:0 16px;scrollbar-width:none}
@@ -256,7 +249,7 @@
   .logrow{border-bottom:1px solid var(--hair2);padding:12px 2px}
   .logrow-top{display:flex;gap:12px;align-items:baseline;width:100%;text-align:left;flex-wrap:wrap}
   .logrow .when{font-family:var(--mono);font-size:11px;color:var(--dim2);flex:none;min-width:104px}
-  .logrow .who{font-family:var(--disp);font-weight:600;font-size:16px;text-transform:uppercase;flex:1 1 auto}
+  .logrow .author{font-family:var(--disp);font-weight:600;font-size:16px;text-transform:uppercase;flex:1 1 auto}
   .logrow .sum{font-family:var(--mono);font-size:11px;color:var(--dim)}
   .logbody{padding:6px 0 4px}
   .logbody h4{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--dim2);margin:10px 0 5px}
@@ -283,19 +276,27 @@
   .status{padding:12px 16px;font-size:11.5px;color:var(--dim);border-top:1px solid var(--hair)}
 
   /* ── ноутбук: три колонки в одной рамке ───── */
-  .rail,.deskhead{display:none}
+  .deskhead{display:none}
+  .rail-right{display:none}
+  .rail-left{padding:14px 16px 0}
+  .rail-left .rail-lab,.rail-left .rail-filters,.rail-left .rail-new{display:none}
 
   @media (min-width:1040px){
-    .wrap{max-width:none;padding:28px 24px 60px}
+    .wrap{max-width:none;padding:0}
     .shell{
-      max-width:1300px;margin:0 auto;background:#fff;
-      border:1.5px solid #000;border-radius:18px;overflow:hidden;
-      display:grid;grid-template-columns:262px minmax(0,1fr) 310px;min-height:740px;
+      display:grid;grid-template-columns:280px minmax(0,1fr) 320px;
+      min-height:100vh;background:#fff;
     }
     .rail{display:block;min-width:0}
-    .rail-left{border-right:1px solid #000;padding:20px 18px}
-    .rail-right{border-left:1px solid #000;padding:0 0 16px}
-    .col-main{min-width:0;padding:22px 24px 40px}
+    .rail-head{display:block}
+    .rail-right{display:block}
+    .rail-left .rail-lab,.rail-left .rail-filters,.rail-left .rail-new{display:""}
+    .rail-left .rail-filters{display:flex}
+    .rail-left .rail-lab{display:flex}
+    .rail-left .rail-new{display:block}
+    .rail-left{border-right:1px solid #000;padding:24px 20px;position:sticky;top:0;align-self:start;max-height:100vh;overflow-y:auto}
+    .rail-right{border-left:1px solid #000;padding:0 0 16px;position:sticky;top:0;align-self:start;max-height:100vh;overflow-y:auto}
+    .col-main{min-width:0;padding:26px 28px 60px}
 
     .rail-h{font-family:var(--disp);font-weight:700;font-size:19px;text-transform:uppercase;line-height:1.1}
     .rail-sub{font-size:12px;color:var(--dim);margin-top:5px}
@@ -326,6 +327,7 @@
 
     /* то, что на телефоне идёт в ленте, на ноутбуке живёт в рельсах */
     .head,.filters,#pinned{display:none}
+    .screens a[data-screen="log"]{display:none}
     .composer{background:transparent;border:none;padding:0}
     .composer-top{padding:7px 7px 7px 14px}
     .composer-top textarea{font-size:16px}
@@ -337,7 +339,7 @@
     .pincard{width:auto;margin:8px 14px;border-radius:12px;padding:11px 12px;display:block}
     .logrow{padding:10px 16px;border-bottom:1px solid var(--hair2)}
     .logrow .when{min-width:0}
-    .logrow .who{font-size:14px}
+    .logrow .author{font-size:14px}
   }
   .status b{color:#000;font-weight:600}
 
@@ -356,23 +358,27 @@
 
 <a class="skip" href="#main">К содержанию</a>
 
-<header class="top">
-  <h1>Копилка · Белград и Черногория</h1>
-  <nav class="screens" aria-label="Экраны">
-    <a href="#feed" data-screen="feed">Копилка</a>
-    <a href="#points" data-screen="points">Точки</a>
-    <a href="#log" data-screen="log">Кто что</a>
-  </nav>
-  <div class="live"><span class="bulb" aria-hidden="true"><span></span><span></span></span><span id="lastline">—</span></div>
-  <button class="who" id="whoBtn">Кто я</button>
-</header>
-
 <div class="wrap">
  <div class="shell">
 
   <aside class="rail rail-left">
-    <div class="rail-h">Копилка поездки</div>
-    <div class="rail-sub" id="railSub"></div>
+    <div class="rail-head">
+      <div class="rail-h">Копилка поездки</div>
+      <div class="rail-sub" id="railSub"></div>
+    </div>
+
+    <nav class="screens" aria-label="Экраны">
+      <a href="#feed" data-screen="feed">Копилка</a>
+      <a href="#points" data-screen="points">Точки</a>
+      <a href="#log" data-screen="log">Кто что</a>
+    </nav>
+
+    <div class="rail-live">
+      <span class="bulb" aria-hidden="true"><span></span><span></span></span>
+      <span id="lastline">—</span>
+      <button class="who" id="whoBtn">Кто я</button>
+    </div>
+
     <div class="rail-lab">
       <span>Точки маршрута</span>
       <a href="#points" class="rail-edit">Править</a>
@@ -1258,7 +1264,7 @@
         var row=el("div","logrow");
         row.innerHTML='<button class="logrow-top" aria-expanded="false">'+
             '<span class="when">'+esc(ago(take[i].updated_at))+'</span>'+
-            '<span class="who">'+esc(take[i].author||"без имени")+'</span>'+
+            '<span class="author">'+esc(take[i].author||"без имени")+'</span>'+
             '<span class="sum">'+esc(older?diffSummary(d):"первый снимок")+'</span>'+
           '</button>'+
           '<div class="logbody" hidden>'+(older?diffBlocks(d):'<p>Самый старый сохранённый снимок.</p>')+'</div>';
