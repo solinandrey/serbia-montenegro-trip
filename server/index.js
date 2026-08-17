@@ -80,7 +80,10 @@ function validPlan(p) {
   return p && typeof p === "object"
     && Array.isArray(p.checklist)
     && p.segments && typeof p.segments === "object"
-    && Array.isArray(p.notes);
+    && Array.isArray(p.notes)
+    // links появился позже: в базе есть планы без него, поэтому проверяем,
+    // только если поле вообще пришло
+    && (p.links === undefined || Array.isArray(p.links));
 }
 
 const server = http.createServer(async (req, res) => {
