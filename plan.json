@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "checklist": [
     {
       "id": "c01",
@@ -113,5 +113,32 @@
     ]
   },
   "notes": [],
-  "links": []
+  "links": [],
+  "points": [
+    {
+      "id": "check",
+      "title": "Сборы",
+      "dates": "до отъезда"
+    },
+    {
+      "id": "beograd",
+      "title": "Белград",
+      "dates": "2 — 13 сен"
+    },
+    {
+      "id": "voz",
+      "title": "Поезд",
+      "dates": "13 сен"
+    },
+    {
+      "id": "sever",
+      "title": "Север",
+      "dates": "14 — 20 сен"
+    },
+    {
+      "id": "more",
+      "title": "Побережье",
+      "dates": "21 — 27 сен"
+    }
+  ]
 }
