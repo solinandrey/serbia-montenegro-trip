@@ -1,8 +1,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Белград → Черногория · сентябрь 2026</title>
-<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0A0A0A" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#FFFFFF">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
@@ -14,7 +13,7 @@
      Плотные данные, моноширинные числа, прямые углы.
      ────────────────────────────────────────────── */
   :root{
-    color-scheme:light dark;
+    color-scheme:light;
 
     --paper:#FFFFFF;
     --surface:#F5F5F5;
@@ -41,26 +40,6 @@
     --r:12px;
     --r-sm:8px;
     --r-xs:5px;
-  }
-
-  @media (prefers-color-scheme:dark){
-    :root{
-      --paper:#0A0A0A;
-      --surface:#161616;
-      --surface-2:#212121;
-      --ink:#F5F5F5;
-      --ink-2:#B0B0B0;
-      --ink-3:#828282;
-      --line:rgba(245,245,245,.20);
-      --line-2:rgba(245,245,245,.10);
-
-      --accent:#FF3B20;
-      --accent-2:#FF5C46;
-      --on-accent:#0A0A0A;   /* на ярко-красном чёрный текст читается лучше белого */
-      --quiet:#A8A8A8;
-      --alert:#FF6A55;
-      --focus:#FF3B20;
-    }
   }
 
   *{box-sizing:border-box}
