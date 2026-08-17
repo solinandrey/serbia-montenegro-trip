@@ -60,18 +60,28 @@
 
   /* ── блок управления (бывшая шапка) ───────── */
   .rail-live{
-    display:flex;align-items:center;gap:8px;flex-wrap:wrap;
-    font-size:11px;color:var(--dim);margin-top:12px;
+    display:flex;align-items:center;gap:8px;
+    font-size:11px;color:var(--dim);margin-top:14px;
   }
+  .rail-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .rail-ask{display:flex;gap:8px;margin-top:10px}
+  .rail-ask input{
+    flex:1;min-width:0;border:1px solid var(--edge);border-radius:9px;
+    padding:7px 11px;font-size:14px;background:#fff;
+  }
+  .rail-ask input:focus{border-color:#000;outline:none}
   .bulb{position:relative;display:inline-flex;width:7px;height:7px;flex:none}
   .bulb span{position:absolute;inset:0;background:var(--acc);border-radius:50%}
   .bulb span:last-child{animation:dot 2.2s infinite}
   .who{
-    margin-left:auto;border:1px solid var(--acc);border-radius:9px;color:var(--acc);
+    border:1px solid var(--acc);border-radius:9px;color:var(--acc);
     padding:6px 11px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
-    transition:background .16s,color .16s;
+    transition:background .16s,color .16s,border-color .16s;
   }
   .who:hover{background:var(--acc);color:#fff}
+  /* Своё имя — не тревога, поэтому нейтральной рамкой. */
+  .who.me{border-color:var(--edge);color:rgba(0,0,0,.62)}
+  .who.me:hover{background:#000;border-color:#000;color:#fff}
 
   .screens{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
   .screens a{
@@ -383,12 +393,19 @@
       <a href="#log" data-screen="log">Кто что</a>
     </nav>
 
-    <div class="rail-live">
+    <div class="rail-live" id="liveLine" hidden>
       <span class="bulb" aria-hidden="true"><span></span><span></span></span>
-      <span id="lastline">—</span>
-      <button class="who" id="connectBtn" hidden>Подключить</button>
-      <button class="who" id="whoBtn">Кто я</button>
+      <span id="lastline"></span>
     </div>
+    <div class="rail-acts" id="railActs">
+      <button class="who me" id="whoBtn">Кто я</button>
+      <button class="who" id="connectBtn" hidden>Подключить</button>
+    </div>
+
+    <form class="rail-ask" id="nameAsk" hidden>
+      <input id="nameInput" placeholder="Как тебя зовут?" aria-label="Твоё имя" autocomplete="off" maxlength="24">
+      <button class="who me" type="submit">Готово</button>
+    </form>
 
     <div class="rail-lab">
       <span>Точки маршрута</span>
@@ -809,16 +826,26 @@
     if(hasStore){ try{ await window.storage.set(NAMEKEY,v,false); }catch(e){} }
   }
   function askKey(){
-    var v=window.prompt("Общий пароль плана (один на троих):","");
+    var v=null;
+    try{ v=window.prompt("Общий пароль плана (один на троих):",""); }catch(e){ v=null; }
     if(!v||!v.trim()) return false;
     apiKey=v.trim();
     if(LS){ try{ LS.setItem(PASSKEY,apiKey); }catch(e){} }
     return true;
   }
 
-  function askName(){
-    var v=window.prompt("Как тебя подписывать?",me||"");
-    if(v&&v.trim()){ setName(v.trim()); renderAll(); }
+  // Модалка prompt() блокирует отрисовку, а кое-где просто запрещена.
+  // Поэтому имя спрашиваем прямо в колонке.
+  function openNameAsk(){
+    var box=$("nameAsk"), acts=$("railActs"), inp=$("nameInput");
+    if(!box||!acts||!inp) return;
+    inp.value=me||"";
+    acts.hidden=true; box.hidden=false;
+    inp.focus(); inp.select();
+  }
+  function closeNameAsk(){
+    if($("nameAsk")) $("nameAsk").hidden=true;
+    if($("railActs")) $("railActs").hidden=false;
   }
 
   /* ── превью ссылок ──────────────────────── */
@@ -1007,8 +1034,12 @@
     if($("railSub")) $("railSub").textContent=sub;
     var logTab=document.querySelector('.screens a[data-screen="log"]');
     if(logTab) logTab.hidden=isDesk();
+    // Строка «кто правил последним» имеет смысл только в общем плане.
     var who=lastAuthor&&String(lastAuthor).trim()?lastAuthor:"без имени";
-    $("lastline").textContent=lastAt?(who+" · "+ago(lastAt)):(shared?"общий план":"локально");
+    var showLive=shared&&!!lastAt;
+    if($("liveLine")) $("liveLine").hidden=!showLive;
+    if(showLive) $("lastline").textContent=who+" · "+ago(lastAt);
+    if($("whoBtn")) $("whoBtn").textContent=me?me:"Кто я";
     var newCount=(state.links||[]).filter(isNew).length;
     var tab=document.querySelector('.screens a[data-screen="feed"]');
     if(tab){
@@ -1399,7 +1430,20 @@
       if(e.key==="Enter"&&(e.metaKey||e.ctrlKey)){ e.preventDefault(); saveDraft(); }
     });
 
-    $("whoBtn").addEventListener("click",askName);
+    $("whoBtn").addEventListener("click",openNameAsk);
+
+    $("nameAsk").addEventListener("submit",function(e){
+      e.preventDefault();
+      var v=$("nameInput").value.trim();
+      if(v) setName(v);
+      closeNameAsk(); renderAll();
+    });
+    $("nameInput").addEventListener("keydown",function(e){
+      if(e.key==="Escape"){ closeNameAsk(); }
+    });
+
+    // Первый заход — спрашиваем имя сразу. Дальше оно помнится в браузере.
+    if(!me) openNameAsk();
 
     $("connectBtn").addEventListener("click",async function(){
       if(!askKey()) return;
