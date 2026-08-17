@@ -1,0 +1,756 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Београд → Црна Гора · сентябрь 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --ink:#16232A;
+    --ink-soft:#41545C;
+    --limestone:#E6E4DC;
+    --limestone-2:#DCDAD0;
+    --card:#F2F1EB;
+    --sea:#0E5A61;
+    --sea-deep:#093F44;
+    --signal:#F0B429;
+    --alarm:#A8382B;
+    --sage:#8C9A92;
+    --line:rgba(22,35,42,.16);
+    --line-soft:rgba(22,35,42,.09);
+    --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+    --body:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--limestone);
+    color:var(--ink);
+    font-family:var(--body);
+    font-size:16px;
+    line-height:1.55;
+    background-image:linear-gradient(180deg,#EAE8E0 0%,var(--limestone) 320px);
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px 96px}
+
+  .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+  .eyebrow{
+    font-family:var(--mono);font-size:11px;font-weight:500;
+    text-transform:uppercase;letter-spacing:.18em;color:var(--sea);
+  }
+
+  /* ── hero ───────────────────────────────── */
+  .hero{padding:56px 0 8px}
+  .hero h1{
+    font-family:var(--display);
+    font-weight:800;font-stretch:118%;
+    font-size:clamp(2.6rem,8.5vw,5.4rem);
+    line-height:.9;letter-spacing:-.025em;
+    margin:14px 0 0;text-transform:uppercase;
+  }
+  .hero h1 .thin{font-weight:400;font-stretch:100%;color:var(--sea)}
+  .hero-meta{
+    display:flex;flex-wrap:wrap;gap:8px 28px;margin-top:22px;
+    font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);
+    text-transform:uppercase;letter-spacing:.06em;
+  }
+  .hero-meta b{color:var(--ink);font-weight:600}
+
+  /* ── signature: профиль высот ────────────── */
+  .profile{margin:34px 0 10px}
+  .profile svg{display:block;width:100%;height:auto}
+  .profile-key{
+    display:flex;gap:22px;flex-wrap:wrap;
+    font-family:var(--mono);font-size:11px;color:var(--ink-soft);
+    text-transform:uppercase;letter-spacing:.1em;margin-top:2px;
+  }
+  .profile-key i{display:inline-block;width:22px;height:0;border-top:2px solid var(--sea);
+    vertical-align:middle;margin-right:7px;font-style:normal}
+  .profile-key i.dash{border-top-style:dashed;border-color:var(--ink)}
+
+  /* ── полоса дедлайна ─────────────────────── */
+  .alarm{
+    display:flex;gap:16px;align-items:baseline;flex-wrap:wrap;
+    border-top:2px solid var(--alarm);border-bottom:1px solid var(--line);
+    padding:14px 0;margin:26px 0 0;
+  }
+  .alarm .tag{
+    font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--alarm);white-space:nowrap;
+  }
+  .alarm p{margin:0;font-size:14.5px;max-width:74ch}
+
+  /* ── статус хранилища ────────────────────── */
+  .bar{
+    display:flex;flex-wrap:wrap;gap:12px;align-items:center;
+    margin:18px 0 0;padding:12px 14px;border:1px solid var(--line);
+    background:var(--card);
+  }
+  .bar .dot{width:8px;height:8px;border-radius:50%;background:var(--sage);flex:none}
+  .bar.live .dot{background:var(--sea)}
+  .bar .txt{font-family:var(--mono);font-size:12px;color:var(--ink-soft);flex:1 1 260px}
+  .bar .txt b{color:var(--ink);font-weight:600}
+
+  /* ── кнопки ──────────────────────────────── */
+  button{font-family:var(--mono);cursor:pointer}
+  .btn{
+    border:1px solid var(--ink);background:transparent;color:var(--ink);
+    font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
+    padding:7px 12px;transition:background .15s,color .15s;
+  }
+  .btn:hover{background:var(--ink);color:var(--limestone)}
+  .btn.solid{background:var(--sea);border-color:var(--sea);color:#F2F1EB}
+  .btn.solid:hover{background:var(--sea-deep);border-color:var(--sea-deep)}
+  .btn.ghost{border-color:var(--line);color:var(--ink-soft)}
+  .btn.ghost:hover{background:var(--limestone-2);color:var(--ink)}
+  :focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+
+  /* ── чеклист ─────────────────────────────── */
+  section{margin-top:64px}
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;
+    border-bottom:1px solid var(--ink);padding-bottom:10px;flex-wrap:wrap}
+  .sec-head h2{
+    font-family:var(--display);font-weight:700;font-stretch:112%;
+    font-size:clamp(1.3rem,3vw,1.9rem);letter-spacing:-.01em;margin:0;text-transform:uppercase;
+  }
+  .sec-head .count{font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+
+  .check li{
+    display:flex;gap:12px;align-items:flex-start;
+    padding:12px 4px;border-bottom:1px solid var(--line-soft);
+  }
+  .check{list-style:none;margin:0;padding:0}
+  .check input[type=checkbox]{
+    appearance:none;-webkit-appearance:none;flex:none;
+    width:17px;height:17px;margin-top:3px;border:1.5px solid var(--ink);
+    background:transparent;cursor:pointer;position:relative;border-radius:0;
+  }
+  .check input[type=checkbox]:checked{background:var(--sea);border-color:var(--sea)}
+  .check input[type=checkbox]:checked::after{
+    content:"";position:absolute;left:5px;top:1px;width:4px;height:9px;
+    border:solid #F2F1EB;border-width:0 2px 2px 0;transform:rotate(43deg);
+  }
+  .check .txt{flex:1;font-size:15px}
+  .check li.done .txt{color:var(--sage);text-decoration:line-through}
+  .row-tools{display:flex;gap:6px;opacity:0;transition:opacity .15s}
+  li:hover .row-tools,li:focus-within .row-tools{opacity:1}
+  @media (hover:none){.row-tools{opacity:1}}
+  .mini{
+    border:none;background:none;color:var(--ink-soft);font-size:11px;
+    letter-spacing:.08em;text-transform:uppercase;padding:3px 5px;
+  }
+  .mini:hover{color:var(--alarm)}
+
+  /* ── сегменты маршрута ───────────────────── */
+  .seg{display:grid;grid-template-columns:132px 1fr;gap:0;
+    border-top:1px solid var(--ink);padding-top:20px;margin-top:34px}
+  .seg-rail{position:relative;padding-right:24px}
+  .seg-rail .when{font-family:var(--mono);font-size:12px;font-weight:600;
+    letter-spacing:.04em;line-height:1.4}
+  .seg-rail .nights{font-family:var(--mono);font-size:11px;color:var(--ink-soft);
+    text-transform:uppercase;letter-spacing:.1em;margin-top:4px}
+  .seg-rail .alt{font-family:var(--mono);font-size:11px;color:var(--sea);margin-top:14px}
+  .seg h3{
+    font-family:var(--display);font-weight:700;font-stretch:114%;
+    font-size:clamp(1.5rem,3.6vw,2.3rem);line-height:1;letter-spacing:-.015em;
+    margin:0 0 6px;text-transform:uppercase;
+  }
+  .seg .lede{margin:0 0 20px;font-size:15px;color:var(--ink-soft);max-width:66ch}
+
+  .facts{list-style:none;margin:0 0 22px;padding:16px 18px;background:var(--card);
+    border-left:2px solid var(--sea)}
+  .facts li{font-size:14px;padding:5px 0;display:flex;gap:12px}
+  .facts li span:first-child{
+    font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--sea);flex:none;width:104px;padding-top:2px;
+  }
+
+  .items{list-style:none;margin:0;padding:0}
+  .items li{display:flex;gap:12px;align-items:flex-start;padding:10px 4px;
+    border-bottom:1px solid var(--line-soft)}
+  .items .bullet{font-family:var(--mono);font-size:11px;color:var(--sage);
+    flex:none;width:26px;padding-top:4px}
+  .items .txt{flex:1;font-size:15px;white-space:pre-wrap}
+  .items .txt b{font-weight:600}
+
+  .add{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .add input,.add textarea,.editbox{
+    font-family:var(--body);font-size:14.5px;color:var(--ink);
+    border:1px solid var(--line);background:var(--card);padding:9px 11px;
+    flex:1 1 240px;min-width:0;border-radius:0;
+  }
+  .add input::placeholder,.add textarea::placeholder{color:var(--sage)}
+  .editbox{width:100%;resize:vertical;font-family:var(--body)}
+
+  /* ── заметки ─────────────────────────────── */
+  .notes{margin-top:26px;border-top:1px dashed var(--line);padding-top:18px}
+  .notes h4{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-soft);margin:0 0 12px}
+  .note{background:var(--card);border:1px solid var(--line-soft);
+    border-left:2px solid var(--signal);padding:11px 13px;margin-bottom:9px}
+  .note .head{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;
+    font-family:var(--mono);font-size:11px;color:var(--ink-soft);
+    text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+  .note .head b{color:var(--sea);font-weight:600}
+  .note .body{font-size:14.5px;white-space:pre-wrap}
+  .empty{font-size:14px;color:var(--sage);font-style:normal;margin:0 0 12px}
+
+  /* ── синхронизация ───────────────────────── */
+  .sync{margin-top:64px;border-top:2px solid var(--ink);padding-top:20px}
+  .sync p{font-size:14.5px;max-width:70ch;color:var(--ink-soft)}
+  .sync .tools{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  #jsonbox{width:100%;height:150px;font-family:var(--mono);font-size:11.5px;
+    border:1px solid var(--line);background:var(--card);padding:12px;display:none;
+    color:var(--ink);border-radius:0}
+
+  footer{margin-top:48px;font-family:var(--mono);font-size:11px;color:var(--sage);
+    text-transform:uppercase;letter-spacing:.1em}
+
+  @media (max-width:720px){
+    .wrap{padding:0 18px 72px}
+    .seg{grid-template-columns:1fr;gap:12px}
+    .seg-rail{padding-right:0;display:flex;gap:18px;align-items:baseline;flex-wrap:wrap}
+    .seg-rail .alt{margin-top:0}
+    .facts li{flex-direction:column;gap:2px}
+    .facts li span:first-child{width:auto}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">Маршрут · 3 человека · один поезд, одна машина</div>
+    <h1>Београд<br><span class="thin">→</span> Црна Гора</h1>
+    <div class="hero-meta">
+      <span>2 сен — 27 сен <b>2026</b></span>
+      <span>Дней всего <b>26</b></span>
+      <span id="countdown">—</span>
+      <span>Валюта <b>RSD → EUR</b></span>
+    </div>
+  </header>
+
+  <div class="profile">
+    <svg viewBox="0 0 1000 300" role="img" aria-label="Профиль высот маршрута: Белград 117 м, перевал у Колашина 1032 м, Подгорица 40 м, Жабляк 1450 м, Которский залив на уровне моря">
+      <defs>
+        <linearGradient id="fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#0E5A61" stop-opacity=".16"/>
+          <stop offset="100%" stop-color="#0E5A61" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+
+      <!-- уровень моря -->
+      <line x1="20" y1="220" x2="980" y2="220" stroke="#16232A" stroke-opacity=".22" stroke-width="1"/>
+      <text x="20" y="236" font-family="IBM Plex Mono, monospace" font-size="10" fill="#8C9A92" letter-spacing="1.4">0 М · УРОВЕНЬ МОРЯ</text>
+
+      <!-- заливка под профилем -->
+      <path d="M60,206 L175,171 L300,154 L380,96 L470,215 L540,219 L700,46 L820,143 L940,220 L940,220 L60,220 Z" fill="url(#fill)"/>
+
+      <!-- участок поезда -->
+      <polyline points="60,206 175,171 300,154 380,96 470,215 540,219"
+        fill="none" stroke="#0E5A61" stroke-width="2.5" stroke-linejoin="round"/>
+      <!-- участок машины -->
+      <polyline points="540,219 700,46 820,143 940,220"
+        fill="none" stroke="#16232A" stroke-width="2" stroke-dasharray="7 5" stroke-linejoin="round"/>
+
+      <g font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#16232A" letter-spacing=".6">
+        <g>
+          <circle cx="60" cy="206" r="4" fill="#0E5A61"/>
+          <text x="52" y="192" font-weight="600">БЕОГРАД</text>
+          <text x="52" y="264" fill="#8C9A92" font-size="9.5">117 М</text>
+        </g>
+        <g>
+          <circle cx="380" cy="96" r="4" fill="#0E5A61"/>
+          <text x="330" y="82" font-weight="600">КОЛАШИН</text>
+          <text x="330" y="264" fill="#8C9A92" font-size="9.5">1032 М · ВЕРХ ЛИНИИ</text>
+        </g>
+        <g>
+          <circle cx="470" cy="215" r="4" fill="#0E5A61"/>
+          <text x="440" y="204" font-weight="600">ПОДГОРИЦА</text>
+        </g>
+        <g>
+          <circle cx="540" cy="219" r="4" fill="#0E5A61"/>
+          <text x="556" y="212" font-weight="600">БАР</text>
+          <text x="556" y="226" fill="#8C9A92" font-size="9.5">конец рельсов</text>
+        </g>
+        <g>
+          <circle cx="700" cy="46" r="4" fill="#16232A"/>
+          <text x="666" y="32" font-weight="600">ЖАБЉАК</text>
+          <text x="666" y="264" fill="#8C9A92" font-size="9.5">1450 М</text>
+        </g>
+        <g>
+          <circle cx="820" cy="143" r="4" fill="#16232A"/>
+          <text x="792" y="132" font-weight="600">НИКШИЋ</text>
+        </g>
+        <g>
+          <circle cx="940" cy="220" r="4" fill="#16232A"/>
+          <text x="880" y="212" font-weight="600">ЗАЛИВ</text>
+          <text x="880" y="264" fill="#8C9A92" font-size="9.5">0 М</text>
+        </g>
+      </g>
+    </svg>
+    <div class="profile-key">
+      <span><i></i>поезд, 11 ч 25 мин</span>
+      <span><i class="dash"></i>машина, две недели</span>
+      <span>дважды вверх на километр, дважды вниз к морю</span>
+    </div>
+  </div>
+
+  <div class="alarm">
+    <span class="tag">Дедлайн · 13.09</span>
+    <p>Дневной сезонный поезд «Тара» из Белграда ходит по <b>13 сентября</b>, летний состав ночного «Ловћен» — по ночь с 13 на 14-е. Уезжать 14-го = дневного поезда уже нет. Билеты на международные рейсы онлайн не продаются: касса на Београд Центар (Прокоп).</p>
+  </div>
+
+  <div class="bar" id="storebar">
+    <span class="dot"></span>
+    <span class="txt" id="storetxt">Проверяю общую память…</span>
+    <button class="btn ghost" id="renameBtn">Кто я</button>
+    <button class="btn ghost" id="reloadBtn">Обновить</button>
+  </div>
+
+  <!-- ── чеклист ── -->
+  <section>
+    <div class="sec-head">
+      <h2>Сделать до отъезда</h2>
+      <span class="count mono" id="checkcount"></span>
+    </div>
+    <ul class="check" id="checklist"></ul>
+    <div class="add">
+      <input id="checkInput" placeholder="Добавить пункт" aria-label="Новый пункт чеклиста">
+      <button class="btn solid" id="checkAdd">Добавить</button>
+    </div>
+  </section>
+
+  <!-- ── сегменты ── -->
+  <section>
+    <div class="sec-head">
+      <h2>Маршрут по отрезкам</h2>
+      <span class="count mono">4 отрезка · правки видны всем</span>
+    </div>
+    <div id="segments"></div>
+  </section>
+
+  <!-- ── синхронизация ── -->
+  <section class="sync">
+    <div class="sec-head"><h2>Репозиторий</h2></div>
+    <p><span class="mono">solinandrey/serbia-montenegro-trip</span> — весь план лежит в <span class="mono">plan.json</span>. Править можно двумя способами: прямо на этой странице, а потом скачать <span class="mono">plan.json</span> и заменить файл в репозитории — или отредактировать <span class="mono">plan.json</span> руками в гите, тогда страница подхватит изменения сама. Второй способ честнее: правки идут через коммиты и не затирают друг друга.</p>
+    <div class="tools">
+      <button class="btn solid" id="downloadBtn">Скачать plan.json</button>
+      <button class="btn" id="exportBtn">Показать JSON</button>
+      <button class="btn" id="importBtn">Вставить JSON</button>
+      <button class="btn ghost" id="closeBox">Свернуть</button>
+    </div>
+    <textarea id="jsonbox" spellcheck="false" aria-label="Данные плана в формате JSON"></textarea>
+  </section>
+
+  <footer>Обновлено вручную · цены, расписание и визовые правила проверяйте перед выездом</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var KEY = "trip:beograd-crnagora:v1";
+  var NAMEKEY = "trip:me";
+  var live = false;
+  var me = "";
+  var state = null;
+
+  /* ── дефолтный план ─────────────────────── */
+  function seed(){
+    return {
+      version:1,
+      checklist:[
+        {id:uid(),text:"Билеты на поезд в кассе Прокоп — дневной 1131 «Тара», 4-местное купе на троих",done:false},
+        {id:uid(),text:"Машина: бронь с автоматом (механика по умолчанию), подгон к вокзалу в Подгорице",done:false},
+        {id:uid(),text:"Если планируем Албанию или Боснию — зелёная карта на эти страны, доплата при бронировании",done:false},
+        {id:uid(),text:"Сим-карта A1 или Yettel в Белграде — в Черногории работает без роуминга",done:false},
+        {id:uid(),text:"У хозяина жилья на рабочую неделю запросить скриншот speedtest: оптика или радиоканал",done:false},
+        {id:uid(),text:"Проверить лимит безвизовых дней по своему паспорту — Сербия и Черногория считаются отдельно",done:false},
+        {id:uid(),text:"Снять 200–300 € наличными: север и частники карты не берут",done:false}
+      ],
+      segments:{
+        beograd:[
+          {id:uid(),text:"Забрать билеты на поезд в кассе Београд Центар (Прокоп) в первые дни, не в последний"},
+          {id:uid(),text:"Симки на всех троих — берём пакет побольше, он же поедет в Черногорию"},
+          {id:uid(),text:"Решить окончательно: дневной 13-го или ночной. Дневной = виадуки и каньоны при свете"}
+        ],
+        voz:[
+          {id:uid(),text:"Выход в Подгорице, не в Баре — на час раньше и машину подгоняют туда"},
+          {id:uid(),text:"Еда и вода с собой: вагона-ресторана рассчитывать не стоит"},
+          {id:uid(),text:"Закладываем опоздание на 1–2 часа, жильё бронируем с поздним заездом"}
+        ],
+        sever:[
+          {id:uid(),text:"Подгорица → каньон Морачи → Колашин (ночёвка или обед)"},
+          {id:uid(),text:"Биоградска гора — озеро в реликтовом лесу, полдня"},
+          {id:uid(),text:"Жабляк: Чёрное озеро, кольцо вокруг Дурмитора, мост Джурджевича. 2–3 ночи"},
+          {id:uid(),text:"Каньон Пивы — тридцать с лишним тоннелей, дорога сама по себе аттракцион"},
+          {id:uid(),text:"Никшич → спуск в залив. Здесь заканчивается свободная неделя"}
+        ],
+        more:[
+          {id:uid(),text:"База на всю неделю, не переезжаем: Тиват / Доброта / Херцег-Нови"},
+          {id:uid(),text:"Рабочие часы днём, вылазки вечером и в выходные"},
+          {id:uid(),text:"Вечерние точки в пределах часа: Пераст, Котор, Ловчен, Скадарское озеро"},
+          {id:uid(),text:"Улцинь и Велика плажа — если хочется дальнюю вылазку в выходной"}
+        ]
+      },
+      notes:[]
+    };
+  }
+
+  var SEGMENTS = [
+    {
+      key:"beograd", when:"2 — 13 сен", nights:"11 ночей", alt:"117 м",
+      title:"Белград",
+      lede:"База перед выездом. Здесь же решаются все вопросы, которые в Черногории решать поздно: билеты, симки, наличные.",
+      facts:[
+        ["Валюта","Динары. Евро в Черногории — не меняйте лишнего перед выездом."],
+        ["Такси","CarGo — местный аналог Uber, им пользуются все."],
+        ["Связь","A1 или Yettel. Роуминга с Черногорией нет, симка едет с вами."],
+        ["Билеты","Международные онлайн не продаются, только касса на Прокопе."]
+      ]
+    },
+    {
+      key:"voz", when:"13 сен", nights:"11 ч 25 мин", alt:"117 → 40 м",
+      title:"Поезд 1131 «Тара»",
+      lede:"Београд Центар 09:45 → Бар 21:10, с пересадкой в Биело-Поле. До границы новые «Штадлеры», дальше черногорские вагоны.",
+      facts:[
+        ["Цена","2 класс 23,80 € · 1 класс 35,60 € · резервация места 3 €"],
+        ["Ночной","«Ловћен» 19:54 с Прокопа. Кушет 4-местный 12 €, 6-местный 8 €."],
+        ["Ради чего","Виадук Мала-Риека и спуск к морю — вторая половина дня. Ночной это проспит."],
+        ["Реальность","Опоздания на час-два — норма. Кондиционер и чистота — лотерея."]
+      ]
+    },
+    {
+      key:"sever", when:"14 — 20 сен", nights:"6 ночей · отпуск", alt:"до 1450 м",
+      title:"Север · машина",
+      lede:"Свободные будни тратим на то, ради чего вообще нужна машина. Работать отсюда нельзя: связь в горах рваная.",
+      facts:[
+        ["Машина","Местные конторы 25–40 €/сут, подгоняют куда скажете. Видео по кругу при выдаче и возврате."],
+        ["Дороги","60 км по карте = два часа. Магистраль на Матешево платная, ~3–4 €, экономит час."],
+        ["Регистрация","Туристичка в течение 24 ч в каждом городе ночёвки. Booking делает автоматически."],
+        ["Наличные","На севере карты часто не принимают вообще."]
+      ]
+    },
+    {
+      key:"more", when:"21 — 27 сен", nights:"7 ночей · работа", alt:"0 м",
+      title:"Побережье · работа",
+      lede:"Садимся на одном месте. После 15 сентября толпы ушли, море ещё 24–25°, жильё дешевеет.",
+      facts:[
+        ["Интернет","Главное узкое место. Оптика 100–300 Мбит, радио на склоне — 20 и пляшет."],
+        ["Коворкинги","Их почти нет. Работаем из квартиры, поэтому канал проверяем до брони."],
+        ["Не селиться","Внутри старого Котора: акустика колодца, бары до трёх, машину девать некуда."],
+        ["Рестораны","Рыба по весу. Спрашивать цену за кг и вес до того, как унесли на кухню."]
+      ]
+    }
+  ];
+
+  /* ── утилиты ────────────────────────────── */
+  function uid(){return Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-4)}
+  function esc(s){return String(s).replace(/[&<>"']/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function $(id){return document.getElementById(id)}
+
+  function stamp(ts){
+    var d=new Date(ts), n=new Date();
+    var same=d.toDateString()===n.toDateString();
+    var t=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
+    if(same) return "сегодня "+t;
+    return String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0")+" "+t;
+  }
+
+  /* ── хранилище ──────────────────────────── */
+  var hasStore = typeof window.storage === "object" && window.storage !== null;
+  var fromFile = false;
+
+  // В репозитории канонический план лежит в plan.json рядом с index.html.
+  async function fetchPlan(){
+    try{
+      var res = await fetch("plan.json",{cache:"no-store"});
+      if(!res.ok) throw new Error("HTTP "+res.status);
+      var data = await res.json();
+      if(data && data.segments && data.checklist){ fromFile = true; return data; }
+    }catch(e){}
+    return null;
+  }
+
+  async function load(){
+    if(!hasStore){
+      state = (await fetchPlan()) || seed();
+      return;
+    }
+    try{
+      var r = await window.storage.get(KEY,true);
+      state = r && r.value ? JSON.parse(r.value) : ((await fetchPlan()) || seed());
+      live = true;
+    }catch(e){
+      state = (await fetchPlan()) || seed();
+      live = true;           // ключа просто ещё нет — это не поломка
+      try{ await save(); }catch(e2){ live = false; }
+    }
+    try{
+      var n = await window.storage.get(NAMEKEY,false);
+      if(n && n.value) me = n.value;
+    }catch(e){}
+  }
+
+  var saving=false, queued=false;
+  async function save(){
+    if(!hasStore) return;
+    if(saving){queued=true;return;}
+    saving=true;
+    try{
+      await window.storage.set(KEY,JSON.stringify(state),true);
+      live=true;
+    }catch(e){
+      live=false; renderBar();
+    }
+    saving=false;
+    if(queued){queued=false;save();}
+  }
+
+  async function setName(v){
+    me=v;
+    if(!hasStore) return;
+    try{ await window.storage.set(NAMEKEY,v,false); }catch(e){}
+  }
+
+  function renderBar(){
+    var bar=$("storebar"), txt=$("storetxt");
+    if(live){
+      bar.classList.add("live");
+      txt.innerHTML = "Общая память включена. Правки видит любой, у кого есть ссылка. Вы подписываетесь как <b>"+esc(me||"без имени")+"</b>.";
+    }else{
+      bar.classList.remove("live");
+      txt.innerHTML = fromFile
+        ? "<b>Режим репозитория.</b> План прочитан из plan.json. Правки живут в этой вкладке — скачайте plan.json и закоммитьте, чтобы их увидели остальные."
+        : "<b>Локальный режим.</b> plan.json не прочитался — открывайте через GitHub&nbsp;Pages или локальный сервер, иначе браузер блокирует чтение файла.";
+    }
+  }
+
+  /* ── рендер: чеклист ────────────────────── */
+  function renderCheck(){
+    var ul=$("checklist"); ul.innerHTML="";
+    var done=0;
+    state.checklist.forEach(function(it){
+      if(it.done) done++;
+      var li=document.createElement("li");
+      if(it.done) li.className="done";
+      li.innerHTML =
+        '<input type="checkbox" '+(it.done?"checked":"")+' aria-label="Готово">'+
+        '<span class="txt">'+esc(it.text)+'</span>'+
+        '<span class="row-tools">'+
+          '<button class="mini" data-act="edit">Править</button>'+
+          '<button class="mini" data-act="del">Убрать</button>'+
+        '</span>';
+      li.querySelector("input").addEventListener("change",function(){
+        it.done=this.checked; save(); renderCheck();
+      });
+      li.querySelector('[data-act="del"]').addEventListener("click",function(){
+        state.checklist=state.checklist.filter(function(x){return x.id!==it.id});
+        save(); renderCheck();
+      });
+      li.querySelector('[data-act="edit"]').addEventListener("click",function(){
+        inlineEdit(li.querySelector(".txt"),it.text,function(v){
+          if(v.trim()){it.text=v.trim();save()} renderCheck();
+        });
+      });
+      ul.appendChild(li);
+    });
+    $("checkcount").textContent = done+" / "+state.checklist.length+" готово";
+  }
+
+  function inlineEdit(node,val,cb){
+    var ta=document.createElement("textarea");
+    ta.className="editbox"; ta.value=val; ta.rows=2;
+    node.replaceWith(ta); ta.focus(); ta.setSelectionRange(val.length,val.length);
+    var closed=false;
+    function finish(ok){ if(closed) return; closed=true; cb(ok?ta.value:val); }
+    ta.addEventListener("blur",function(){finish(true)});
+    ta.addEventListener("keydown",function(e){
+      if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();finish(true)}
+      if(e.key==="Escape"){finish(false)}
+    });
+  }
+
+  /* ── рендер: сегменты ───────────────────── */
+  function renderSegments(){
+    var host=$("segments"); host.innerHTML="";
+    SEGMENTS.forEach(function(seg){
+      var items = state.segments[seg.key] || (state.segments[seg.key]=[]);
+      var notes = state.notes.filter(function(n){return n.segment===seg.key});
+
+      var wrap=document.createElement("article");
+      wrap.className="seg";
+      wrap.innerHTML =
+        '<div class="seg-rail">'+
+          '<div class="when">'+esc(seg.when)+'</div>'+
+          '<div class="nights">'+esc(seg.nights)+'</div>'+
+          '<div class="alt">'+esc(seg.alt)+'</div>'+
+        '</div>'+
+        '<div class="seg-body">'+
+          '<h3>'+esc(seg.title)+'</h3>'+
+          '<p class="lede">'+esc(seg.lede)+'</p>'+
+          '<ul class="facts">'+seg.facts.map(function(f){
+            return '<li><span>'+esc(f[0])+'</span><span>'+esc(f[1])+'</span></li>';
+          }).join("")+'</ul>'+
+          '<ul class="items"></ul>'+
+          '<div class="add">'+
+            '<input placeholder="Добавить пункт в план" aria-label="Новый пункт плана">'+
+            '<button class="btn">Добавить</button>'+
+          '</div>'+
+          '<div class="notes">'+
+            '<h4>Заметки — '+notes.length+'</h4>'+
+            '<div class="notelist"></div>'+
+            '<div class="add">'+
+              '<input class="ntext" placeholder="Что важно знать остальным" aria-label="Текст заметки">'+
+              '<button class="btn solid">Оставить</button>'+
+            '</div>'+
+          '</div>'+
+        '</div>';
+
+      // пункты плана
+      var ul=wrap.querySelector(".items");
+      items.forEach(function(it,i){
+        var li=document.createElement("li");
+        li.innerHTML =
+          '<span class="bullet">'+String(i+1).padStart(2,"0")+'</span>'+
+          '<span class="txt">'+esc(it.text)+'</span>'+
+          '<span class="row-tools">'+
+            '<button class="mini" data-act="edit">Править</button>'+
+            '<button class="mini" data-act="del">Убрать</button>'+
+          '</span>';
+        li.querySelector('[data-act="del"]').addEventListener("click",function(){
+          state.segments[seg.key]=items.filter(function(x){return x.id!==it.id});
+          save(); renderSegments();
+        });
+        li.querySelector('[data-act="edit"]').addEventListener("click",function(){
+          inlineEdit(li.querySelector(".txt"),it.text,function(v){
+            if(v.trim()){it.text=v.trim();save()} renderSegments();
+          });
+        });
+        ul.appendChild(li);
+      });
+      if(!items.length){
+        var p=document.createElement("p"); p.className="empty";
+        p.textContent="Пусто. Первый пункт — за вами.";
+        ul.parentNode.insertBefore(p,ul.nextSibling);
+      }
+
+      var addWrap=wrap.querySelectorAll(".add")[0];
+      var addInput=addWrap.querySelector("input");
+      function addItem(){
+        var v=addInput.value.trim(); if(!v) return;
+        items.push({id:uid(),text:v}); addInput.value="";
+        save(); renderSegments();
+      }
+      addWrap.querySelector("button").addEventListener("click",addItem);
+      addInput.addEventListener("keydown",function(e){if(e.key==="Enter")addItem()});
+
+      // заметки
+      var nl=wrap.querySelector(".notelist");
+      if(!notes.length){
+        nl.innerHTML='<p class="empty">Заметок пока нет.</p>';
+      }else{
+        notes.slice().sort(function(a,b){return b.ts-a.ts}).forEach(function(n){
+          var d=document.createElement("div"); d.className="note";
+          d.innerHTML =
+            '<div class="head"><b>'+esc(n.author||"без имени")+'</b>'+
+            '<span>'+esc(stamp(n.ts))+'</span>'+
+            '<span class="row-tools"><button class="mini" data-act="del">Удалить</button></span></div>'+
+            '<div class="body">'+esc(n.text)+'</div>';
+          d.querySelector('[data-act="del"]').addEventListener("click",function(){
+            state.notes=state.notes.filter(function(x){return x.id!==n.id});
+            save(); renderSegments();
+          });
+          nl.appendChild(d);
+        });
+      }
+
+      var nAdd=wrap.querySelector(".notes .add");
+      var nInput=nAdd.querySelector("input");
+      function addNote(){
+        var v=nInput.value.trim(); if(!v) return;
+        if(!me){ askName(); }
+        state.notes.push({id:uid(),segment:seg.key,author:me||"без имени",text:v,ts:Date.now()});
+        nInput.value=""; save(); renderSegments();
+      }
+      nAdd.querySelector("button").addEventListener("click",addNote);
+      nInput.addEventListener("keydown",function(e){if(e.key==="Enter")addNote()});
+
+      host.appendChild(wrap);
+    });
+  }
+
+  function askName(){
+    var v=window.prompt("Как подписывать ваши заметки?",me||"");
+    if(v && v.trim()){ setName(v.trim()); renderBar(); }
+  }
+
+  /* ── обратный отсчёт ────────────────────── */
+  function countdown(){
+    var start=new Date(2026,8,2);
+    var days=Math.ceil((start-new Date())/864e5);
+    $("countdown").innerHTML = days>0
+      ? "До выезда <b>"+days+" дн.</b>"
+      : (days>-26 ? "<b>В пути</b>" : "<b>Архив</b>");
+  }
+
+  /* ── JSON ───────────────────────────────── */
+  function bindSync(){
+    var box=$("jsonbox");
+    $("exportBtn").addEventListener("click",function(){
+      box.style.display="block";
+      box.value=JSON.stringify(state,null,2);
+      box.select();
+    });
+    $("importBtn").addEventListener("click",function(){
+      if(box.style.display!=="block"){
+        box.style.display="block"; box.value=""; box.placeholder="Вставьте JSON и нажмите «Загрузить JSON» ещё раз";
+        box.focus(); return;
+      }
+      try{
+        var next=JSON.parse(box.value);
+        if(!next.segments||!next.checklist) throw new Error("не тот формат");
+        state=next; save(); renderCheck(); renderSegments();
+        box.style.display="none";
+      }catch(e){
+        alert("JSON не разобрался: "+e.message+". Проверьте, что скопирован весь текст целиком.");
+      }
+    });
+    $("closeBox").addEventListener("click",function(){box.style.display="none"});
+    $("downloadBtn").addEventListener("click",function(){
+      var blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+      var a=document.createElement("a");
+      a.href=URL.createObjectURL(blob); a.download="plan.json";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){URL.revokeObjectURL(a.href)},1000);
+    });
+  }
+
+  /* ── старт ──────────────────────────────── */
+  (async function init(){
+    await load();
+    renderBar(); renderCheck(); renderSegments(); countdown(); bindSync();
+
+    $("renameBtn").addEventListener("click",askName);
+    $("reloadBtn").addEventListener("click",async function(){
+      await load(); renderBar(); renderCheck(); renderSegments();
+    });
+
+    var ci=$("checkInput");
+    function addCheck(){
+      var v=ci.value.trim(); if(!v) return;
+      state.checklist.push({id:uid(),text:v,done:false});
+      ci.value=""; save(); renderCheck();
+    }
+    $("checkAdd").addEventListener("click",addCheck);
+    ci.addEventListener("keydown",function(e){if(e.key==="Enter")addCheck()});
+  })();
+
+})();
+</script>
