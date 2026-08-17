@@ -167,37 +167,67 @@
   .btn.ghost{border-color:var(--line);color:var(--ink-2)}
   .btn.ghost:hover{background:var(--surface-2);color:var(--ink)}
 
-  /* ── переключатель видов ──────────────────── */
-  .views{
-    display:flex;gap:0;margin:26px 0 0;
-    border:var(--rule);overflow-x:auto;scrollbar-width:none;
+  /* ── дорога: переключатель отрезков ───────── */
+  /* Это дорога, а не график: осей нет, ничего не измеряет.
+     Единственная её работа — показывать, где вы, и переключать вид. */
+  .road{
+    margin:26px 0 0;padding:0;
+    overflow-x:auto;overflow-y:hidden;scrollbar-width:none;
   }
-  .views::-webkit-scrollbar{display:none}
-  .views a{
-    flex:1 1 0;min-width:118px;
-    display:block;padding:11px 14px;text-decoration:none;color:var(--ink-2);
-    border-right:var(--rule);
-    transition:background .18s var(--ease),color .18s var(--ease);
+  .road::-webkit-scrollbar{display:none}
+  .road-inner{position:relative;min-width:640px}
+  .road svg{display:block;width:100%;height:auto}
+
+  .road-base{fill:none;stroke:var(--line);stroke-width:12;stroke-linecap:round}
+  .road-dash{
+    fill:none;stroke:var(--paper);stroke-width:1.5;
+    stroke-dasharray:9 13;stroke-linecap:round;opacity:.9;
   }
-  .views a:last-child{border-right:none}
-  .views a b{
-    display:block;font-size:14.5px;font-weight:600;color:var(--ink);
-    letter-spacing:-.01em;line-height:1.25;
+  .road-done{fill:none;stroke:var(--accent);stroke-width:12;stroke-linecap:round;opacity:.28}
+  .road-mark circle:first-child{fill:var(--accent);opacity:.22}
+  .road-mark circle:last-child{fill:var(--accent)}
+
+  .stops{position:relative;height:62px;margin-top:2px}
+  .stop{
+    position:absolute;top:0;transform:translateX(-50%);
+    display:block;padding:9px 10px 0;text-align:center;text-decoration:none;
+    color:var(--ink-2);white-space:nowrap;
+    transition:color .2s var(--ease);
   }
-  .views a span{
+  .road-tick{stroke:var(--line);stroke-width:1;transition:stroke .2s var(--ease)}
+  .road-tick.on{stroke:var(--accent)}
+  .stop b{
+    display:block;font-size:14px;font-weight:600;color:var(--ink-2);
+    letter-spacing:-.01em;line-height:1.2;
+    transition:color .2s var(--ease),transform .2s var(--ease);
+  }
+  .stop span{
     display:block;margin-top:3px;
-    font-family:var(--mono);font-size:10.5px;text-transform:uppercase;
-    letter-spacing:.1em;color:var(--ink-3);white-space:nowrap;
+    font-family:var(--mono);font-size:10px;text-transform:uppercase;
+    letter-spacing:.1em;color:var(--ink-3);
   }
-  .views a:hover{background:var(--surface)}
-  .views a[aria-current="page"]{background:var(--ink)}
-  .views a[aria-current="page"] b{color:var(--paper)}
-  .views a[aria-current="page"] span{color:var(--paper);opacity:.72}
-  .views a.now b::after{
-    content:"·сейчас";font-family:var(--mono);font-size:10px;font-weight:500;
-    color:var(--accent);margin-left:6px;letter-spacing:.06em;
+  .stop:hover b{color:var(--ink);transform:translateY(-1px)}
+  .stop[aria-current="page"] b{color:var(--ink)}
+  .stop.now b::after{
+    content:"·сейчас";font-family:var(--mono);font-size:9.5px;font-weight:500;
+    color:var(--accent);margin-left:5px;letter-spacing:.06em;
   }
-  .views a[aria-current="page"].now b::after{color:var(--focus)}
+
+  .offroad{
+    display:inline-block;margin:6px 0 0;
+    font-family:var(--mono);font-size:11px;text-transform:uppercase;
+    letter-spacing:.1em;color:var(--ink-3);text-decoration:none;
+    border-bottom:1px solid var(--line);padding-bottom:2px;
+    transition:color .2s var(--ease),border-color .2s var(--ease);
+  }
+  .offroad:hover{color:var(--ink);border-color:var(--ink-2)}
+  .offroad[aria-current="page"]{color:var(--accent);border-color:var(--accent)}
+
+  /* Приезд: содержимое отрезка появляется, когда точка тронулась. */
+  @media (prefers-reduced-motion:no-preference){
+    .arrive{animation:arrive .34s var(--ease) both}
+    @keyframes arrive{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  }
 
   /* ── секции ───────────────────────────────── */
   main{margin-top:34px}
@@ -343,7 +373,7 @@
     .wrap{padding:0 18px 80px}
     .hero{padding-top:32px}
     .facts-grid dd{font-size:15px}
-    .views a{min-width:132px;flex:0 0 auto}
+    .road-inner{min-width:600px}
   }
 
   /* На телефоне кнопки правки видны всегда — уводим их на свою строку,
@@ -409,14 +439,31 @@
     <button class="btn" id="undoBtn">Вернуть</button>
   </div>
 
-  <nav class="views rise" id="views" style="--i:3" aria-label="Разделы плана">
-    <a href="#check"   data-view="check"><b>Сборы</b><span>до отъезда</span></a>
-    <a href="#beograd" data-view="beograd"><b>Белград</b><span>2 — 13 сен</span></a>
-    <a href="#voz"     data-view="voz"><b>Поезд</b><span>13 сен</span></a>
-    <a href="#sever"   data-view="sever"><b>Север</b><span>14 — 20 сен</span></a>
-    <a href="#more"    data-view="more"><b>Побережье</b><span>21 — 27 сен</span></a>
-    <a href="#repo"    data-view="repo"><b>Файл</b><span>plan.json</span></a>
+  <nav class="road rise" id="road" style="--i:3" aria-label="Отрезки поездки">
+    <div class="road-inner">
+      <svg viewBox="0 0 1000 118" role="presentation" aria-hidden="true">
+        <path id="roadPath" class="road-base"
+          d="M 40,88 C 150,88 168,30 268,30 C 368,30 392,94 512,94 C 632,94 650,26 762,26 C 862,26 908,80 960,80"/>
+        <path id="roadDone" class="road-done"
+          d="M 40,88 C 150,88 168,30 268,30 C 368,30 392,94 512,94 C 632,94 650,26 762,26 C 862,26 908,80 960,80"/>
+        <path class="road-dash"
+          d="M 40,88 C 150,88 168,30 268,30 C 368,30 392,94 512,94 C 632,94 650,26 762,26 C 862,26 908,80 960,80"/>
+        <g id="roadMark" class="road-mark">
+          <circle r="11"/>
+          <circle r="4.5"/>
+        </g>
+      </svg>
+      <div class="stops" id="stops">
+        <a class="stop" href="#check"   data-view="check"><b>Сборы</b><span>до отъезда</span></a>
+        <a class="stop" href="#beograd" data-view="beograd"><b>Белград</b><span>2 — 13 сен</span></a>
+        <a class="stop" href="#voz"     data-view="voz"><b>Поезд</b><span>13 сен</span></a>
+        <a class="stop" href="#sever"   data-view="sever"><b>Север</b><span>14 — 20 сен</span></a>
+        <a class="stop" href="#more"    data-view="more"><b>Побережье</b><span>21 — 27 сен</span></a>
+      </div>
+    </div>
   </nav>
+
+  <a class="offroad" href="#repo" data-view="repo">Файл плана</a>
 
   <main id="main">
 
@@ -783,6 +830,72 @@
   /* ── виды: на экране всегда один отрезок ── */
   var VIEWS = ["check","beograd","voz","sever","more","repo"];
 
+  /* ── дорога ───────────────────────────────
+     Точка едет по SVG-пути, координаты берём с самого пути,
+     поэтому остановки всегда стоят на дороге, как её ни гни.
+     Двигаем только transform и dashoffset — без перекладки макета. */
+  var STOPS = [
+    {k:"check",   f:0.03},
+    {k:"beograd", f:0.27},
+    {k:"voz",     f:0.50},
+    {k:"sever",   f:0.74},
+    {k:"more",    f:0.97}
+  ];
+  var road = {path:null,done:null,mark:null,len:0,at:null,to:null,raf:0};
+
+  function reduceMotion(){
+    return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  }
+
+  function roadInit(){
+    road.path=$("roadPath"); road.done=$("roadDone"); road.mark=$("roadMark");
+    if(!road.path || typeof road.path.getTotalLength!=="function") return;
+    road.len=road.path.getTotalLength();
+    if(!road.len) return;
+    road.done.style.strokeDasharray=road.len;
+    road.done.style.strokeDashoffset=road.len;
+    var host=$("stops"), svg=road.path.parentNode, NS="http://www.w3.org/2000/svg";
+    for(var i=0;i<STOPS.length;i++){
+      var pt=road.path.getPointAtLength(STOPS[i].f*road.len);
+      var a=host.querySelector('[data-view="'+STOPS[i].k+'"]');
+      if(a) a.style.left=(pt.x/1000*100)+"%";
+
+      // выноска от дороги вниз к подписи
+      var tick=document.createElementNS(NS,"line");
+      tick.setAttribute("class","road-tick");
+      tick.setAttribute("data-tick",STOPS[i].k);
+      tick.setAttribute("x1",pt.x); tick.setAttribute("x2",pt.x);
+      tick.setAttribute("y1",pt.y+13); tick.setAttribute("y2",116);
+      svg.insertBefore(tick,road.mark);
+    }
+  }
+
+  function setMark(f){
+    var pt=road.path.getPointAtLength(f*road.len);
+    road.mark.setAttribute("transform","translate("+pt.x+","+pt.y+")");
+    road.done.style.strokeDashoffset=road.len*(1-f);
+  }
+
+  function travelTo(f){
+    if(!road.path || !road.len) return;
+    road.to=f;
+    cancelAnimationFrame(road.raf);
+    // Во вкладке в фоне rAF замораживается. Не анимируем в пустоту:
+    // придёт человек — увидит точку на месте, а не застрявшей на полпути.
+    if(document.hidden){ road.at=f; setMark(f); return; }
+    if(road.at===null || reduceMotion()){ road.at=f; setMark(f); return; }
+    var from=road.at, dist=Math.abs(f-from);
+    if(dist<0.0005){ road.at=f; setMark(f); return; }
+    var dur=380+dist*820, t0=performance.now();   // дальний отрезок едет дольше
+    road.raf=requestAnimationFrame(function step(now){
+      var p=Math.min(1,(now-t0)/dur);
+      var e=1-Math.pow(1-p,3);                    // power3.out
+      road.at=from+(f-from)*e;
+      setMark(road.at);
+      if(p<1) road.raf=requestAnimationFrame(step);
+    });
+  }
+
   function nowView(){
     var t = new Date();
     if(t.getFullYear()!==2026 || t.getMonth()!==8) return null;
@@ -797,9 +910,16 @@
   function route(){
     var k = location.hash.replace(/^#/,"");
     if(VIEWS.indexOf(k)<0) k = nowView() || "check";
-    var panels = document.querySelectorAll("[data-panel]");
+    var panels = document.querySelectorAll("[data-panel]"), shown=null;
     for(var i=0;i<panels.length;i++){
-      panels[i].hidden = panels[i].getAttribute("data-panel")!==k;
+      var mine = panels[i].getAttribute("data-panel")===k;
+      if(mine && panels[i].hidden) shown=panels[i];
+      panels[i].hidden = !mine;
+    }
+    if(shown && !reduceMotion()){
+      shown.classList.remove("arrive");
+      void shown.offsetWidth;                     // перезапуск анимации
+      shown.classList.add("arrive");
     }
     // Дедлайн по билетам относится к сборам и поезду; после 13.09.2026 не относится ни к чему.
     var al = $("alarm");
@@ -808,12 +928,20 @@
       al.hidden = passed || al.getAttribute("data-when").indexOf(k)<0;
     }
 
-    var links = document.querySelectorAll("#views a"), cur = nowView();
+    var links = document.querySelectorAll(".stop, .offroad"), cur = nowView();
     for(var j=0;j<links.length;j++){
       var v = links[j].getAttribute("data-view");
       if(v===k) links[j].setAttribute("aria-current","page");
       else links[j].removeAttribute("aria-current");
       links[j].classList.toggle("now", v===cur);
+    }
+
+    var ticks=document.querySelectorAll(".road-tick");
+    for(var t=0;t<ticks.length;t++){
+      ticks[t].classList.toggle("on",ticks[t].getAttribute("data-tick")===k);
+    }
+    for(var m=0;m<STOPS.length;m++){
+      if(STOPS[m].k===k){ travelTo(STOPS[m].f); break; }
     }
   }
 
@@ -1068,6 +1196,7 @@
   (async function init(){
     await load();
     renderBar(); renderCheck(); renderSegments(); countdown(); bindSync();
+    roadInit();
     route();
     window.addEventListener("hashchange",route);
 
@@ -1079,7 +1208,9 @@
     // Чужие правки сами появляются раз в 20 секунд.
     setInterval(pullShared,20000);
     document.addEventListener("visibilitychange",function(){
-      if(!document.hidden) pullShared();
+      if(document.hidden) return;
+      pullShared();
+      if(road.to!==null && road.at!==road.to){ travelTo(road.to); }
     });
 
     $("undoBtn").addEventListener("click",function(){
