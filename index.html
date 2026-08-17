@@ -335,17 +335,12 @@
   .logrow.tap:hover{background:var(--surf)}
   .logrow-head{display:flex;gap:10px;align-items:baseline;justify-content:space-between}
   .logrow .when{font-family:var(--mono);font-size:10.5px;color:var(--dim2);flex:none}
-  .logrow .what{
-    font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.12em;
-    text-transform:uppercase;color:var(--acc);flex:none;
+  .logrow-line{
+    font-size:13.5px;line-height:1.35;margin-top:4px;font-weight:600;
   }
   .logrow-text{
-    font-size:13.5px;line-height:1.35;margin-top:5px;
+    font-size:13px;line-height:1.35;margin-top:3px;color:var(--dim);
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-  }
-  .logrow-who{
-    font-family:var(--disp);font-weight:600;font-size:12px;text-transform:uppercase;
-    letter-spacing:.04em;color:var(--dim);margin-top:4px;
   }
   .log .logrow{padding-left:2px;padding-right:2px}
 
@@ -1635,14 +1630,16 @@
 
     return {add:add,del:del,chg:chg,joined:joined,reacts:reacts,comments:comments};
   }
-  var EVENT_LABEL={
-    join:"новый участник",
-    add:"новая ссылка",
-    del:"убрано",
-    chg:"поправлено",
-    point:"новая точка маршрута",
-    react:"новая реакция",
-    comment:"новый комментарий"
+  /* Формулировки без рода: «Женя» — имя и мужское, и женское,
+     а «присоединился» наугад через раз обращается к человеку неверно. */
+  var EVENT_LINE={
+    join:   function(w){ return w+" теперь в поездке"; },
+    add:    function(w){ return w+" — новая ссылка"; },
+    point:  function(w){ return w+" — новая точка маршрута"; },
+    comment:function(w){ return w+" — новый комментарий"; },
+    react:  function(w){ return w+" — новая реакция"; },
+    chg:    function(w){ return w+" — правка"; },
+    del:    function(w){ return w+" — убрано"; }
   };
 
   /* Из соседних снимков делаем понятные события. Ревизии, где менялись
@@ -1716,14 +1713,14 @@
 
       host.innerHTML="";
       events.slice(0,20).forEach(function(ev){
+        var line=(EVENT_LINE[ev.kind]||EVENT_LINE.chg)(ev.who);
+        // У «нового участника» объект и есть имя — второй раз его не повторяем.
+        var body=(ev.kind==="join")?"":(/^https?:\/\//i.test(ev.text)?shortUrl(ev.text):ev.text);
         var row=el(ev.id?"button":"div","logrow"+(ev.id?" tap":""));
         row.innerHTML=
-          '<div class="logrow-head">'+
-            '<span class="when">'+esc(ago(ev.when))+'</span>'+
-            '<span class="what">'+esc(EVENT_LABEL[ev.kind]||"правка")+'</span>'+
-          '</div>'+
-          '<div class="logrow-text">'+esc(/^https?:\/\//i.test(ev.text)?shortUrl(ev.text):ev.text)+'</div>'+
-          '<div class="logrow-who">'+esc(ev.who)+'</div>';
+          '<div class="logrow-head"><span class="when">'+esc(ago(ev.when))+'</span></div>'+
+          '<div class="logrow-line">'+esc(line)+'</div>'+
+          (body?'<div class="logrow-text">'+esc(body)+'</div>':"");
         if(ev.id) row.addEventListener("click",function(){ jumpToCard(ev.id); });
         host.appendChild(row);
       });
