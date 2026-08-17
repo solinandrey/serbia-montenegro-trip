@@ -4,6 +4,7 @@
 <meta name="theme-color" content="#000000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" defer></script>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400..700&family=Golos+Text:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap" rel="stylesheet">
 
 <style>
@@ -755,6 +756,9 @@
       lastAuthor=null, lastAt=null, fromFile=false, localSaved=false, dirty=false;
   var tomb=Object.create(null), mineIds=Object.create(null), seenAt=0, seenSaved=false;
   var ogCache=Object.create(null), copied="", popId="", popKind="", pickTimer=0;
+  // Что уже мигнуло в этой сессии: рендер случается на каждый чих —
+  // смену раскладки, фильтр, реакцию, — а вспышка должна быть один раз.
+  var flashed=Object.create(null);
   var feedCols="two";
   var filterTags=[];
   var draftPoints=[], filterPoint="all", trash=null, trashTimer=0;
@@ -1478,14 +1482,17 @@
   /* Закреплённая карточка: нажатие копирует значение, стрелка открывает
      ссылку. Без стрелки до ссылки приходилось идти в ленту. */
   function pinCard(l){
-    var v=l.num||l.title, url=safeUrl(l.url), ps=linkPoints(l);
+    var url=safeUrl(l.url), ps=linkPoints(l);
+    var fs=Array.isArray(l.fields)?l.fields:[];
+    // Копировать осмысленно ссылку, а не заголовок: заголовок и так виден.
+    var v=url||(fs[0]&&fs[0].value)||l.title;
     var box=el("div","pincard");
     var head=el("div","pincard-top");
     head.innerHTML='<span class="t">'+esc(ps.length?pointName(ps[0]):"Без точки")+'</span>';
 
     var done=copied===v;
     var cp=el("button","copybtn"+(done?" done":""),done?"✓":"⧉");
-    cp.title=done?"Скопировано":"Копировать значение";
+    cp.title=done?"Скопировано":(url?"Копировать ссылку":"Копировать значение");
     cp.setAttribute("aria-label","Скопировать значение");
     cp.addEventListener("click",function(e){ e.stopPropagation(); copyVal(v); });
     head.appendChild(cp);
@@ -1501,7 +1508,7 @@
     box.appendChild(head);
 
     var val=el("button","pincard-val");
-    val.innerHTML='<span class="v">'+esc(v)+'</span>'+
+    val.innerHTML='<span class="v">'+esc(l.title)+'</span>'+
       '<span class="b">'+esc((l.by||"—")+(l.ts?" · "+ago(l.ts):""))+'</span>';
     val.title="Открыть карточку целиком";
     val.addEventListener("click",function(){ jumpToCard(l.id,true); });
@@ -1586,6 +1593,30 @@
     }
   }
 
+  /* ── микроанимации ──────────────────────────
+     GSAP подключён с CDN и может не доехать (горы, плохая связь),
+     поэтому каждое обращение под проверкой. Двигаем только transform
+     и opacity, reduced-motion уважаем. */
+  function anim(){
+    if(reduceMotion()) return null;
+    return (typeof window.gsap!=="undefined")?window.gsap:null;
+  }
+
+  function animateIn(nodes,opts){
+    var g=anim();
+    if(!g||!nodes.length) return;
+    var o=opts||{};
+    g.killTweensOf(nodes);
+    g.fromTo(nodes,
+      {opacity:0,y:o.y===undefined?10:o.y},
+      {opacity:1,y:0,duration:o.duration||0.42,ease:"power3.out",
+       stagger:o.stagger===undefined?0.035:o.stagger,clearProps:"transform,opacity"});
+  }
+
+  // Анимируем только когда набор на экране действительно изменился,
+  // а не на каждую перерисовку от сохранения или опроса.
+  var lastSig="";
+
   function renderCards(){
     renderActiveFilter();
     var host=$("cards"); host.innerHTML="";
@@ -1639,8 +1670,15 @@
       return;
     }
 
+    var sig=feedCols+"|"+filterPoint+"|"+filterTags.join(",")+"|"+
+      list.map(function(l){return l.id}).join(",");
+    var changed=sig!==lastSig;
+    lastSig=sig;
+
     list.forEach(function(l){
-      var wrap=el("div","cardwrap"+(isNew(l)?" fresh":""));
+      var fresh=isNew(l)&&!flashed[l.id];
+      if(fresh) flashed[l.id]=1;
+      var wrap=el("div","cardwrap"+(fresh?" fresh":""));
       wrap.setAttribute("data-id",l.id);
       var card=el("div","card");
       var url=safeUrl(l.url), isLink=!!url, v=l.num||l.title;
@@ -1952,6 +1990,7 @@
         moreBtn.addEventListener("click",function(){
           var open=details.hidden;
           details.hidden=!open;
+          if(open) animateIn([].slice.call(details.children),{y:6,stagger:0.03});
           moreBtn.setAttribute("aria-expanded",open?"true":"false");
           moreBtn.textContent=(open?"Свернуть":"Подробнее · "+fields.length+" "+
             plural(fields.length,["поле","поля","полей"]));
@@ -1967,6 +2006,7 @@
       talk.addEventListener("click",function(){
         var open=thread.hidden;
         thread.hidden=!open;
+        if(open) animateIn([thread],{y:6,stagger:0});
         talk.setAttribute("aria-expanded",open?"true":"false");
         if(open){ var i2=addC.querySelector("input"); if(i2) i2.focus(); }
       });
@@ -1977,6 +2017,8 @@
       wrap.appendChild(card);
       host.appendChild(wrap);
     });
+
+    if(changed) animateIn([].slice.call(host.children),{y:12});
 
     popId=""; popKind="";
   }
@@ -2321,6 +2363,7 @@
       }
 
       host.innerHTML="";
+      var logNodes=[];
       events.slice(0,25).forEach(function(ev){
         var tail=EVENT_TAIL[ev.kind]||EVENT_TAIL.chg;
         if(ev.count) tail=PLURAL_TAIL[ev.kind]?PLURAL_TAIL[ev.kind](ev.count):tail;
@@ -2333,7 +2376,9 @@
           (body?'<div class="logrow-text">'+esc(body)+'</div>':"");
         if(ev.id) row.addEventListener("click",function(){ jumpToCard(ev.id); });
         host.appendChild(row);
+        logNodes.push(row);
       });
+      animateIn(logNodes,{y:8,stagger:0.02});
     }catch(e){
       host.innerHTML='<p class="intro">Журнал не загрузился. Похоже, сервис недоступен.</p>';
     }
