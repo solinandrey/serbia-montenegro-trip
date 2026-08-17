@@ -233,6 +233,75 @@
   .offroad[aria-current="page"]{border-color:var(--accent)}
   .offroad[aria-current="page"] b{color:var(--accent)}
 
+  /* ── новое с прошлого захода ──────────────── */
+  .fresh{
+    display:inline-block;margin-left:8px;vertical-align:1px;
+    font-family:var(--mono);font-size:9.5px;font-weight:500;
+    text-transform:uppercase;letter-spacing:.11em;
+    color:var(--on-accent);background:var(--accent);padding:1px 5px;
+  }
+  .badge{
+    display:inline-block;margin-left:7px;font-style:normal;
+    font-family:var(--mono);font-size:9.5px;font-weight:600;
+    color:var(--on-accent);background:var(--accent);padding:1px 5px;
+    vertical-align:1px;letter-spacing:.04em;
+  }
+  .stop[aria-current="page"] .badge,.offroad[aria-current="page"] .badge{
+    background:var(--focus);color:#12171C;
+  }
+
+  /* ── реакции ──────────────────────────────── */
+  .reacts{display:flex;gap:4px;flex:none;align-items:flex-start;padding-top:2px}
+  .react{
+    display:inline-flex;align-items:center;justify-content:center;gap:5px;
+    border:1px solid var(--line);background:transparent;color:var(--ink-3);
+    font-family:var(--mono);font-size:11.5px;line-height:1;
+    padding:6px 9px;min-height:28px;min-width:34px;border-radius:0;
+    transition:border-color .18s var(--ease),color .18s var(--ease),background .18s var(--ease);
+  }
+  /* На тач-устройствах в кнопку надо попадать пальцем, а не курсором. */
+  @media (hover:none){
+    .react{min-height:36px;min-width:44px;padding:8px 12px;font-size:12.5px}
+  }
+  .react:hover{border-color:var(--ink-2);color:var(--ink)}
+  .react.on{border-color:var(--accent);color:var(--accent)}
+  .react i{font-style:normal;font-weight:600;font-variant-numeric:tabular-nums}
+  .note .reacts{margin-top:9px}
+
+  /* ── история правок ───────────────────────── */
+  .hist-title{
+    font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--ink-3);margin:34px 0 12px;
+    padding-top:18px;border-top:1px solid var(--line-2);
+  }
+  .hist-row{border-bottom:1px solid var(--line-2)}
+  .hist-head{
+    display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;width:100%;
+    border:none;background:none;text-align:left;padding:11px 4px;
+    transition:background .18s var(--ease);
+  }
+  .hist-head:hover{background:var(--surface)}
+  .hist-when{font-size:11.5px;color:var(--ink-3);flex:none;min-width:112px}
+  .hist-who{font-size:14px;font-weight:600;color:var(--ink);flex:1 1 auto;font-family:var(--display)}
+  .hist-sum{font-size:11.5px;color:var(--ink-2);flex:none}
+  .hist-body{padding:4px 4px 16px}
+  .hist-block{margin-bottom:14px}
+  .hist-block h5{
+    font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--ink-3);margin:0 0 6px;
+  }
+  .hist-block p{
+    margin:0 0 5px;font-size:14px;line-height:1.45;
+    padding-left:11px;border-left:2px solid var(--line);overflow-wrap:anywhere;
+  }
+  .hist-block p span{
+    font-family:var(--mono);font-size:10px;text-transform:uppercase;
+    letter-spacing:.1em;color:var(--ink-3);margin-right:8px;
+  }
+  .hist-block p.h-add{border-left-color:var(--accent)}
+  .hist-block p.h-del{border-left-color:var(--alert)}
+  .hist-block p.h-chg{border-left-color:var(--focus)}
+
   /* ── ссылки внутри текста ─────────────────── */
   .inline-link{
     color:var(--accent);text-decoration:underline;
@@ -265,6 +334,15 @@
   .lfields dd{margin:0;flex:1;min-width:0;font-size:14.5px;overflow-wrap:anywhere;line-height:1.45}
   .lfields dd.mono{font-family:var(--mono);font-size:13.5px;font-variant-numeric:tabular-nums}
   .lfields a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+  .licon{margin-right:8px;font-size:17px;line-height:1;vertical-align:-1px}
+  .add.add-link{display:grid;gap:8px;align-items:start}
+  @media (min-width:680px){
+    .add.add-link{grid-template-columns:76px minmax(0,1fr) minmax(0,1.15fr) auto}
+  }
+  .add.add-link input{flex:none;width:100%}
+  .add.add-link .f-icon{text-align:center;font-size:16px}
+  .add.add-link .btn{align-self:stretch}
+
   .lempty{
     font-size:15px;color:var(--ink-2);margin:22px 0 0;max-width:62ch;
     padding:14px 16px;background:var(--surface);border-left:2px solid var(--focus);
@@ -428,6 +506,7 @@
   @media (max-width:560px){
     .items li,.check li{flex-wrap:wrap}
     .items .row-tools,.check .row-tools{flex:1 0 100%;justify-content:flex-end;margin-top:2px}
+    .items .reacts{order:3;margin-top:4px}
     .lcard-head{flex-wrap:wrap}
     .lcard-head b{flex:1 1 100%}
     .lcard-head .row-tools{justify-content:flex-end;width:100%;margin-top:6px}
@@ -552,6 +631,9 @@
         <button class="btn ghost" id="closeBox">Свернуть</button>
       </div>
       <textarea id="jsonbox" spellcheck="false" aria-label="Данные плана в формате JSON"></textarea>
+
+      <h3 class="hist-title">Кто что менял</h3>
+      <div class="hist" id="history"></div>
     </section>
 
   </main>
@@ -566,6 +648,8 @@
   var KEY = "trip:beograd-crnagora:v1";
   var NAMEKEY = "trip:me";
   var PASSKEY = "trip:key";
+  var SEENKEY = "trip:seen";     // когда заходили в прошлый раз
+  var MINEKEY = "trip:mine";     // что правил я — своё «новым» не помечаем
 
   // Общий план на троих. Сервис на Railway, одна строка в Postgres.
   // Без пароля не отдаёт и не принимает ничего.
@@ -573,6 +657,8 @@
   var apiKey = null;      // общий пароль, лежит в браузере каждого
   var shared = false;     // работаем через сервер, правки видны всем
   var rev = 0;            // ревизия сервера, по ней ловим чужие записи
+  var lastAuthor = null;  // кто правил последним
+  var lastAt = null;      // когда
   var tomb = Object.create(null);   // что удалено в этой сессии
   var live = false;
   var dirty = false;
@@ -676,6 +762,105 @@
     return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
   function $(id){return document.getElementById(id)}
 
+  /* ── новое с прошлого захода ──────────────
+     Метка снимается не при загрузке, а при уходе со страницы или через
+     минуту: иначе она исчезнет раньше, чем человек успеет её прочитать. */
+  var seenAt=0, mineIds=Object.create(null), seenSaved=false;
+
+  function loadSeen(){
+    if(!LS) return;
+    try{ me = LS.getItem(NAMEKEY) || me; }catch(e){}
+    try{
+      seenAt=Number(LS.getItem(SEENKEY)||0)||0;
+      var m=JSON.parse(LS.getItem(MINEKEY)||"[]");
+      for(var i=0;i<m.length;i++) mineIds[m[i]]=1;
+    }catch(e){}
+  }
+
+  function markMine(id){
+    mineIds[id]=1;
+    if(!LS) return;
+    try{ LS.setItem(MINEKEY,JSON.stringify(Object.keys(mineIds).slice(-500))); }catch(e){}
+  }
+
+  function touch(o){ o.ts=Date.now(); markMine(o.id); return o; }
+
+  function isNew(o){ return !!(o && o.ts && o.ts>seenAt && !mineIds[o.id]); }
+
+  function saveSeen(){
+    if(seenSaved||!LS) return;
+    seenSaved=true;
+    try{ LS.setItem(SEENKEY,String(Date.now())); }catch(e){}
+  }
+
+  function freshTag(o){
+    return isNew(o) ? '<span class="fresh" title="появилось с вашего прошлого захода">новое</span>' : '';
+  }
+
+  function ago(t){
+    var ms=Date.now()-(typeof t==="number"?t:Date.parse(t));
+    if(isNaN(ms)) return "";
+    if(ms<60000) return "только что";
+    var min=Math.floor(ms/60000);
+    if(min<60) return min+" мин. назад";
+    var h=Math.floor(min/60);
+    var d=new Date(typeof t==="number"?t:Date.parse(t));
+    var hhmm=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
+    if(h<24 && d.toDateString()===new Date().toDateString()) return h+" ч. назад";
+    var y=new Date(); y.setDate(y.getDate()-1);
+    if(d.toDateString()===y.toDateString()) return "вчера "+hhmm;
+    return String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0")+" "+hhmm;
+  }
+
+  /* ── реакции ──────────────────────────────
+     Массив пар (кто, что), а не счётчик: счётчик развалится при слиянии. */
+  var REACTS=[{kind:"+1",label:"+1",title:"За"},{kind:"?",label:"?",title:"Есть вопрос"}];
+
+  function myName(){ return me||"без имени"; }
+  function reactList(o){ return Array.isArray(o.react)?o.react:[]; }
+
+  function reactNames(o,kind){
+    var r=reactList(o),out=[],i;
+    for(i=0;i<r.length;i++) if(r[i].kind===kind) out.push(r[i].who||"без имени");
+    return out;
+  }
+  function hasMine(o,kind){
+    var r=reactList(o),i,n=myName();
+    for(i=0;i<r.length;i++) if(r[i].kind===kind && (r[i].who||"без имени")===n) return true;
+    return false;
+  }
+  function toggleReact(o,kind){
+    var r=reactList(o).slice(),i,n=myName(),at=-1;
+    for(i=0;i<r.length;i++) if(r[i].kind===kind && (r[i].who||"без имени")===n){ at=i; break; }
+    if(at>=0) r.splice(at,1); else r.push({who:n,kind:kind});
+    o.react=r;
+  }
+
+  function reactHtml(o){
+    var h="",i,names,n,on;
+    for(i=0;i<REACTS.length;i++){
+      names=reactNames(o,REACTS[i].kind); n=names.length; on=hasMine(o,REACTS[i].kind);
+      h+='<button class="react'+(on?" on":"")+'" data-react="'+REACTS[i].kind+'"'+
+         ' aria-pressed="'+(on?"true":"false")+'"'+
+         ' title="'+esc(REACTS[i].title+(n?": "+names.join(", "):""))+'">'+
+         esc(REACTS[i].label)+(n?'<i>'+n+'</i>':'')+'</button>';
+    }
+    return '<span class="reacts">'+h+'</span>';
+  }
+
+  function bindReacts(root,o,after){
+    var bs=root.querySelectorAll("[data-react]"),i;
+    for(i=0;i<bs.length;i++){
+      (function(b){
+        b.addEventListener("click",function(){
+          // Реакция не меняет ts: это не правка содержимого, и «новым» она не делает.
+          toggleReact(o,b.getAttribute("data-react"));
+          save(); after();
+        });
+      })(bs[i]);
+    }
+  }
+
   /* ── ссылки в тексте ──────────────────────
      Работаем по уже экранированной строке: сначала esc(), потом это.
      Пускаем только http, https и tel. Ничего другого в href не попадает. */
@@ -730,6 +915,29 @@
 
   // Ничего не затираем: элементы объединяются по id, своя версия свежее.
   // Удалённое в этой сессии не воскресает — на это есть tomb.
+  // Реакции нельзя терять при слиянии: двое жмут «+1» одновременно, и замена
+  // элемента своим оставила бы одну реакцию. Поэтому пары (who, kind) объединяем.
+  function mergeReact(a,b){
+    var out=[],seen=Object.create(null),i,r,k;
+    var both=(a||[]).concat(b||[]);
+    for(i=0;i<both.length;i++){
+      r=both[i];
+      if(!r || typeof r.kind!=="string") continue;
+      k=(r.who||"")+"\u0000"+r.kind;
+      if(seen[k]) continue;
+      seen[k]=1; out.push({who:r.who||"",kind:r.kind});
+    }
+    return out;
+  }
+
+  function mergeItem(srv,mine){
+    var out={},k;
+    for(k in mine) out[k]=mine[k];          // своя версия текста свежее
+    if(srv.react || mine.react) out.react=mergeReact(srv.react,mine.react);
+    if(srv.ts && (!mine.ts || srv.ts>mine.ts)) out.ts=srv.ts;
+    return out;
+  }
+
   function mergeList(srv,mine){
     var out=[],at=Object.create(null),i;
     for(i=0;i<srv.length;i++){
@@ -738,7 +946,7 @@
     }
     for(i=0;i<mine.length;i++){
       if(tomb[mine[i].id]) continue;
-      if(at[mine[i].id]!==undefined) out[at[mine[i].id]]=mine[i];
+      if(at[mine[i].id]!==undefined) out[at[mine[i].id]]=mergeItem(out[at[mine[i].id]],mine[i]);
       else out.push(mine[i]);
     }
     return out;
@@ -766,15 +974,48 @@
     return p;
   }
 
-  function renderAll(){ renderCheck(); renderSegments(); renderLinks(); }
+  function newCounts(){
+    var c={check:0,beograd:0,voz:0,sever:0,more:0,links:0,repo:0},k;
+    (state.checklist||[]).forEach(function(o){ if(isNew(o)) c.check++; });
+    for(k in (state.segments||{})){
+      if(c[k]===undefined) continue;
+      (state.segments[k]||[]).forEach(function(o){ if(isNew(o)) c[k]++; });
+    }
+    (state.notes||[]).forEach(function(o){ if(isNew(o)&&c[o.segment]!==undefined) c[o.segment]++; });
+    (state.links||[]).forEach(function(o){ if(isNew(o)) c.links++; });
+    return c;
+  }
+
+  function renderBadges(){
+    var c=newCounts(),links=document.querySelectorAll(".stop, .offroad"),i,v,b,n,host;
+    for(i=0;i<links.length;i++){
+      v=links[i].getAttribute("data-view");
+      n=c[v]||0;
+      b=links[i].querySelector(".badge");
+      host=links[i].querySelector("b");
+      if(n&&host){
+        if(!b){ b=document.createElement("i"); b.className="badge"; host.appendChild(b); }
+        b.textContent=n;
+        b.title=n+" новых с вашего прошлого захода";
+      }else if(b){ b.parentNode.removeChild(b); }
+    }
+  }
+
+  function renderAll(){ renderCheck(); renderSegments(); renderLinks(); renderBadges(); }
+
+  function noteMeta(d){
+    if(!d) return;
+    if(d.author!==undefined) lastAuthor=d.author;
+    if(d.updated_at!==undefined) lastAt=d.updated_at;
+  }
 
   async function pushShared(){
-    var r=await apiReq("PUT",{rev:rev,plan:state});
-    if(r.status===200){ rev=r.data.rev; return true; }
+    var r=await apiReq("PUT",{rev:rev,plan:state,author:me||""});
+    if(r.status===200){ rev=r.data.rev; noteMeta(r.data); return true; }
     if(r.status===409 && r.data && r.data.plan){
-      state=normalize(mergePlan(normalize(r.data.plan),state)); rev=r.data.rev;
-      var again=await apiReq("PUT",{rev:rev,plan:state});
-      if(again.status===200){ rev=again.data.rev; renderAll(); return true; }
+      state=normalize(mergePlan(normalize(r.data.plan),state)); rev=r.data.rev; noteMeta(r.data);
+      var again=await apiReq("PUT",{rev:rev,plan:state,author:me||""});
+      if(again.status===200){ rev=again.data.rev; noteMeta(again.data); renderAll(); return true; }
     }
     if(r.status===401){ shared=false; apiKey=null; }
     return false;
@@ -788,7 +1029,7 @@
       if(r.status!==200 || !r.data) return;
       if(r.data.rev===rev) return;
       state=normalize(mergePlan(normalize(r.data.plan),state));
-      rev=r.data.rev;
+      rev=r.data.rev; noteMeta(r.data);
       renderAll(); renderBar();
     }catch(e){}
   }
@@ -850,6 +1091,7 @@
           var r = await apiReq("GET");
           if(r.status===200 && r.data){
             state=normalize(r.data.plan); rev=r.data.rev; shared=true; live=true; localSaved=false;
+            noteMeta(r.data);
             return;
           }
           if(r.status===401){
@@ -913,6 +1155,9 @@
 
   async function setName(v){
     me=v;
+    // Без этого имя сбрасывается на каждой перезагрузке, и «кто правил
+    // последним» показывает «без имени» у всех троих.
+    if(LS){ try{ LS.setItem(NAMEKEY,v); }catch(e){} }
     if(!hasStore) return;
     try{ await window.storage.set(NAMEKEY,v,false); }catch(e){}
   }
@@ -1064,6 +1309,9 @@
       links[j].classList.toggle("now", v===cur);
     }
 
+    if(k==="repo") renderHistory();
+    renderBadges();
+
     var ticks=document.querySelectorAll(".road-tick");
     for(var t=0;t<ticks.length;t++){
       ticks[t].classList.toggle("on",ticks[t].getAttribute("data-tick")===k);
@@ -1080,7 +1328,10 @@
     if(keyBtn) keyBtn.hidden = hasStore || shared;
     if(shared){
       bar.classList.add("live");
-      txt.innerHTML = "<b>Общий план.</b> Правки видят все трое, чужие подтягиваются сами. Вы подписываетесь как <b>"+esc(me||"без имени")+"</b>.";
+      var who = lastAuthor && String(lastAuthor).trim() ? esc(lastAuthor) : "без имени";
+      var tail = lastAt ? " Последняя правка: <b>"+who+"</b>, "+esc(ago(lastAt))+"." : "";
+      txt.innerHTML = "<b>Общий план.</b> Правки видят все трое, чужие подтягиваются сами."+
+        tail+" Вы подписываетесь как <b>"+esc(me||"без имени")+"</b>.";
       return;
     }
     if(live){
@@ -1111,7 +1362,7 @@
       li.innerHTML =
         '<label class="tick">'+
           '<input type="checkbox" '+(it.done?"checked":"")+' aria-label="Готово">'+
-          '<span class="txt">'+linkify(esc(it.text))+'</span>'+
+          '<span class="txt">'+linkify(esc(it.text))+freshTag(it)+'</span>'+
         '</label>'+
         '<span class="row-tools">'+
           '<button class="mini" data-act="edit">Править</button>'+
@@ -1132,7 +1383,7 @@
       });
       li.querySelector('[data-act="edit"]').addEventListener("click",function(){
         inlineEdit(li.querySelector(".txt"),it.text,function(v){
-          if(v.trim()){it.text=v.trim();save()} renderCheck();
+          if(v.trim()){it.text=v.trim();touch(it);save()} renderCheck();
         });
       });
       ul.appendChild(li);
@@ -1153,6 +1404,100 @@
     });
   }
 
+  /* ── история правок ─────────────────────── */
+  function planItems(p){
+    var out=Object.create(null),k;
+    (p.checklist||[]).forEach(function(o){ out["c:"+o.id]={kind:"в сборах",text:o.text||""}; });
+    for(k in (p.segments||{}))
+      (p.segments[k]||[]).forEach(function(o){ out["s:"+o.id]={kind:"в плане",text:o.text||""}; });
+    (p.notes||[]).forEach(function(o){ out["n:"+o.id]={kind:"заметка",text:o.text||""}; });
+    (p.links||[]).forEach(function(o){ out["l:"+o.id]={kind:"под рукой",text:o.title||""}; });
+    return out;
+  }
+
+  function diffPlans(older,newer){
+    var a=planItems(older||{}),b=planItems(newer||{}),add=[],del=[],chg=[],k;
+    for(k in b){
+      if(!a[k]) add.push(b[k]);
+      else if(a[k].text!==b[k].text) chg.push(b[k]);
+    }
+    for(k in a) if(!b[k]) del.push(a[k]);
+    return {add:add,del:del,chg:chg};
+  }
+
+  function diffSummary(d){
+    var bits=[];
+    if(d.add.length) bits.push("+"+d.add.length);
+    if(d.del.length) bits.push("−"+d.del.length);
+    if(d.chg.length) bits.push("правок "+d.chg.length);
+    return bits.length?bits.join(" · "):"без изменений в содержимом";
+  }
+
+  function diffDetails(d){
+    var h="",i;
+    function block(title,arr,cls){
+      if(!arr.length) return "";
+      var out='<div class="hist-block"><h5>'+esc(title)+'</h5>';
+      for(i=0;i<arr.length;i++)
+        out+='<p class="'+cls+'"><span>'+esc(arr[i].kind)+'</span>'+esc(arr[i].text.slice(0,140))+'</p>';
+      return out+'</div>';
+    }
+    h+=block("Добавлено",d.add,"h-add");
+    h+=block("Убрано",d.del,"h-del");
+    h+=block("Поправлено",d.chg,"h-chg");
+    return h||'<p class="empty">Изменились только реакции или порядок.</p>';
+  }
+
+  async function renderHistory(){
+    var host=$("history"); if(!host) return;
+    if(!shared||!apiKey){
+      host.innerHTML='<p class="empty">История лежит на сервере. Подключите общий план, чтобы её увидеть.</p>';
+      return;
+    }
+    host.innerHTML='<p class="empty">Загружаю историю…</p>';
+    try{
+      var res=await fetch(API+"/history",{headers:{"x-trip-key":apiKey}});
+      if(!res.ok) throw new Error("нет истории");
+      var list=(await res.json()).history||[];
+      if(!list.length){ host.innerHTML='<p class="empty">Правок пока не было.</p>'; return; }
+
+      // Тянем на один снимок больше, чем показываем: последнему нужен предок для сравнения.
+      var take=list.slice(0,13);
+      var snaps=await Promise.all(take.map(function(h){
+        return fetch(API+"/history/"+h.rev,{headers:{"x-trip-key":apiKey}})
+          .then(function(r){ return r.ok?r.json():null; })
+          .catch(function(){ return null; });
+      }));
+
+      host.innerHTML="";
+      for(var i=0;i<Math.min(12,snaps.length);i++){
+        if(!snaps[i]) continue;
+        var older=snaps[i+1]?snaps[i+1].plan:null;
+        var d=diffPlans(older,snaps[i].plan);
+        var row=document.createElement("div");
+        row.className="hist-row";
+        row.innerHTML=
+          '<button class="hist-head" aria-expanded="false">'+
+            '<span class="hist-when mono">'+esc(ago(take[i].updated_at))+'</span>'+
+            '<span class="hist-who">'+esc((take[i].author||"без имени"))+'</span>'+
+            '<span class="hist-sum mono">'+esc(older?diffSummary(d):"первый снимок")+'</span>'+
+          '</button>'+
+          '<div class="hist-body" hidden>'+(older?diffDetails(d):'<p class="empty">Это самый старый снимок из сохранённых.</p>')+'</div>';
+        (function(row){
+          var head=row.querySelector(".hist-head"), body=row.querySelector(".hist-body");
+          head.addEventListener("click",function(){
+            var open=body.hidden;
+            body.hidden=!open;
+            head.setAttribute("aria-expanded",open?"true":"false");
+          });
+        })(row);
+        host.appendChild(row);
+      }
+    }catch(e){
+      host.innerHTML='<p class="empty">История не загрузилась. Похоже, сервис недоступен.</p>';
+    }
+  }
+
   /* ── рендер: под рукой ──────────────────── */
   var LINK_GROUPS=[
     {key:null,      title:"Общее"},
@@ -1162,9 +1507,14 @@
     {key:"more",    title:"Побережье"}
   ];
   var LINK_FIELDS=[
-    ["title","Название"],["url","Ссылка"],["phone","Телефон"],
+    ["icon","Значок"],["title","Название"],["url","Ссылка"],["phone","Телефон"],
     ["address","Адрес"],["ref","Бронь"],["note","Заметка"]
   ];
+
+  // Значок — один-два символа, чтобы карточка не превращалась в ленту эмодзи.
+  function cleanIcon(v){
+    return Array.from(String(v||"").trim()).slice(0,2).join("");
+  }
 
   function safeUrl(u){
     return /^https?:\/\//i.test(String(u||"").trim()) ? String(u).trim() : "";
@@ -1187,7 +1537,8 @@
         }
       }
     }
-    if(!r.title) r.title=base.title||"Без названия";
+    if(r.icon) r.icon=cleanIcon(r.icon);
+    if(!r.title) r.title=base.title||safeUrl(r.url)&&shortUrl(r.url)||"Без названия";
     return r;
   }
 
@@ -1226,7 +1577,8 @@
 
         card.innerHTML=
           '<div class="lcard-head">'+
-            '<b class="ltitle">'+esc(r.title)+'</b>'+
+            '<b class="ltitle">'+(r.icon?'<span class="licon">'+esc(r.icon)+'</span>':'')+
+              esc(r.title)+freshTag(r)+'</b>'+
             '<span class="row-tools">'+
               '<button class="mini" data-act="edit">Править</button>'+
               '<button class="mini" data-act="del">Убрать</button>'+
@@ -1247,7 +1599,8 @@
 
         card.querySelector('[data-act="edit"]').addEventListener("click",function(){
           inlineEdit(card.querySelector(".ltitle"),recToText(r),function(v){
-            var next=textToRec(v,r);
+            var next=touch(textToRec(v,r));
+            next.react=r.react;
             var at=state.links.indexOf(r);
             if(at>=0) state.links[at]=next;
             save(); renderLinks();
@@ -1258,21 +1611,36 @@
       });
 
       var add=document.createElement("div");
-      add.className="add";
+      add.className="add add-link";
       add.innerHTML=
-        '<input name="new-link" autocomplete="off" placeholder="Название или ссылка…" aria-label="Новая запись в «'+esc(g.title)+'»">'+
+        '<input class="f-icon" name="new-icon" autocomplete="off" maxlength="4" '+
+          'placeholder="значок" aria-label="Значок записи в «'+esc(g.title)+'»">'+
+        '<input class="f-title" name="new-title" autocomplete="off" '+
+          'placeholder="Название" aria-label="Название записи в «'+esc(g.title)+'»">'+
+        '<input class="f-url" name="new-url" autocomplete="off" inputmode="url" '+
+          'placeholder="Ссылка (необязательно)" aria-label="Ссылка записи в «'+esc(g.title)+'»">'+
         '<button class="btn">Добавить</button>';
-      var inp=add.querySelector("input");
+
+      var fIcon=add.querySelector(".f-icon"),
+          fTitle=add.querySelector(".f-title"),
+          fUrl=add.querySelector(".f-url");
+
       function addLink(){
-        var v=inp.value.trim(); if(!v) return;
-        var url=safeUrl(v);
-        var rec={id:uid(),segment:g.key,title:url?shortUrl(url):v};
+        var title=fTitle.value.trim(), url=safeUrl(fUrl.value), icon=cleanIcon(fIcon.value);
+        // Название важнее ссылки: без имени запись потом не найти глазами.
+        if(!title && !url) return;
+        var rec={id:uid(),segment:g.key,title:title||shortUrl(url)};
         if(url) rec.url=url;
-        state.links.push(rec); inp.value="";
+        if(icon) rec.icon=icon;
+        state.links.push(touch(rec));
+        fIcon.value=""; fTitle.value=""; fUrl.value="";
         save(); renderLinks();
+        fTitle.focus();
       }
       add.querySelector("button").addEventListener("click",addLink);
-      inp.addEventListener("keydown",function(e){if(e.key==="Enter")addLink()});
+      [fIcon,fTitle,fUrl].forEach(function(f){
+        f.addEventListener("keydown",function(e){if(e.key==="Enter")addLink()});
+      });
       box.appendChild(add);
 
       host.appendChild(box);
@@ -1323,7 +1691,8 @@
         var li=document.createElement("li");
         li.innerHTML =
           '<span class="bullet">'+String(i+1).padStart(2,"0")+'</span>'+
-          '<span class="txt">'+linkify(esc(it.text))+'</span>'+
+          '<span class="txt">'+linkify(esc(it.text))+freshTag(it)+'</span>'+
+          reactHtml(it)+
           '<span class="row-tools">'+
             '<button class="mini" data-act="edit">Править</button>'+
             '<button class="mini" data-act="del">Убрать</button>'+
@@ -1340,9 +1709,10 @@
         });
         li.querySelector('[data-act="edit"]').addEventListener("click",function(){
           inlineEdit(li.querySelector(".txt"),it.text,function(v){
-            if(v.trim()){it.text=v.trim();save()} renderSegments();
+            if(v.trim()){it.text=v.trim();touch(it);save()} renderSegments();
           });
         });
+        bindReacts(li,it,renderSegments);
         ul.appendChild(li);
       });
       if(!items.length){
@@ -1355,7 +1725,7 @@
       var addInput=addWrap.querySelector("input");
       function addItem(){
         var v=addInput.value.trim(); if(!v) return;
-        items.push({id:uid(),text:v}); addInput.value="";
+        items.push(touch({id:uid(),text:v})); addInput.value="";
         save(); renderSegments();
       }
       addWrap.querySelector("button").addEventListener("click",addItem);
@@ -1372,7 +1742,8 @@
             '<div class="head"><b>'+esc(n.author||"без имени")+'</b>'+
             '<span>'+esc(stamp(n.ts))+'</span>'+
             '<span class="row-tools"><button class="mini" data-act="del">Удалить</button></span></div>'+
-            '<div class="body">'+linkify(esc(n.text))+'</div>';
+            '<div class="body">'+linkify(esc(n.text))+freshTag(n)+'</div>'+
+            reactHtml(n);
           d.querySelector('[data-act="del"]').addEventListener("click",function(){
             tomb[n.id]=true;
             state.notes=state.notes.filter(function(x){return x.id!==n.id});
@@ -1382,6 +1753,7 @@
               state.notes.push(n); save(); renderSegments();
             });
           });
+          bindReacts(d,n,renderSegments);
           nl.appendChild(d);
         });
       }
@@ -1391,7 +1763,7 @@
       function addNote(){
         var v=nInput.value.trim(); if(!v) return;
         if(!me){ askName(); }
-        state.notes.push({id:uid(),segment:seg.key,author:me||"без имени",text:v,ts:Date.now()});
+        state.notes.push(touch({id:uid(),segment:seg.key,author:me||"без имени",text:v}));
         nInput.value=""; save(); renderSegments();
       }
       nAdd.querySelector("button").addEventListener("click",addNote);
@@ -1450,6 +1822,7 @@
 
   /* ── старт ──────────────────────────────── */
   (async function init(){
+    loadSeen();
     takeKeyFromHash();
     await load();
     renderBar(); renderCheck(); renderSegments(); renderLinks(); countdown(); bindSync();
@@ -1461,6 +1834,11 @@
       if(!askKey()) return;
       await load(); renderBar(); renderAll();
     });
+
+    // Метку «новое» снимаем на уходе или через минуту — не при загрузке,
+    // иначе человек её просто не успеет увидеть.
+    window.addEventListener("pagehide",saveSeen);
+    setTimeout(saveSeen,60000);
 
     // Чужие правки сами появляются раз в 20 секунд.
     setInterval(pullShared,20000);
@@ -1494,7 +1872,7 @@
     var ci=$("checkInput");
     function addCheck(){
       var v=ci.value.trim(); if(!v) return;
-      state.checklist.push({id:uid(),text:v,done:false});
+      state.checklist.push(touch({id:uid(),text:v,done:false}));
       ci.value=""; save(); renderCheck();
     }
     $("checkAdd").addEventListener("click",addCheck);
