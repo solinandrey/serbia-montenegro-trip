@@ -1,351 +1,452 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Београд → Црна Гора · сентябрь 2026</title>
+<title>Белград → Черногория · сентябрь 2026</title>
+<meta name="theme-color" content="#ECEDEF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101418" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
 
 <style>
+  /* ──────────────────────────────────────────────
+     Путевой лист на троих. На экране всегда один
+     отрезок: сборы, Белград, поезд, север, море.
+     Плотные данные, моноширинные числа, прямые углы.
+     ────────────────────────────────────────────── */
   :root{
-    --ink:#16232A;
-    --ink-soft:#41545C;
-    --limestone:#E6E4DC;
-    --limestone-2:#DCDAD0;
-    --card:#F2F1EB;
-    --sea:#0E5A61;
-    --sea-deep:#093F44;
-    --signal:#F0B429;
-    --alarm:#A8382B;
-    --sage:#8C9A92;
-    --line:rgba(22,35,42,.16);
-    --line-soft:rgba(22,35,42,.09);
-    --display:"Archivo","Helvetica Neue",Arial,sans-serif;
-    --body:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    color-scheme:light dark;
+
+    --paper:#ECEDEF;
+    --surface:#F6F7F8;
+    --surface-2:#E1E4E7;
+    --ink:#12171C;
+    --ink-2:#4C565F;
+    --ink-3:#7C868F;
+    --line:rgba(18,23,28,.15);
+    --line-2:rgba(18,23,28,.07);
+
+    --accent:#1D42B4;
+    --accent-2:#16348D;
+    --on-accent:#F6F7F8;
+    --alert:#A8321F;
+    --focus:#D9A211;
+
+    --display:"Geist","Helvetica Neue",Arial,sans-serif;
+    --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --ease:cubic-bezier(.16,1,.3,1);
+    --rule:1px solid var(--line);
+  }
+
+  @media (prefers-color-scheme:dark){
+    :root{
+      --paper:#101418;
+      --surface:#171D23;
+      --surface-2:#1E262E;
+      --ink:#E6EAEE;
+      --ink-2:#A6B1BB;
+      --ink-3:#78838D;
+      --line:rgba(230,234,238,.17);
+      --line-2:rgba(230,234,238,.08);
+
+      --accent:#8CA6FF;
+      --accent-2:#A9BCFF;
+      --on-accent:#0E1319;
+      --alert:#E8705E;
+      --focus:#F0B429;
+    }
   }
 
   *{box-sizing:border-box}
   html{-webkit-text-size-adjust:100%}
   body{
     margin:0;
-    background:var(--limestone);
+    background:var(--paper);
     color:var(--ink);
-    font-family:var(--body);
+    font-family:var(--display);
     font-size:16px;
     line-height:1.55;
-    background-image:linear-gradient(180deg,#EAE8E0 0%,var(--limestone) 320px);
+    -webkit-tap-highlight-color:rgba(29,66,180,.16);
   }
-  .wrap{max-width:1080px;margin:0 auto;padding:0 24px 96px}
+  button,input,textarea,a{touch-action:manipulation}
+  [hidden]{display:none!important}
 
+  .wrap{max-width:1140px;margin:0 auto;padding:0 28px 104px}
   .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
-  .eyebrow{
-    font-family:var(--mono);font-size:11px;font-weight:500;
-    text-transform:uppercase;letter-spacing:.18em;color:var(--sea);
-  }
 
-  /* ── hero ───────────────────────────────── */
-  .hero{padding:56px 0 8px}
+  .skip{
+    position:absolute;left:-9999px;top:0;z-index:9;
+    background:var(--ink);color:var(--paper);padding:10px 14px;
+    font-family:var(--mono);font-size:12px;
+  }
+  .skip:focus{left:0}
+
+  :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+  /* ── шапка ────────────────────────────────── */
+  .hero{display:grid;gap:22px;padding:44px 0 0}
+  @media (min-width:900px){
+    .hero{grid-template-columns:minmax(0,1.3fr) minmax(300px,.7fr);align-items:end;gap:44px}
+  }
+  .kicker{
+    font-family:var(--mono);font-size:11.5px;font-weight:500;
+    text-transform:uppercase;letter-spacing:.16em;color:var(--accent);
+    margin-bottom:16px;
+  }
   .hero h1{
-    font-family:var(--display);
-    font-weight:800;font-stretch:118%;
-    font-size:clamp(2.6rem,8.5vw,5.4rem);
-    line-height:.9;letter-spacing:-.025em;
-    margin:14px 0 0;text-transform:uppercase;
+    font-family:var(--display);font-weight:700;
+    font-size:clamp(2.3rem,6.4vw,4.2rem);
+    line-height:.96;letter-spacing:-.035em;margin:0;
+    text-wrap:balance;
   }
-  .hero h1 .thin{font-weight:400;font-stretch:100%;color:var(--sea)}
-  .hero-meta{
-    display:flex;flex-wrap:wrap;gap:8px 28px;margin-top:22px;
-    font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);
-    text-transform:uppercase;letter-spacing:.06em;
-  }
-  .hero-meta b{color:var(--ink);font-weight:600}
+  .hero h1 .to{color:var(--accent);font-weight:400}
 
-  /* ── signature: профиль высот ────────────── */
-  .profile{margin:34px 0 10px}
-  .profile svg{display:block;width:100%;height:auto}
-  .profile-key{
-    display:flex;gap:22px;flex-wrap:wrap;
-    font-family:var(--mono);font-size:11px;color:var(--ink-soft);
-    text-transform:uppercase;letter-spacing:.1em;margin-top:2px;
+  .facts-grid{
+    display:grid;grid-template-columns:1fr 1fr;
+    border-top:var(--rule);border-left:var(--rule);
   }
-  .profile-key i{display:inline-block;width:22px;height:0;border-top:2px solid var(--sea);
-    vertical-align:middle;margin-right:7px;font-style:normal}
-  .profile-key i.dash{border-top-style:dashed;border-color:var(--ink)}
+  .facts-grid div{border-right:var(--rule);border-bottom:var(--rule);padding:12px 15px}
+  .facts-grid dt{
+    font-family:var(--mono);font-size:10.5px;text-transform:uppercase;
+    letter-spacing:.13em;color:var(--ink-3);margin:0 0 5px;
+  }
+  .facts-grid dd{
+    margin:0;font-family:var(--mono);font-size:16px;font-weight:500;
+    font-variant-numeric:tabular-nums;letter-spacing:-.01em;
+  }
+  .facts-grid dd small{font-size:12px;color:var(--ink-2);font-weight:400}
 
-  /* ── полоса дедлайна ─────────────────────── */
+  /* ── дедлайн ──────────────────────────────── */
   .alarm{
-    display:flex;gap:16px;align-items:baseline;flex-wrap:wrap;
-    border-top:2px solid var(--alarm);border-bottom:1px solid var(--line);
-    padding:14px 0;margin:26px 0 0;
+    display:grid;gap:8px;margin:26px 0 0;padding:14px 16px;
+    background:var(--surface);border:var(--rule);border-left:3px solid var(--alert);
   }
+  @media (min-width:760px){.alarm{grid-template-columns:150px 1fr;gap:20px}}
   .alarm .tag{
-    font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.14em;
-    text-transform:uppercase;color:var(--alarm);white-space:nowrap;
+    font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--alert);
   }
-  .alarm p{margin:0;font-size:14.5px;max-width:74ch}
+  .alarm p{margin:0;font-size:15px;max-width:76ch;color:var(--ink-2)}
+  .alarm p b{color:var(--ink);font-weight:600}
 
-  /* ── статус хранилища ────────────────────── */
+  /* ── статус хранилища ─────────────────────── */
   .bar{
-    display:flex;flex-wrap:wrap;gap:12px;align-items:center;
-    margin:18px 0 0;padding:12px 14px;border:1px solid var(--line);
-    background:var(--card);
+    display:flex;flex-wrap:wrap;gap:10px 12px;align-items:center;
+    margin:12px 0 0;padding:11px 15px;border:var(--rule);
   }
-  .bar .dot{width:8px;height:8px;border-radius:50%;background:var(--sage);flex:none}
-  .bar.live .dot{background:var(--sea)}
-  .bar .txt{font-family:var(--mono);font-size:12px;color:var(--ink-soft);flex:1 1 260px}
+  .bar .dot{width:7px;height:7px;background:var(--ink-3);flex:none}
+  .bar.live .dot{background:var(--accent)}
+  .bar .txt{
+    font-family:var(--mono);font-size:12.5px;color:var(--ink-2);
+    flex:1 1 280px;min-width:0;line-height:1.5;
+  }
   .bar .txt b{color:var(--ink);font-weight:600}
 
-  /* ── кнопки ──────────────────────────────── */
+  /* ── отмена удаления ──────────────────────── */
+  .undo{
+    display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+    margin:8px 0 0;padding:11px 15px;
+    background:var(--surface);border:var(--rule);border-left:3px solid var(--focus);
+  }
+  .undo .what{
+    font-family:var(--mono);font-size:12.5px;color:var(--ink-2);
+    flex:1 1 260px;min-width:0;overflow-wrap:anywhere;
+  }
+
+  /* ── кнопки ───────────────────────────────── */
   button{font-family:var(--mono);cursor:pointer}
   .btn{
     border:1px solid var(--ink);background:transparent;color:var(--ink);
-    font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
-    padding:7px 12px;transition:background .15s,color .15s;
+    font-size:11.5px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;
+    padding:9px 14px;white-space:nowrap;
+    transition:background .18s var(--ease),color .18s var(--ease),transform .12s var(--ease);
   }
-  .btn:hover{background:var(--ink);color:var(--limestone)}
-  .btn.solid{background:var(--sea);border-color:var(--sea);color:#F2F1EB}
-  .btn.solid:hover{background:var(--sea-deep);border-color:var(--sea-deep)}
-  .btn.ghost{border-color:var(--line);color:var(--ink-soft)}
-  .btn.ghost:hover{background:var(--limestone-2);color:var(--ink)}
-  :focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+  .btn:hover{background:var(--ink);color:var(--paper)}
+  .btn:active{transform:translateY(1px)}
+  .btn.solid{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+  .btn.solid:hover{background:var(--accent-2);border-color:var(--accent-2);color:var(--on-accent)}
+  .btn.ghost{border-color:var(--line);color:var(--ink-2)}
+  .btn.ghost:hover{background:var(--surface-2);color:var(--ink)}
 
-  /* ── чеклист ─────────────────────────────── */
-  section{margin-top:64px}
-  .sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;
-    border-bottom:1px solid var(--ink);padding-bottom:10px;flex-wrap:wrap}
+  /* ── переключатель видов ──────────────────── */
+  .views{
+    display:flex;gap:0;margin:26px 0 0;
+    border:var(--rule);overflow-x:auto;scrollbar-width:none;
+  }
+  .views::-webkit-scrollbar{display:none}
+  .views a{
+    flex:1 1 0;min-width:118px;
+    display:block;padding:11px 14px;text-decoration:none;color:var(--ink-2);
+    border-right:var(--rule);
+    transition:background .18s var(--ease),color .18s var(--ease);
+  }
+  .views a:last-child{border-right:none}
+  .views a b{
+    display:block;font-size:14.5px;font-weight:600;color:var(--ink);
+    letter-spacing:-.01em;line-height:1.25;
+  }
+  .views a span{
+    display:block;margin-top:3px;
+    font-family:var(--mono);font-size:10.5px;text-transform:uppercase;
+    letter-spacing:.1em;color:var(--ink-3);white-space:nowrap;
+  }
+  .views a:hover{background:var(--surface)}
+  .views a[aria-current="page"]{background:var(--ink)}
+  .views a[aria-current="page"] b{color:var(--paper)}
+  .views a[aria-current="page"] span{color:var(--paper);opacity:.72}
+  .views a.now b::after{
+    content:"·сейчас";font-family:var(--mono);font-size:10px;font-weight:500;
+    color:var(--accent);margin-left:6px;letter-spacing:.06em;
+  }
+  .views a[aria-current="page"].now b::after{color:var(--focus)}
+
+  /* ── секции ───────────────────────────────── */
+  main{margin-top:34px}
+  .sec-head{
+    display:flex;align-items:baseline;justify-content:space-between;gap:16px;
+    flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:12px;
+  }
   .sec-head h2{
-    font-family:var(--display);font-weight:700;font-stretch:112%;
-    font-size:clamp(1.3rem,3vw,1.9rem);letter-spacing:-.01em;margin:0;text-transform:uppercase;
+    font-family:var(--display);font-weight:700;
+    font-size:clamp(1.4rem,3vw,2rem);letter-spacing:-.025em;margin:0;
+    text-wrap:balance;
   }
-  .sec-head .count{font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+  .sec-head .count{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
 
+  /* ── чеклист ──────────────────────────────── */
+  .check{list-style:none;margin:22px 0 0;padding:0;display:grid;gap:2px}
+  @media (min-width:820px){.check{grid-template-columns:1fr 1fr;gap:2px 34px}}
   .check li{
-    display:flex;gap:12px;align-items:flex-start;
-    padding:12px 4px;border-bottom:1px solid var(--line-soft);
+    display:flex;gap:10px;align-items:flex-start;padding:4px 6px 4px 0;
+    transition:background .18s var(--ease);
   }
-  .check{list-style:none;margin:0;padding:0}
+  .check li:hover{background:var(--surface)}
+  .tick{
+    display:flex;gap:13px;align-items:flex-start;flex:1;min-width:0;
+    padding:8px 6px 8px 12px;cursor:pointer;
+  }
   .check input[type=checkbox]{
     appearance:none;-webkit-appearance:none;flex:none;
-    width:17px;height:17px;margin-top:3px;border:1.5px solid var(--ink);
+    width:18px;height:18px;margin:2px 0 0;border:1.5px solid var(--ink-2);
     background:transparent;cursor:pointer;position:relative;border-radius:0;
+    transition:background .16s var(--ease),border-color .16s var(--ease);
   }
-  .check input[type=checkbox]:checked{background:var(--sea);border-color:var(--sea)}
+  .tick:hover input[type=checkbox]{border-color:var(--ink)}
+  .check input[type=checkbox]:checked{background:var(--accent);border-color:var(--accent)}
   .check input[type=checkbox]:checked::after{
-    content:"";position:absolute;left:5px;top:1px;width:4px;height:9px;
-    border:solid #F2F1EB;border-width:0 2px 2px 0;transform:rotate(43deg);
+    content:"";position:absolute;left:5px;top:1px;width:5px;height:10px;
+    border:solid var(--on-accent);border-width:0 2px 2px 0;transform:rotate(43deg);
   }
-  .check .txt{flex:1;font-size:15px}
-  .check li.done .txt{color:var(--sage);text-decoration:line-through}
-  .row-tools{display:flex;gap:6px;opacity:0;transition:opacity .15s}
-  li:hover .row-tools,li:focus-within .row-tools{opacity:1}
+  .check .txt{flex:1;min-width:0;font-size:15px;line-height:1.5;overflow-wrap:anywhere}
+  .check li.done .txt{color:var(--ink-3);text-decoration:line-through}
+
+  .row-tools{display:flex;gap:4px;opacity:0;transition:opacity .18s var(--ease);flex:none}
+  li:hover .row-tools,li:focus-within .row-tools,.note:hover .row-tools,.note:focus-within .row-tools{opacity:1}
   @media (hover:none){.row-tools{opacity:1}}
   .mini{
-    border:none;background:none;color:var(--ink-soft);font-size:11px;
-    letter-spacing:.08em;text-transform:uppercase;padding:3px 5px;
+    border:none;background:none;color:var(--ink-3);font-size:11px;
+    letter-spacing:.07em;text-transform:uppercase;padding:6px;
+    transition:color .16s var(--ease);
   }
-  .mini:hover{color:var(--alarm)}
+  .mini:hover{color:var(--alert)}
 
-  /* ── сегменты маршрута ───────────────────── */
-  .seg{display:grid;grid-template-columns:132px 1fr;gap:0;
-    border-top:1px solid var(--ink);padding-top:20px;margin-top:34px}
-  .seg-rail{position:relative;padding-right:24px}
-  .seg-rail .when{font-family:var(--mono);font-size:12px;font-weight:600;
-    letter-spacing:.04em;line-height:1.4}
-  .seg-rail .nights{font-family:var(--mono);font-size:11px;color:var(--ink-soft);
-    text-transform:uppercase;letter-spacing:.1em;margin-top:4px}
-  .seg-rail .alt{font-family:var(--mono);font-size:11px;color:var(--sea);margin-top:14px}
+  /* ── отрезок маршрута ─────────────────────── */
+  .seg{display:block;margin-top:26px}
+  .seg-rail{
+    display:flex;gap:8px 20px;align-items:baseline;flex-wrap:wrap;
+    padding-bottom:14px;margin-bottom:20px;border-bottom:1px solid var(--line-2);
+  }
+  .seg-rail .when{
+    font-family:var(--mono);font-size:13px;font-weight:600;
+    letter-spacing:.02em;font-variant-numeric:tabular-nums;
+  }
+  .seg-rail .nights{
+    font-family:var(--mono);font-size:11px;color:var(--ink-2);
+    text-transform:uppercase;letter-spacing:.1em;
+  }
+  .seg-rail .alt{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.06em}
   .seg h3{
-    font-family:var(--display);font-weight:700;font-stretch:114%;
-    font-size:clamp(1.5rem,3.6vw,2.3rem);line-height:1;letter-spacing:-.015em;
-    margin:0 0 6px;text-transform:uppercase;
+    font-family:var(--display);font-weight:700;
+    font-size:clamp(1.5rem,3.4vw,2.1rem);line-height:1.02;letter-spacing:-.03em;
+    margin:0 0 10px;text-wrap:balance;
   }
-  .seg .lede{margin:0 0 20px;font-size:15px;color:var(--ink-soft);max-width:66ch}
+  .seg .lede{margin:0 0 24px;font-size:15.5px;color:var(--ink-2);max-width:64ch}
 
-  .facts{list-style:none;margin:0 0 22px;padding:16px 18px;background:var(--card);
-    border-left:2px solid var(--sea)}
-  .facts li{font-size:14px;padding:5px 0;display:flex;gap:12px}
+  .facts{
+    list-style:none;margin:0 0 26px;padding:0;
+    display:grid;gap:1px;background:var(--line-2);border:1px solid var(--line-2);
+  }
+  @media (min-width:680px){.facts{grid-template-columns:1fr 1fr}}
+  .facts li{display:block;background:var(--surface);padding:13px 15px;font-size:14.5px}
   .facts li span:first-child{
-    font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;
-    color:var(--sea);flex:none;width:104px;padding-top:2px;
+    display:block;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;
+    letter-spacing:.12em;color:var(--accent);margin-bottom:5px;
   }
+  .facts li span:last-child{color:var(--ink-2);line-height:1.5}
 
-  .items{list-style:none;margin:0;padding:0}
-  .items li{display:flex;gap:12px;align-items:flex-start;padding:10px 4px;
-    border-bottom:1px solid var(--line-soft)}
-  .items .bullet{font-family:var(--mono);font-size:11px;color:var(--sage);
-    flex:none;width:26px;padding-top:4px}
-  .items .txt{flex:1;font-size:15px;white-space:pre-wrap}
+  .items{list-style:none;margin:0;padding:0;border-top:1px solid var(--line-2)}
+  .items li{
+    display:flex;gap:14px;align-items:flex-start;padding:11px 6px 11px 2px;
+    transition:background .18s var(--ease);
+  }
+  .items li:hover{background:var(--surface)}
+  .items .bullet{
+    font-family:var(--mono);font-size:11px;color:var(--ink-3);
+    flex:none;width:24px;padding-top:4px;font-variant-numeric:tabular-nums;
+  }
+  .items .txt{flex:1;min-width:0;font-size:15px;white-space:pre-wrap;line-height:1.5;overflow-wrap:anywhere}
   .items .txt b{font-weight:600}
 
-  .add{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .add{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
   .add input,.add textarea,.editbox{
-    font-family:var(--body);font-size:14.5px;color:var(--ink);
-    border:1px solid var(--line);background:var(--card);padding:9px 11px;
-    flex:1 1 240px;min-width:0;border-radius:0;
+    font-family:var(--display);font-size:16px;color:var(--ink);
+    border:var(--rule);background:var(--surface);padding:10px 13px;
+    flex:1 1 260px;min-width:0;border-radius:0;
+    transition:border-color .18s var(--ease);
   }
-  .add input::placeholder,.add textarea::placeholder{color:var(--sage)}
-  .editbox{width:100%;resize:vertical;font-family:var(--body)}
+  .add input:hover,.add textarea:hover{border-color:var(--ink-2)}
+  .add input::placeholder,.add textarea::placeholder{color:var(--ink-3)}
+  .editbox{width:100%;resize:vertical}
 
-  /* ── заметки ─────────────────────────────── */
-  .notes{margin-top:26px;border-top:1px dashed var(--line);padding-top:18px}
-  .notes h4{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.14em;
-    text-transform:uppercase;color:var(--ink-soft);margin:0 0 12px}
-  .note{background:var(--card);border:1px solid var(--line-soft);
-    border-left:2px solid var(--signal);padding:11px 13px;margin-bottom:9px}
-  .note .head{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;
-    font-family:var(--mono);font-size:11px;color:var(--ink-soft);
-    text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
-  .note .head b{color:var(--sea);font-weight:600}
-  .note .body{font-size:14.5px;white-space:pre-wrap}
-  .empty{font-size:14px;color:var(--sage);font-style:normal;margin:0 0 12px}
+  /* ── заметки ──────────────────────────────── */
+  .notes{margin-top:30px;padding-top:20px;border-top:1px solid var(--line-2)}
+  .notes h4{
+    font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--ink-3);margin:0 0 14px;
+  }
+  .note{background:var(--surface);border-left:2px solid var(--focus);padding:12px 15px;margin-bottom:10px}
+  .note .head{
+    display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;
+    font-family:var(--mono);font-size:11px;color:var(--ink-3);
+    text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;
+  }
+  .note .head b{color:var(--accent);font-weight:600}
+  .note .body{font-size:15px;white-space:pre-wrap;line-height:1.5;overflow-wrap:anywhere}
+  .empty{font-size:14.5px;color:var(--ink-3);margin:0 0 12px}
 
-  /* ── синхронизация ───────────────────────── */
-  .sync{margin-top:64px;border-top:2px solid var(--ink);padding-top:20px}
-  .sync p{font-size:14.5px;max-width:70ch;color:var(--ink-soft)}
-  .sync .tools{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
-  #jsonbox{width:100%;height:150px;font-family:var(--mono);font-size:11.5px;
-    border:1px solid var(--line);background:var(--card);padding:12px;display:none;
-    color:var(--ink);border-radius:0}
+  /* ── файл плана ───────────────────────────── */
+  .sync p{font-size:15px;max-width:72ch;color:var(--ink-2);margin:22px 0 0}
+  .sync .tools{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 0}
+  #jsonbox{
+    width:100%;height:170px;margin-top:14px;
+    font-family:var(--mono);font-size:12px;line-height:1.5;
+    border:var(--rule);background:var(--surface);padding:14px;display:none;
+    color:var(--ink);border-radius:0;
+  }
 
-  footer{margin-top:48px;font-family:var(--mono);font-size:11px;color:var(--sage);
-    text-transform:uppercase;letter-spacing:.1em}
+  footer{
+    margin-top:56px;padding-top:18px;border-top:1px solid var(--line-2);
+    font-family:var(--mono);font-size:11px;color:var(--ink-3);
+    text-transform:uppercase;letter-spacing:.1em;
+  }
 
   @media (max-width:720px){
-    .wrap{padding:0 18px 72px}
-    .seg{grid-template-columns:1fr;gap:12px}
-    .seg-rail{padding-right:0;display:flex;gap:18px;align-items:baseline;flex-wrap:wrap}
-    .seg-rail .alt{margin-top:0}
-    .facts li{flex-direction:column;gap:2px}
-    .facts li span:first-child{width:auto}
+    .wrap{padding:0 18px 80px}
+    .hero{padding-top:32px}
+    .facts-grid dd{font-size:15px}
+    .views a{min-width:132px;flex:0 0 auto}
   }
-  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+  /* На телефоне кнопки правки видны всегда — уводим их на свою строку,
+     иначе текст пункта сжимается в колонку шириной в два слова. */
+  @media (max-width:560px){
+    .items li,.check li{flex-wrap:wrap}
+    .row-tools{flex:1 0 100%;justify-content:flex-end;margin-top:2px}
+  }
+
+  @media (prefers-reduced-motion:no-preference){
+    .rise{animation:rise .5s var(--ease) both;animation-delay:calc(var(--i,0)*60ms)}
+    @keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important;animation:none!important}
+  }
 </style>
+
+<a class="skip" href="#main">К содержанию</a>
 
 <div class="wrap">
 
-  <header class="hero">
-    <div class="eyebrow">Маршрут · 3 человека · один поезд, одна машина</div>
-    <h1>Београд<br><span class="thin">→</span> Црна Гора</h1>
-    <div class="hero-meta">
-      <span>2 сен — 27 сен <b>2026</b></span>
-      <span>Дней всего <b>26</b></span>
-      <span id="countdown">—</span>
-      <span>Валюта <b>RSD → EUR</b></span>
+  <header class="hero rise" style="--i:0">
+    <div>
+      <div class="kicker">Трое · один поезд · одна машина</div>
+      <h1>Белград<br><span class="to">→</span> Черногория</h1>
     </div>
+    <dl class="facts-grid">
+      <div>
+        <dt>Даты</dt>
+        <dd>02.09 <small>—</small> 27.09</dd>
+      </div>
+      <div>
+        <dt>Дней</dt>
+        <dd>26</dd>
+      </div>
+      <div>
+        <dt>До выезда</dt>
+        <dd id="countdown">—</dd>
+      </div>
+      <div>
+        <dt>Валюта</dt>
+        <dd>RSD <small>→</small> EUR</dd>
+      </div>
+    </dl>
   </header>
 
-  <div class="profile">
-    <svg viewBox="0 0 1000 300" role="img" aria-label="Профиль высот маршрута: Белград 117 м, перевал у Колашина 1032 м, Подгорица 40 м, Жабляк 1450 м, Которский залив на уровне моря">
-      <defs>
-        <linearGradient id="fill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#0E5A61" stop-opacity=".16"/>
-          <stop offset="100%" stop-color="#0E5A61" stop-opacity="0"/>
-        </linearGradient>
-      </defs>
-
-      <!-- уровень моря -->
-      <line x1="20" y1="220" x2="980" y2="220" stroke="#16232A" stroke-opacity=".22" stroke-width="1"/>
-      <text x="20" y="236" font-family="IBM Plex Mono, monospace" font-size="10" fill="#8C9A92" letter-spacing="1.4">0 М · УРОВЕНЬ МОРЯ</text>
-
-      <!-- заливка под профилем -->
-      <path d="M60,206 L175,171 L300,154 L380,96 L470,215 L540,219 L700,46 L820,143 L940,220 L940,220 L60,220 Z" fill="url(#fill)"/>
-
-      <!-- участок поезда -->
-      <polyline points="60,206 175,171 300,154 380,96 470,215 540,219"
-        fill="none" stroke="#0E5A61" stroke-width="2.5" stroke-linejoin="round"/>
-      <!-- участок машины -->
-      <polyline points="540,219 700,46 820,143 940,220"
-        fill="none" stroke="#16232A" stroke-width="2" stroke-dasharray="7 5" stroke-linejoin="round"/>
-
-      <g font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#16232A" letter-spacing=".6">
-        <g>
-          <circle cx="60" cy="206" r="4" fill="#0E5A61"/>
-          <text x="52" y="192" font-weight="600">БЕОГРАД</text>
-          <text x="52" y="264" fill="#8C9A92" font-size="9.5">117 М</text>
-        </g>
-        <g>
-          <circle cx="380" cy="96" r="4" fill="#0E5A61"/>
-          <text x="330" y="82" font-weight="600">КОЛАШИН</text>
-          <text x="330" y="264" fill="#8C9A92" font-size="9.5">1032 М · ВЕРХ ЛИНИИ</text>
-        </g>
-        <g>
-          <circle cx="470" cy="215" r="4" fill="#0E5A61"/>
-          <text x="440" y="204" font-weight="600">ПОДГОРИЦА</text>
-        </g>
-        <g>
-          <circle cx="540" cy="219" r="4" fill="#0E5A61"/>
-          <text x="556" y="212" font-weight="600">БАР</text>
-          <text x="556" y="226" fill="#8C9A92" font-size="9.5">конец рельсов</text>
-        </g>
-        <g>
-          <circle cx="700" cy="46" r="4" fill="#16232A"/>
-          <text x="666" y="32" font-weight="600">ЖАБЉАК</text>
-          <text x="666" y="264" fill="#8C9A92" font-size="9.5">1450 М</text>
-        </g>
-        <g>
-          <circle cx="820" cy="143" r="4" fill="#16232A"/>
-          <text x="792" y="132" font-weight="600">НИКШИЋ</text>
-        </g>
-        <g>
-          <circle cx="940" cy="220" r="4" fill="#16232A"/>
-          <text x="880" y="212" font-weight="600">ЗАЛИВ</text>
-          <text x="880" y="264" fill="#8C9A92" font-size="9.5">0 М</text>
-        </g>
-      </g>
-    </svg>
-    <div class="profile-key">
-      <span><i></i>поезд, 11 ч 25 мин</span>
-      <span><i class="dash"></i>машина, две недели</span>
-      <span>дважды вверх на километр, дважды вниз к морю</span>
-    </div>
-  </div>
-
-  <div class="alarm">
+  <div class="alarm rise" id="alarm" data-when="check voz" style="--i:1">
     <span class="tag">Дедлайн · 13.09</span>
-    <p>Дневной сезонный поезд «Тара» из Белграда ходит по <b>13 сентября</b>, летний состав ночного «Ловћен» — по ночь с 13 на 14-е. Уезжать 14-го = дневного поезда уже нет. Билеты на международные рейсы онлайн не продаются: касса на Београд Центар (Прокоп).</p>
+    <p>Дневной сезонный поезд «Тара» из Белграда ходит по <b>13 сентября</b>, летний состав ночного «Ловчен» — по ночь с 13 на 14-е. Уезжать 14-го = дневного поезда уже нет. Билеты на международные рейсы онлайн не продаются: касса на вокзале Белград-Центр (Прокоп).</p>
   </div>
 
-  <div class="bar" id="storebar">
+  <div class="bar rise" id="storebar" style="--i:2">
     <span class="dot"></span>
-    <span class="txt" id="storetxt">Проверяю общую память…</span>
+    <span class="txt" id="storetxt" aria-live="polite">Проверяю общую память…</span>
+    <button class="btn solid" id="keyBtn" hidden>Подключить общий план</button>
     <button class="btn ghost" id="renameBtn">Кто я</button>
     <button class="btn ghost" id="reloadBtn">Обновить</button>
   </div>
 
-  <!-- ── чеклист ── -->
-  <section>
-    <div class="sec-head">
-      <h2>Сделать до отъезда</h2>
-      <span class="count mono" id="checkcount"></span>
-    </div>
-    <ul class="check" id="checklist"></ul>
-    <div class="add">
-      <input id="checkInput" placeholder="Добавить пункт" aria-label="Новый пункт чеклиста">
-      <button class="btn solid" id="checkAdd">Добавить</button>
-    </div>
-  </section>
+  <div class="undo" id="undobar" hidden>
+    <span class="what" id="undotxt"></span>
+    <button class="btn" id="undoBtn">Вернуть</button>
+  </div>
 
-  <!-- ── сегменты ── -->
-  <section>
-    <div class="sec-head">
-      <h2>Маршрут по отрезкам</h2>
-      <span class="count mono">4 отрезка · правки видны всем</span>
-    </div>
+  <nav class="views rise" id="views" style="--i:3" aria-label="Разделы плана">
+    <a href="#check"   data-view="check"><b>Сборы</b><span>до отъезда</span></a>
+    <a href="#beograd" data-view="beograd"><b>Белград</b><span>2 — 13 сен</span></a>
+    <a href="#voz"     data-view="voz"><b>Поезд</b><span>13 сен</span></a>
+    <a href="#sever"   data-view="sever"><b>Север</b><span>14 — 20 сен</span></a>
+    <a href="#more"    data-view="more"><b>Побережье</b><span>21 — 27 сен</span></a>
+    <a href="#repo"    data-view="repo"><b>Файл</b><span>plan.json</span></a>
+  </nav>
+
+  <main id="main">
+
+    <section data-panel="check" hidden>
+      <div class="sec-head">
+        <h2>Сделать до отъезда</h2>
+        <span class="count mono" id="checkcount"></span>
+      </div>
+      <ul class="check" id="checklist"></ul>
+      <div class="add">
+        <input id="checkInput" name="new-check" autocomplete="off" placeholder="Добавить пункт…" aria-label="Новый пункт чеклиста">
+        <button class="btn solid" id="checkAdd">Добавить</button>
+      </div>
+    </section>
+
     <div id="segments"></div>
-  </section>
 
-  <!-- ── синхронизация ── -->
-  <section class="sync">
-    <div class="sec-head"><h2>Репозиторий</h2></div>
-    <p><span class="mono">solinandrey/serbia-montenegro-trip</span> — весь план лежит в <span class="mono">plan.json</span>. Править можно двумя способами: прямо на этой странице, а потом скачать <span class="mono">plan.json</span> и заменить файл в репозитории — или отредактировать <span class="mono">plan.json</span> руками в гите, тогда страница подхватит изменения сама. Второй способ честнее: правки идут через коммиты и не затирают друг друга.</p>
-    <div class="tools">
-      <button class="btn solid" id="downloadBtn">Скачать plan.json</button>
-      <button class="btn" id="exportBtn">Показать JSON</button>
-      <button class="btn" id="importBtn">Вставить JSON</button>
-      <button class="btn ghost" id="closeBox">Свернуть</button>
-    </div>
-    <textarea id="jsonbox" spellcheck="false" aria-label="Данные плана в формате JSON"></textarea>
-  </section>
+    <section class="sync" data-panel="repo" hidden>
+      <div class="sec-head"><h2>Файл плана</h2></div>
+      <p>Весь план лежит в <span class="mono" translate="no">plan.json</span> в репозитории <span class="mono" translate="no">solinandrey/serbia-montenegro-trip</span>. Правки на этой странице живут только в вашей вкладке: чтобы их увидели остальные, нажмите «Скачать plan.json» и замените файл в репозитории. Либо правьте <span class="mono" translate="no">plan.json</span> прямо в гите — тогда страница подхватит изменения сама, и ничьи правки не затрутся.</p>
+      <div class="tools">
+        <button class="btn solid" id="downloadBtn">Скачать plan.json</button>
+        <button class="btn" id="exportBtn">Показать JSON</button>
+        <button class="btn" id="importBtn">Вставить JSON</button>
+        <button class="btn ghost" id="closeBox">Свернуть</button>
+      </div>
+      <textarea id="jsonbox" spellcheck="false" aria-label="Данные плана в формате JSON"></textarea>
+    </section>
+
+  </main>
 
   <footer>Обновлено вручную · цены, расписание и визовые правила проверяйте перед выездом</footer>
 </div>
@@ -356,7 +457,18 @@
 
   var KEY = "trip:beograd-crnagora:v1";
   var NAMEKEY = "trip:me";
+  var PASSKEY = "trip:key";
+
+  // Общий план на троих. Сервис на Railway, одна строка в Postgres.
+  // Без пароля не отдаёт и не принимает ничего.
+  var API = "https://api-production-aa10.up.railway.app";
+  var apiKey = null;      // общий пароль, лежит в браузере каждого
+  var shared = false;     // работаем через сервер, правки видны всем
+  var rev = 0;            // ревизия сервера, по ней ловим чужие записи
+  var tomb = Object.create(null);   // что удалено в этой сессии
   var live = false;
+  var dirty = false;
+  var undoState = null, undoTimer = null;
   var me = "";
   var state = null;
 
@@ -375,7 +487,7 @@
       ],
       segments:{
         beograd:[
-          {id:uid(),text:"Забрать билеты на поезд в кассе Београд Центар (Прокоп) в первые дни, не в последний"},
+          {id:uid(),text:"Забрать билеты на поезд в кассе вокзала Белград-Центр (Прокоп) в первые дни, не в последний"},
           {id:uid(),text:"Симки на всех троих — берём пакет побольше, он же поедет в Черногорию"},
           {id:uid(),text:"Решить окончательно: дневной 13-го или ночной. Дневной = виадуки и каньоны при свете"}
         ],
@@ -417,10 +529,10 @@
     {
       key:"voz", when:"13 сен", nights:"11 ч 25 мин", alt:"117 → 40 м",
       title:"Поезд 1131 «Тара»",
-      lede:"Београд Центар 09:45 → Бар 21:10, с пересадкой в Биело-Поле. До границы новые «Штадлеры», дальше черногорские вагоны.",
+      lede:"Белград-Центр 09:45 → Бар 21:10, с пересадкой в Биело-Поле. До границы новые «Штадлеры», дальше черногорские вагоны.",
       facts:[
         ["Цена","2 класс 23,80 € · 1 класс 35,60 € · резервация места 3 €"],
-        ["Ночной","«Ловћен» 19:54 с Прокопа. Кушет 4-местный 12 €, 6-местный 8 €."],
+        ["Ночной","«Ловчен» 19:54 с Прокопа. Кушет 4-местный 12 €, 6-местный 8 €."],
         ["Ради чего","Виадук Мала-Риека и спуск к морю — вторая половина дня. Ночной это проспит."],
         ["Реальность","Опоздания на час-два — норма. Кондиционер и чистота — лотерея."]
       ]
@@ -463,9 +575,110 @@
     return String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0")+" "+t;
   }
 
+  /* ── общий план: сеть и слияние ─────────── */
+  async function apiReq(method,body){
+    var opts={method:method,headers:{"x-trip-key":apiKey}};
+    if(body){
+      opts.headers["content-type"]="application/json";
+      opts.body=JSON.stringify(body);
+    }
+    var res=await fetch(API+"/plan",opts);
+    var data=null;
+    try{ data=await res.json(); }catch(e){}
+    return {status:res.status,data:data};
+  }
+
+  // Ничего не затираем: элементы объединяются по id, своя версия свежее.
+  // Удалённое в этой сессии не воскресает — на это есть tomb.
+  function mergeList(srv,mine){
+    var out=[],at=Object.create(null),i;
+    for(i=0;i<srv.length;i++){
+      if(tomb[srv[i].id]) continue;
+      at[srv[i].id]=out.length; out.push(srv[i]);
+    }
+    for(i=0;i<mine.length;i++){
+      if(tomb[mine[i].id]) continue;
+      if(at[mine[i].id]!==undefined) out[at[mine[i].id]]=mine[i];
+      else out.push(mine[i]);
+    }
+    return out;
+  }
+
+  function mergePlan(srv,mine){
+    var out={version:srv.version||mine.version||1,segments:{}};
+    out.checklist=mergeList(srv.checklist||[],mine.checklist||[]);
+    out.notes=mergeList(srv.notes||[],mine.notes||[]);
+    var keys=Object.create(null),k;
+    for(k in (srv.segments||{})) keys[k]=1;
+    for(k in (mine.segments||{})) keys[k]=1;
+    for(k in keys) out.segments[k]=mergeList((srv.segments||{})[k]||[],(mine.segments||{})[k]||[]);
+    return out;
+  }
+
+  function renderAll(){ renderCheck(); renderSegments(); }
+
+  async function pushShared(){
+    var r=await apiReq("PUT",{rev:rev,plan:state});
+    if(r.status===200){ rev=r.data.rev; return true; }
+    if(r.status===409 && r.data && r.data.plan){
+      state=mergePlan(r.data.plan,state); rev=r.data.rev;
+      var again=await apiReq("PUT",{rev:rev,plan:state});
+      if(again.status===200){ rev=again.data.rev; renderAll(); return true; }
+    }
+    if(r.status===401){ shared=false; apiKey=null; }
+    return false;
+  }
+
+  // Чужие правки подтягиваются сами: в дороге никто не жмёт «обновить».
+  async function pullShared(){
+    if(!shared || !apiKey) return;
+    try{
+      var r=await apiReq("GET");
+      if(r.status!==200 || !r.data) return;
+      if(r.data.rev===rev) return;
+      state=mergePlan(r.data.plan,state);
+      rev=r.data.rev;
+      renderAll(); renderBar();
+    }catch(e){}
+  }
+
+  function askKey(){
+    var v=window.prompt("Общий пароль плана (один на троих):","");
+    if(v && v.trim()){
+      apiKey=v.trim();
+      if(LS){ try{ LS.setItem(PASSKEY,apiKey); }catch(e){} }
+      return true;
+    }
+    return false;
+  }
+
   /* ── хранилище ──────────────────────────── */
   var hasStore = typeof window.storage === "object" && window.storage !== null;
   var fromFile = false;
+  var localSaved = false;
+
+  // window.storage есть только в артефакте Claude. На GitHub Pages его нет,
+  // и без этого запаса правки жили бы до первого обновления страницы.
+  // localStorage тут не заменяет общую память: он у каждого свой.
+  var LS = (function(){
+    try{
+      var k="trip:probe";
+      window.localStorage.setItem(k,"1");
+      window.localStorage.removeItem(k);
+      return window.localStorage;
+    }catch(e){ return null; }
+  })();
+
+  function readLocal(){
+    if(!LS) return null;
+    try{
+      var raw = LS.getItem(KEY);
+      if(!raw) return null;
+      var data = JSON.parse(raw);
+      if(data && data.segments && data.checklist) return data;
+    }catch(e){}
+    return null;
+  }
 
   // В репозитории канонический план лежит в plan.json рядом с index.html.
   async function fetchPlan(){
@@ -480,7 +693,25 @@
 
   async function load(){
     if(!hasStore){
+      if(!apiKey && LS){ try{ apiKey = LS.getItem(PASSKEY); }catch(e){} }
+      if(apiKey){
+        try{
+          var r = await apiReq("GET");
+          if(r.status===200 && r.data){
+            state=r.data.plan; rev=r.data.rev; shared=true; live=true; localSaved=false;
+            return;
+          }
+          if(r.status===401){
+            apiKey=null;
+            if(LS){ try{ LS.removeItem(PASSKEY); }catch(e){} }
+          }
+        }catch(e){}   // сети нет — уходим в запасные варианты
+      }
+      shared=false; live=false;
+      var mine = readLocal();
+      if(mine){ state = mine; localSaved = true; fromFile = false; return; }
       state = (await fetchPlan()) || seed();
+      localSaved = false;
       return;
     }
     try{
@@ -500,7 +731,23 @@
 
   var saving=false, queued=false;
   async function save(){
-    if(!hasStore) return;
+    if(shared){
+      var ok=false;
+      try{ ok=await pushShared(); }catch(e){}
+      if(LS){ try{ LS.setItem(KEY,JSON.stringify(state)); }catch(e){} }
+      if(!ok){ live=false; shared=false; localSaved=true; }
+      renderBar();
+      return;
+    }
+    if(!hasStore){
+      dirty = true;
+      if(LS){
+        try{ LS.setItem(KEY,JSON.stringify(state)); localSaved = true; dirty = false; }
+        catch(e){ localSaved = false; }
+      }
+      renderBar();
+      return;
+    }
     if(saving){queued=true;return;}
     saving=true;
     try{
@@ -519,16 +766,79 @@
     try{ await window.storage.set(NAMEKEY,v,false); }catch(e){}
   }
 
+  // Удаление одним нажатием опасно: на телефоне кнопки правки видны всегда.
+  function offerUndo(label,restore){
+    undoState = restore;
+    $("undotxt").textContent = "Убрано: "+label;
+    $("undobar").hidden = false;
+    if(undoTimer) clearTimeout(undoTimer);
+    undoTimer = setTimeout(clearUndo,25000);
+  }
+  function clearUndo(){
+    undoState = null;
+    $("undobar").hidden = true;
+    if(undoTimer){ clearTimeout(undoTimer); undoTimer = null; }
+  }
+
+  /* ── виды: на экране всегда один отрезок ── */
+  var VIEWS = ["check","beograd","voz","sever","more","repo"];
+
+  function nowView(){
+    var t = new Date();
+    if(t.getFullYear()!==2026 || t.getMonth()!==8) return null;
+    var d = t.getDate();
+    if(d>=2 && d<=12) return "beograd";
+    if(d===13) return "voz";
+    if(d>=14 && d<=20) return "sever";
+    if(d>=21 && d<=27) return "more";
+    return null;
+  }
+
+  function route(){
+    var k = location.hash.replace(/^#/,"");
+    if(VIEWS.indexOf(k)<0) k = nowView() || "check";
+    var panels = document.querySelectorAll("[data-panel]");
+    for(var i=0;i<panels.length;i++){
+      panels[i].hidden = panels[i].getAttribute("data-panel")!==k;
+    }
+    // Дедлайн по билетам относится к сборам и поезду; после 13.09.2026 не относится ни к чему.
+    var al = $("alarm");
+    if(al){
+      var passed = new Date() > new Date(2026,8,13,23,59);
+      al.hidden = passed || al.getAttribute("data-when").indexOf(k)<0;
+    }
+
+    var links = document.querySelectorAll("#views a"), cur = nowView();
+    for(var j=0;j<links.length;j++){
+      var v = links[j].getAttribute("data-view");
+      if(v===k) links[j].setAttribute("aria-current","page");
+      else links[j].removeAttribute("aria-current");
+      links[j].classList.toggle("now", v===cur);
+    }
+  }
+
   function renderBar(){
-    var bar=$("storebar"), txt=$("storetxt");
+    var bar=$("storebar"), txt=$("storetxt"), keyBtn=$("keyBtn");
+    if(keyBtn) keyBtn.hidden = hasStore || shared;
+    if(shared){
+      bar.classList.add("live");
+      txt.innerHTML = "<b>Общий план.</b> Правки видят все трое, чужие подтягиваются сами. Вы подписываетесь как <b>"+esc(me||"без имени")+"</b>.";
+      return;
+    }
     if(live){
       bar.classList.add("live");
       txt.innerHTML = "Общая память включена. Правки видит любой, у кого есть ссылка. Вы подписываетесь как <b>"+esc(me||"без имени")+"</b>.";
     }else{
       bar.classList.remove("live");
-      txt.innerHTML = fromFile
-        ? "<b>Режим репозитория.</b> План прочитан из plan.json. Правки живут в этой вкладке — скачайте plan.json и закоммитьте, чтобы их увидели остальные."
-        : "<b>Локальный режим.</b> plan.json не прочитался — открывайте через GitHub&nbsp;Pages или локальный сервер, иначе браузер блокирует чтение файла.";
+      if(!fromFile && !localSaved){
+        txt.innerHTML = "<b>Файл не прочитался.</b> Открывайте через GitHub&nbsp;Pages или локальный сервер, иначе браузер блокирует чтение plan.json.";
+      }else if(localSaved){
+        txt.innerHTML = "<b>Правки сохранены в этом браузере.</b> Остальные их не видят: чтобы поделиться, скачайте plan.json и закоммитьте.";
+      }else if(LS){
+        txt.innerHTML = "<b>План из plan.json.</b> Ваши правки сохранятся в этом браузере, но у каждого свои — общими они станут только через коммит.";
+      }else{
+        txt.innerHTML = "<b>План из plan.json.</b> Браузер запретил локальное хранение, правки живут только до обновления страницы.";
+      }
     }
   }
 
@@ -541,8 +851,10 @@
       var li=document.createElement("li");
       if(it.done) li.className="done";
       li.innerHTML =
-        '<input type="checkbox" '+(it.done?"checked":"")+' aria-label="Готово">'+
-        '<span class="txt">'+esc(it.text)+'</span>'+
+        '<label class="tick">'+
+          '<input type="checkbox" '+(it.done?"checked":"")+' aria-label="Готово">'+
+          '<span class="txt">'+esc(it.text)+'</span>'+
+        '</label>'+
         '<span class="row-tools">'+
           '<button class="mini" data-act="edit">Править</button>'+
           '<button class="mini" data-act="del">Убрать</button>'+
@@ -551,8 +863,14 @@
         it.done=this.checked; save(); renderCheck();
       });
       li.querySelector('[data-act="del"]').addEventListener("click",function(){
+        var idx=state.checklist.indexOf(it);
+        tomb[it.id]=true;
         state.checklist=state.checklist.filter(function(x){return x.id!==it.id});
         save(); renderCheck();
+        offerUndo(it.text,function(){
+          delete tomb[it.id];
+          state.checklist.splice(idx<0?0:idx,0,it); save(); renderCheck();
+        });
       });
       li.querySelector('[data-act="edit"]').addEventListener("click",function(){
         inlineEdit(li.querySelector(".txt"),it.text,function(v){
@@ -586,6 +904,8 @@
 
       var wrap=document.createElement("article");
       wrap.className="seg";
+      wrap.setAttribute("data-panel",seg.key);
+      wrap.hidden=true;
       wrap.innerHTML =
         '<div class="seg-rail">'+
           '<div class="when">'+esc(seg.when)+'</div>'+
@@ -600,14 +920,14 @@
           }).join("")+'</ul>'+
           '<ul class="items"></ul>'+
           '<div class="add">'+
-            '<input placeholder="Добавить пункт в план" aria-label="Новый пункт плана">'+
+            '<input name="new-item" autocomplete="off" placeholder="Добавить пункт в план…" aria-label="Новый пункт плана">'+
             '<button class="btn">Добавить</button>'+
           '</div>'+
           '<div class="notes">'+
             '<h4>Заметки — '+notes.length+'</h4>'+
             '<div class="notelist"></div>'+
             '<div class="add">'+
-              '<input class="ntext" placeholder="Что важно знать остальным" aria-label="Текст заметки">'+
+              '<input class="ntext" name="new-note" autocomplete="off" placeholder="Что важно знать остальным…" aria-label="Текст заметки">'+
               '<button class="btn solid">Оставить</button>'+
             '</div>'+
           '</div>'+
@@ -625,8 +945,14 @@
             '<button class="mini" data-act="del">Убрать</button>'+
           '</span>';
         li.querySelector('[data-act="del"]').addEventListener("click",function(){
+          var idx=items.indexOf(it);
+          tomb[it.id]=true;
           state.segments[seg.key]=items.filter(function(x){return x.id!==it.id});
           save(); renderSegments();
+          offerUndo(it.text,function(){
+            delete tomb[it.id];
+            state.segments[seg.key].splice(idx<0?0:idx,0,it); save(); renderSegments();
+          });
         });
         li.querySelector('[data-act="edit"]').addEventListener("click",function(){
           inlineEdit(li.querySelector(".txt"),it.text,function(v){
@@ -664,8 +990,13 @@
             '<span class="row-tools"><button class="mini" data-act="del">Удалить</button></span></div>'+
             '<div class="body">'+esc(n.text)+'</div>';
           d.querySelector('[data-act="del"]').addEventListener("click",function(){
+            tomb[n.id]=true;
             state.notes=state.notes.filter(function(x){return x.id!==n.id});
             save(); renderSegments();
+            offerUndo(n.text,function(){
+              delete tomb[n.id];
+              state.notes.push(n); save(); renderSegments();
+            });
           });
           nl.appendChild(d);
         });
@@ -684,6 +1015,7 @@
 
       host.appendChild(wrap);
     });
+    route();
   }
 
   function askName(){
@@ -695,9 +1027,9 @@
   function countdown(){
     var start=new Date(2026,8,2);
     var days=Math.ceil((start-new Date())/864e5);
-    $("countdown").innerHTML = days>0
-      ? "До выезда <b>"+days+" дн.</b>"
-      : (days>-26 ? "<b>В пути</b>" : "<b>Архив</b>");
+    $("countdown").textContent = days>0
+      ? days+" дн."
+      : (days>-26 ? "в пути" : "архив");
   }
 
   /* ── JSON ───────────────────────────────── */
@@ -736,9 +1068,38 @@
   (async function init(){
     await load();
     renderBar(); renderCheck(); renderSegments(); countdown(); bindSync();
+    route();
+    window.addEventListener("hashchange",route);
+
+    $("keyBtn").addEventListener("click",async function(){
+      if(!askKey()) return;
+      await load(); renderBar(); renderAll();
+    });
+
+    // Чужие правки сами появляются раз в 20 секунд.
+    setInterval(pullShared,20000);
+    document.addEventListener("visibilitychange",function(){
+      if(!document.hidden) pullShared();
+    });
+
+    $("undoBtn").addEventListener("click",function(){
+      if(undoState){ var r=undoState; clearUndo(); r(); }
+    });
+
+    // В режиме репозитория правки живут только во вкладке.
+    window.addEventListener("beforeunload",function(e){
+      if(dirty && !live){ e.preventDefault(); e.returnValue=""; }
+    });
 
     $("renameBtn").addEventListener("click",askName);
     $("reloadBtn").addEventListener("click",async function(){
+      if(shared){ await pullShared(); return; }
+      if(!hasStore && localSaved){
+        var ok = window.confirm("Перечитать plan.json из репозитория? Ваши несохранённые в гит правки в этом браузере пропадут.");
+        if(!ok) return;
+        try{ LS.removeItem(KEY); }catch(e){}
+        localSaved = false; clearUndo();
+      }
       await load(); renderBar(); renderCheck(); renderSegments();
     });
 
