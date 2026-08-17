@@ -64,6 +64,18 @@
     font-size:11px;color:var(--dim);margin-top:14px;
   }
   .rail-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .gate{margin-top:16px;padding:14px;border:1.5px solid #000;border-radius:14px;background:#fff}
+  .gate-h{font-family:var(--disp);font-weight:700;font-size:19px;text-transform:uppercase;line-height:1}
+  .gate-p{margin:7px 0 0;font-size:12.5px;line-height:1.45;color:var(--dim)}
+  .gate-known{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .gate-known .chip{padding:6px 11px;font-size:12px}
+
+  /* Пока не представился — трогать нечего: имя проставляется в каждую
+     правку, без него в журнале одни «без имени». */
+  .locked .col-main,.locked .rail-right,.locked .rail-filters,.locked .rail-new,.locked .screens{
+    opacity:.38;pointer-events:none;
+  }
+
   .rail-ask{display:flex;gap:8px;margin-top:10px}
   .rail-ask input{
     flex:1;min-width:0;border:1px solid var(--edge);border-radius:9px;
@@ -73,6 +85,12 @@
   .bulb{position:relative;display:inline-flex;width:7px;height:7px;flex:none}
   .bulb span{position:absolute;inset:0;background:var(--acc);border-radius:50%}
   .bulb span:last-child{animation:dot 2.2s infinite}
+  .keylink{
+    background:none;border:none;padding:0;color:var(--acc);
+    font-size:11.5px;font-weight:600;text-decoration:underline;text-underline-offset:2px;
+  }
+  .keylink:hover{color:#000}
+
   .who{
     border:1px solid var(--acc);border-radius:9px;color:var(--acc);
     padding:6px 11px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
@@ -397,15 +415,19 @@
       <span class="bulb" aria-hidden="true"><span></span><span></span></span>
       <span id="lastline"></span>
     </div>
-    <div class="rail-acts" id="railActs">
-      <button class="who me" id="whoBtn">Кто я</button>
-      <button class="who" id="connectBtn" hidden>Подключить</button>
+    <div class="gate" id="gate" hidden>
+      <div class="gate-h">Кто ты?</div>
+      <p class="gate-p">Чтобы в дороге было видно, чья это правка. Имя сохранится в браузере — второй раз вводить не придётся.</p>
+      <form class="rail-ask" id="nameAsk">
+        <input id="nameInput" placeholder="Имя" aria-label="Твоё имя" autocomplete="off" maxlength="24">
+        <button class="who me" type="submit">Готово</button>
+      </form>
+      <div class="gate-known" id="knownNames"></div>
     </div>
 
-    <form class="rail-ask" id="nameAsk" hidden>
-      <input id="nameInput" placeholder="Как тебя зовут?" aria-label="Твоё имя" autocomplete="off" maxlength="24">
-      <button class="who me" type="submit">Готово</button>
-    </form>
+    <div class="rail-acts" id="railActs" hidden>
+      <button class="who me" id="whoBtn">Кто я</button>
+    </div>
 
     <div class="rail-lab">
       <span>Точки маршрута</span>
@@ -836,16 +858,52 @@
 
   // Модалка prompt() блокирует отрисовку, а кое-где просто запрещена.
   // Поэтому имя спрашиваем прямо в колонке.
-  function openNameAsk(){
-    var box=$("nameAsk"), acts=$("railActs"), inp=$("nameInput");
-    if(!box||!acts||!inp) return;
-    inp.value=me||"";
-    acts.hidden=true; box.hidden=false;
-    inp.focus(); inp.select();
+  /* Имена, которые уже встречались в плане: подписи карточек и реакции.
+     Второму и третьему не надо печатать — жмут своё. */
+  function knownNames(){
+    var seen=Object.create(null),out=[];
+    function add(n){
+      n=String(n||"").trim();
+      if(!n||n==="без имени"||n===me) return;
+      var k=n.toLowerCase();
+      if(seen[k]) return;
+      seen[k]=1; out.push(n);
+    }
+    (state&&state.links||[]).forEach(function(l){
+      add(l.by);
+      (Array.isArray(l.react)?l.react:[]).forEach(function(r){ add(r.who); });
+    });
+    if(lastAuthor) add(lastAuthor);
+    return out.slice(0,6);
   }
-  function closeNameAsk(){
-    if($("nameAsk")) $("nameAsk").hidden=true;
-    if($("railActs")) $("railActs").hidden=false;
+
+  function renderGate(){
+    var gate=$("gate"), acts=$("railActs");
+    if(!gate||!acts) return;
+    var need=!me;
+    gate.hidden=!need;
+    acts.hidden=need;
+    document.body.classList.toggle("locked",need);
+
+    var host=$("knownNames");
+    if(host){
+      host.innerHTML="";
+      if(need) knownNames().forEach(function(n){
+        var b=chip(n,false,{sm:true});
+        b.type="button";
+        b.addEventListener("click",function(){ setName(n); renderGate(); renderAll(); });
+        host.appendChild(b);
+      });
+    }
+    if(need&&$("nameInput")&&document.activeElement!==$("nameInput")) $("nameInput").focus();
+  }
+
+  function openNameAsk(){
+    var gate=$("gate"), acts=$("railActs"), inp=$("nameInput");
+    if(!gate||!acts||!inp) return;
+    inp.value=me||"";
+    acts.hidden=true; gate.hidden=false;
+    inp.focus(); inp.select();
   }
 
   /* ── превью ссылок ──────────────────────── */
@@ -1050,16 +1108,16 @@
   }
 
   function renderStatus(){
-    var t=$("status"), c=$("connectBtn");
-    if(c) c.hidden = shared || hasStore;
+    var t=$("status");
     if(shared){
       t.innerHTML="<b>Общий план.</b> Правки видят все трое, чужие подтягиваются сами. Ты подписан как <b>"+esc(myName())+"</b>.";
       return;
     }
     if(hasStore&&live){ t.innerHTML="<b>Общая память включена.</b> Ты подписан как <b>"+esc(myName())+"</b>."; return; }
     if(!fromFile&&!localSaved){ t.innerHTML="<b>Файл не прочитался.</b> Открывай через GitHub&nbsp;Pages или локальный сервер."; return; }
-    if(localSaved){ t.innerHTML="<b>Правки сохранены в этом браузере.</b> Остальные их не видят — нажми «Подключить» и введи общий пароль."; return; }
-    t.innerHTML="<b>План из plan.json.</b> Правки сохранятся в этом браузере. Чтобы их видели все трое — «Подключить» и общий пароль.";
+    t.innerHTML="<b>Пока только у тебя.</b> Правки лежат в этом браузере, остальные их не видят. "+
+      "Чтобы копилка стала общей, открой ссылку с ключом от Андрея "+
+      '<button class="keylink" id="keyBtn">или введи ключ вручную</button>.';
   }
 
   function chip(label,on,opts){
@@ -1395,6 +1453,7 @@
   }
 
   function renderAll(){
+    renderGate();
     renderFeed(); renderPoints(); renderStatus(); renderHead();
     if(isDesk()) renderLog();
   }
@@ -1435,17 +1494,15 @@
     $("nameAsk").addEventListener("submit",function(e){
       e.preventDefault();
       var v=$("nameInput").value.trim();
-      if(v) setName(v);
-      closeNameAsk(); renderAll();
+      if(!v) return;
+      setName(v); renderGate(); renderAll();
     });
     $("nameInput").addEventListener("keydown",function(e){
-      if(e.key==="Escape"){ closeNameAsk(); }
+      if(e.key==="Escape"&&me){ renderGate(); }
     });
 
-    // Первый заход — спрашиваем имя сразу. Дальше оно помнится в браузере.
-    if(!me) openNameAsk();
-
-    $("connectBtn").addEventListener("click",async function(){
+    document.addEventListener("click",async function(e){
+      if(!e.target||e.target.id!=="keyBtn") return;
       if(!askKey()) return;
       await load();
       route(); renderAll();
