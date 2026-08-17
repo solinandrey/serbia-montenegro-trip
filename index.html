@@ -207,8 +207,16 @@
     padding:3px 7px;border-radius:999px;background:var(--acc);color:#fff;
     font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
   }
+  .iconbtn{
+    margin-left:auto;width:28px;height:28px;flex:none;
+    display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--edge);border-radius:999px;color:var(--dim);
+    font-size:12px;line-height:1;
+    transition:border-color .16s,color .16s,background .16s;
+  }
+  .iconbtn:hover{border-color:#000;color:#000}
   .pin{
-    margin-left:auto;padding:4px 10px;border-radius:999px;
+    margin-left:8px;padding:4px 10px;border-radius:999px;
     font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
     border:1px solid var(--edge);background:#fff;color:rgba(0,0,0,.5);
     transition:background .16s,color .16s,border-color .16s;
@@ -227,17 +235,19 @@
   .num b{font-family:var(--mono);font-size:20px;font-weight:500}
   .copied{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);opacity:0;transition:opacity .2s}
   .copied.on{opacity:1}
-  .card-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+  .card-bottom{margin-top:auto;padding-top:11px}
+  /* Тегов может быть несколько — ряд переносится. */
+  .card-tags{display:flex;flex-wrap:wrap;gap:6px;min-width:0}
   /* Голосовалка прижата к низу: в сетке карточки одной строки разной
      высоты, и без этого подвал болтался бы по середине. */
   /* Подвал переносится, а не распирает карточку: в сетке колонка узкая,
      а кнопок в нём стало больше. */
   .card-foot{
-    display:flex;align-items:center;gap:8px;margin-top:auto;
+    display:flex;align-items:center;gap:8px;margin-top:11px;
     padding-top:12px;border-top:1px solid var(--hair2);
     flex-wrap:wrap;row-gap:8px;min-width:0;
   }
-  .card-tags{margin-bottom:2px}
+
   .react{
     display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;
     border:1px solid var(--edge);background:#fff;color:rgba(0,0,0,.62);
@@ -254,7 +264,14 @@
   .kill{margin-left:auto;font-size:17px;color:var(--dim2);padding:0 4px;line-height:1}
   .kill:hover{color:var(--acc)}
 
-  .card-edit{display:grid;gap:8px;margin-top:10px}
+  .card-edit{display:grid;gap:10px;margin-top:10px}
+  /* Подпись над полем видна всегда, в отличие от подсказки внутри. */
+  .fld{display:block}
+  .fld>span{
+    display:block;margin-bottom:4px;
+    font-family:var(--mono);font-size:9.5px;font-weight:700;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--dim2);
+  }
   .card-edit input,.card-edit textarea{
     width:100%;border:1px solid var(--edge);border-radius:10px;
     padding:9px 11px;font-size:14px;background:#fff;resize:vertical;
@@ -267,7 +284,19 @@
   }
   .linkbtn:hover{color:var(--acc)}
 
-  .thread{margin-top:10px;padding-top:10px;border-top:1px solid var(--hair2)}
+  .card-talk{margin-top:10px;padding-top:10px;border-top:1px solid var(--hair2)}
+  .talkbtn{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:12px;font-weight:600;color:var(--dim);
+    letter-spacing:.02em;
+  }
+  .talkbtn::before{
+    content:"";width:13px;height:11px;flex:none;
+    border:1.5px solid currentColor;border-radius:4px 4px 4px 0;
+  }
+  .talkbtn:hover{color:var(--acc)}
+
+  .thread{margin-top:10px}
   .thread-list{display:grid;gap:8px}
   .comment{background:var(--surf);border-radius:10px;padding:8px 10px}
   .comment-head{
@@ -1336,6 +1365,11 @@
       var top=el("div","card-top");
       top.innerHTML='<span class="host'+(isLink?"":" note")+'">'+esc(isLink?hostOf(l):"заметка")+'</span>'+
         (isNew(l)?'<span class="newtag">ново</span>':"");
+      var pen=el("button","iconbtn","✎");
+      pen.setAttribute("aria-label","Править карточку «"+l.title+"»");
+      pen.title="Править";
+      top.appendChild(pen);
+
       var pin=el("button","pin"+(l.pin?" on":""),l.pin?"под рукой":"закрепить");
       pin.addEventListener("click",function(){
         l.pin=!l.pin; popId=l.id; popKind="pin"; save(); renderFeed();
@@ -1369,15 +1403,17 @@
         l.point=next; popId=l.id; popKind="point"; save(); renderFeed();
       });
       tags.appendChild(tag);
-      card.appendChild(tags);
 
       // правка карточки
       var editBox=el("div","card-edit");
       editBox.hidden=true;
       editBox.innerHTML=
-        '<input class="f-t" placeholder="Название" aria-label="Название карточки">'+
-        '<textarea class="f-n" rows="2" placeholder="Примечание: чем полезно, что уточнить" aria-label="Примечание"></textarea>'+
-        '<input class="f-u" placeholder="Ссылка" inputmode="url" aria-label="Ссылка">'+
+        '<label class="fld"><span>Название</span>'+
+          '<input class="f-t" placeholder="Как называем"></label>'+
+        '<label class="fld"><span>Примечание</span>'+
+          '<textarea class="f-n" rows="2" placeholder="Чем полезно, что уточнить"></textarea></label>'+
+        '<label class="fld"><span>Ссылка</span>'+
+          '<input class="f-u" placeholder="https://…" inputmode="url"></label>'+
         '<div class="card-edit-acts">'+
           '<button class="who me f-save" type="button">Сохранить</button>'+
           '<button class="linkbtn f-cancel" type="button">Отмена</button>'+
@@ -1392,6 +1428,7 @@
         body.hidden=true;
         editBox.querySelector(".f-t").focus();
       }
+      pen.addEventListener("click",openEdit);
       editBox.querySelector(".f-cancel").addEventListener("click",function(){
         editBox.hidden=true; body.hidden=false;
       });
@@ -1432,7 +1469,6 @@
         touch(l); inp.value=""; save(); renderFeed();
       });
       thread.appendChild(addC);
-      card.appendChild(thread);
 
       var foot=el("div","card-foot");
       [["+1","✓","agree"],["?","?","doubt"]].forEach(function(r){
@@ -1447,22 +1483,9 @@
         });
         foot.appendChild(b);
       });
-      var talk=el("button","react talk",'✎<span>'+comments.length+'</span>');
-      talk.title=comments.length?"Обсуждение":"Написать остальным";
-      talk.setAttribute("aria-expanded","false");
-      talk.addEventListener("click",function(){
-        var open=thread.hidden;
-        thread.hidden=!open;
-        talk.setAttribute("aria-expanded",open?"true":"false");
-        if(open){ var i2=addC.querySelector("input"); if(i2) i2.focus(); }
-      });
-      foot.appendChild(talk);
-
       foot.appendChild(el("span","byline",esc((l.by||"—")+(l.ts?" · "+ago(l.ts):""))));
 
-      var pen=el("button","linkbtn","править");
-      pen.addEventListener("click",openEdit);
-      foot.appendChild(pen);
+
       var kill=el("button","kill","×");
       kill.setAttribute("aria-label","Убрать «"+l.title+"»");
       kill.addEventListener("click",function(){
@@ -1470,7 +1493,26 @@
         setTimeout(function(){ removeLink(l); },220);
       });
       foot.appendChild(kill);
-      card.appendChild(foot);
+      // Теги и подвал — один нижний блок, прижатый к низу карточки:
+      // иначе теги стоят на разной высоте, потому что тексты разной длины.
+      var bottom=el("div","card-bottom");
+      bottom.appendChild(tags);
+      bottom.appendChild(foot);
+      card.appendChild(bottom);
+
+      var talkRow=el("div","card-talk");
+      var talk=el("button","talkbtn",
+        comments.length?("Обсуждение · "+comments.length):"Комментировать");
+      talk.setAttribute("aria-expanded","false");
+      talk.addEventListener("click",function(){
+        var open=thread.hidden;
+        thread.hidden=!open;
+        talk.setAttribute("aria-expanded",open?"true":"false");
+        if(open){ var i2=addC.querySelector("input"); if(i2) i2.focus(); }
+      });
+      talkRow.appendChild(talk);
+      card.appendChild(talkRow);
+      card.appendChild(thread);
 
       wrap.appendChild(card);
       host.appendChild(wrap);
@@ -1641,6 +1683,15 @@
   }
   /* Формулировки без рода: «Женя» — имя и мужское, и женское,
      а «присоединился» наугад через раз обращается к человеку неверно. */
+  var PLURAL_TAIL={
+    add:    function(n){ return " — "+n+" "+plural(n,["новая ссылка","новые ссылки","новых ссылок"]); },
+    point:  function(n){ return " — "+n+" "+plural(n,["новая точка","новые точки","новых точек"]); },
+    del:    function(n){ return " — убрано "+n; },
+    chg:    function(n){ return " — правок: "+n; },
+    react:  function(n){ return " — "+n+" "+plural(n,["новая реакция","новые реакции","новых реакций"]); },
+    comment:function(n){ return " — "+n+" "+plural(n,["новый комментарий","новых комментария","новых комментариев"]); }
+  };
+
   var EVENT_TAIL={
     join:" теперь в поездке",
     add:" — новая ссылка",
@@ -1663,21 +1714,31 @@
       var who=list[i].author||"без имени", when=list[i].updated_at;
 
       d.joined.forEach(function(n){ out.push({kind:"join",who:who,when:when,text:n}); });
-      d.add.forEach(function(x){
-        out.push({kind:x.kind==="point"?"point":"add",who:who,when:when,text:x.text,id:x.id});
-      });
-      d.del.forEach(function(x){ out.push({kind:"del",who:who,when:when,text:x.text}); });
-      d.chg.forEach(function(x){
-        out.push({kind:"chg",who:who,when:when,text:x.text,id:x.kind==="link"?x.id:null});
-      });
-      (d.reacts||[]).forEach(function(x){
-        out.push({kind:"react",who:who,when:when,id:x.id,
-          text:(x.kind==="+1"?"за":"вопрос")+" · "+x.title});
-      });
-      (d.comments||[]).forEach(function(x){
-        out.push({kind:"comment",who:who,when:when,id:x.id,
-          text:x.text+" — "+x.title});
-      });
+      // Пачку однотипных правок сворачиваем в одну строку: иначе одно
+      // действие человека растекается на десяток одинаковых событий.
+      function push(kind,items,label){
+        if(!items.length) return;
+        if(items.length===1){
+          out.push({kind:kind,who:who,when:when,text:items[0].text,id:items[0].id||null});
+          return;
+        }
+        out.push({kind:kind,who:who,when:when,count:items.length,
+          text:items.slice(0,3).map(function(x){return x.text}).join(" · ")+
+               (items.length>3?" и ещё "+(items.length-3):"")});
+      }
+
+      var links=d.add.filter(function(x){return x.kind!=="point"});
+      var pts=d.add.filter(function(x){return x.kind==="point"});
+      push("add",links.map(function(x){return {text:x.text,id:x.id}}));
+      push("point",pts.map(function(x){return {text:x.text}}));
+      push("del",d.del.map(function(x){return {text:x.text}}));
+      push("chg",d.chg.map(function(x){return {text:x.text,id:x.kind==="link"?x.id:null}}));
+      push("react",(d.reacts||[]).map(function(x){
+        return {text:(x.kind==="+1"?"за":"вопрос")+" · "+x.title,id:x.id};
+      }));
+      push("comment",(d.comments||[]).map(function(x){
+        return {text:x.text+" — "+x.title,id:x.id};
+      }));
     }
     return out;
   }
@@ -1723,6 +1784,7 @@
       host.innerHTML="";
       events.slice(0,20).forEach(function(ev){
         var tail=EVENT_TAIL[ev.kind]||EVENT_TAIL.chg;
+        if(ev.count) tail=PLURAL_TAIL[ev.kind]?PLURAL_TAIL[ev.kind](ev.count):tail;
         // У «нового участника» объект и есть имя — второй раз его не повторяем.
         var body=(ev.kind==="join")?"":(/^https?:\/\//i.test(ev.text)?shortUrl(ev.text):ev.text);
         var row=el(ev.id?"button":"div","logrow"+(ev.id?" tap":""));
