@@ -1,8 +1,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Белград → Черногория · сентябрь 2026</title>
-<meta name="theme-color" content="#ECEDEF" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#101418" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#FBF4EC" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#181110" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
@@ -16,43 +16,50 @@
   :root{
     color-scheme:light dark;
 
-    --paper:#ECEDEF;
-    --surface:#F6F7F8;
-    --surface-2:#E1E4E7;
-    --ink:#12171C;
-    --ink-2:#4C565F;
-    --ink-3:#7C868F;
-    --line:rgba(18,23,28,.15);
-    --line-2:rgba(18,23,28,.07);
+    --paper:#FBF4EC;
+    --surface:#FFFAF4;
+    --surface-2:#F3E7DA;
+    --ink:#231A16;
+    --ink-2:#5C4C44;
+    --ink-3:#8C7A70;
+    --line:rgba(35,26,22,.16);
+    --line-2:rgba(35,26,22,.08);
 
-    --accent:#1D42B4;
-    --accent-2:#16348D;
-    --on-accent:#F6F7F8;
-    --alert:#A8321F;
-    --focus:#D9A211;
+    --accent:#DC4426;      /* действие */
+    --accent-2:#B93619;
+    --on-accent:#FFFAF4;
+    --sea:#0E7B78;         /* категория, метки, пройденный путь */
+    --alert:#B3261E;
+    --focus:#E8A317;
 
     --display:"Geist","Helvetica Neue",Arial,sans-serif;
     --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
     --ease:cubic-bezier(.16,1,.3,1);
     --rule:1px solid var(--line);
+
+    /* Одна шкала на весь проект: блок, элемент управления, мелкая метка. */
+    --r:12px;
+    --r-sm:8px;
+    --r-xs:5px;
   }
 
   @media (prefers-color-scheme:dark){
     :root{
-      --paper:#101418;
-      --surface:#171D23;
-      --surface-2:#1E262E;
-      --ink:#E6EAEE;
-      --ink-2:#A6B1BB;
-      --ink-3:#78838D;
-      --line:rgba(230,234,238,.17);
-      --line-2:rgba(230,234,238,.08);
+      --paper:#181110;
+      --surface:#221917;
+      --surface-2:#2E2320;
+      --ink:#F3E9E2;
+      --ink-2:#BFACA2;
+      --ink-3:#8E7C73;
+      --line:rgba(243,233,226,.18);
+      --line-2:rgba(243,233,226,.09);
 
-      --accent:#8CA6FF;
-      --accent-2:#A9BCFF;
-      --on-accent:#0E1319;
-      --alert:#E8705E;
-      --focus:#F0B429;
+      --accent:#FF7C5C;
+      --accent-2:#FF9878;
+      --on-accent:#1A1210;
+      --sea:#4FC7BE;
+      --alert:#F2705C;
+      --focus:#FFC257;
     }
   }
 
@@ -65,7 +72,7 @@
     font-family:var(--display);
     font-size:16px;
     line-height:1.55;
-    -webkit-tap-highlight-color:rgba(29,66,180,.16);
+    -webkit-tap-highlight-color:rgba(220,68,38,.16);
   }
   button,input,textarea,a{touch-action:manipulation}
   [hidden]{display:none!important}
@@ -75,12 +82,12 @@
 
   .skip{
     position:absolute;left:-9999px;top:0;z-index:9;
-    background:var(--ink);color:var(--paper);padding:10px 14px;
+    background:var(--ink);color:var(--paper);padding:10px 14px;border-radius:var(--r-sm);
     font-family:var(--mono);font-size:12px;
   }
   .skip:focus{left:0}
 
-  :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+  :focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:var(--r-xs)}
 
   /* ── шапка ────────────────────────────────── */
   .hero{display:grid;gap:22px;padding:44px 0 0}
@@ -102,9 +109,11 @@
 
   .facts-grid{
     display:grid;grid-template-columns:1fr 1fr;
-    border-top:var(--rule);border-left:var(--rule);
+    border:var(--rule);border-radius:var(--r);overflow:hidden;
   }
   .facts-grid div{border-right:var(--rule);border-bottom:var(--rule);padding:12px 15px}
+  .facts-grid div:nth-child(2n){border-right:none}
+  .facts-grid div:nth-last-child(-n+2){border-bottom:none}
   .facts-grid dt{
     font-family:var(--mono);font-size:10.5px;text-transform:uppercase;
     letter-spacing:.13em;color:var(--ink-3);margin:0 0 5px;
@@ -119,6 +128,7 @@
   .alarm{
     display:grid;gap:8px;margin:26px 0 0;padding:14px 16px;
     background:var(--surface);border:var(--rule);border-left:3px solid var(--alert);
+    border-radius:var(--r);
   }
   @media (min-width:760px){.alarm{grid-template-columns:150px 1fr;gap:20px}}
   .alarm .tag{
@@ -131,7 +141,7 @@
   /* ── статус хранилища ─────────────────────── */
   .bar{
     display:flex;flex-wrap:wrap;gap:10px 12px;align-items:center;
-    margin:12px 0 0;padding:11px 15px;border:var(--rule);
+    margin:12px 0 0;padding:11px 15px;border:var(--rule);border-radius:var(--r);
   }
   .bar .dot{width:7px;height:7px;background:var(--ink-3);flex:none}
   .bar.live .dot{background:var(--accent)}
@@ -146,6 +156,7 @@
     display:flex;gap:12px;align-items:center;flex-wrap:wrap;
     margin:8px 0 0;padding:11px 15px;
     background:var(--surface);border:var(--rule);border-left:3px solid var(--focus);
+    border-radius:var(--r);
   }
   .undo .what{
     font-family:var(--mono);font-size:12.5px;color:var(--ink-2);
@@ -157,7 +168,7 @@
   .btn{
     border:1px solid var(--ink);background:transparent;color:var(--ink);
     font-size:11.5px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;
-    padding:9px 14px;white-space:nowrap;
+    padding:9px 14px;white-space:nowrap;border-radius:var(--r-sm);
     transition:background .18s var(--ease),color .18s var(--ease),transform .12s var(--ease);
   }
   .btn:hover{background:var(--ink);color:var(--paper)}
@@ -183,8 +194,8 @@
     fill:none;stroke:var(--paper);stroke-width:1.5;
     stroke-dasharray:9 13;stroke-linecap:round;opacity:.9;
   }
-  .road-done{fill:none;stroke:var(--accent);stroke-width:12;stroke-linecap:round;opacity:.28}
-  .road-mark circle:first-child{fill:var(--accent);opacity:.22}
+  .road-done{fill:none;stroke:var(--sea);stroke-width:12;stroke-linecap:round;opacity:.4}
+  .road-mark circle:first-child{fill:var(--accent);opacity:.24}
   .road-mark circle:last-child{fill:var(--accent)}
 
   .stops{position:relative;height:62px;margin-top:2px}
@@ -238,12 +249,12 @@
     display:inline-block;margin-left:8px;vertical-align:1px;
     font-family:var(--mono);font-size:9.5px;font-weight:500;
     text-transform:uppercase;letter-spacing:.11em;
-    color:var(--on-accent);background:var(--accent);padding:1px 5px;
+    color:var(--on-accent);background:var(--accent);padding:1px 6px;border-radius:var(--r-xs);
   }
   .badge{
     display:inline-block;margin-left:7px;font-style:normal;
     font-family:var(--mono);font-size:9.5px;font-weight:600;
-    color:var(--on-accent);background:var(--accent);padding:1px 5px;
+    color:var(--on-accent);background:var(--accent);padding:1px 6px;border-radius:var(--r-xs);
     vertical-align:1px;letter-spacing:.04em;
   }
   .stop[aria-current="page"] .badge,.offroad[aria-current="page"] .badge{
@@ -256,7 +267,7 @@
     display:inline-flex;align-items:center;justify-content:center;gap:5px;
     border:1px solid var(--line);background:transparent;color:var(--ink-3);
     font-family:var(--mono);font-size:11.5px;line-height:1;
-    padding:6px 9px;min-height:28px;min-width:34px;border-radius:0;
+    padding:6px 9px;min-height:28px;min-width:34px;border-radius:var(--r-sm);
     transition:border-color .18s var(--ease),color .18s var(--ease),background .18s var(--ease);
   }
   /* На тач-устройствах в кнопку надо попадать пальцем, а не курсором. */
@@ -310,20 +321,105 @@
   }
   .inline-link:hover{text-decoration-thickness:2px}
 
-  /* ── под рукой: брони, телефоны, адреса ───── */
-  .lgroup{margin-top:28px}
-  .lgroup > h3{
-    font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.13em;
-    text-transform:uppercase;color:var(--ink-3);margin:0 0 12px;
-    padding-bottom:8px;border-bottom:1px solid var(--line-2);
+  /* ── под рукой: ссылки и заметки ──────────── */
+  /* Составной блок ввода: имя крупно, уточнения строкой ниже. */
+  .composer{
+    margin:24px 0 0;padding:6px 6px 6px;
+    background:var(--surface);border:var(--rule);border-radius:var(--r);
+    transition:border-color .2s var(--ease);
   }
+  .composer:focus-within{border-color:var(--ink-2)}
+  .composer .f-title{
+    display:block;width:100%;border:none;background:transparent;
+    font-family:var(--display);font-size:17px;color:var(--ink);
+    padding:13px 14px 11px;border-radius:var(--r-sm);
+  }
+  .composer .f-title::placeholder{color:var(--ink-3)}
+  .composer .f-title:focus{outline:none}
+  .composer:focus-within .f-title{outline:none}
+  .composer-row{
+    display:grid;gap:8px;padding:0 6px 6px;
+    border-top:1px solid var(--line-2);margin-top:2px;padding-top:8px;
+  }
+  @media (min-width:760px){
+    .composer-row{grid-template-columns:minmax(0,1fr) auto auto;align-items:center}
+  }
+  .composer .f-url{
+    width:100%;min-width:0;border:var(--rule);border-radius:var(--r-sm);
+    background:var(--paper);color:var(--ink);
+    font-family:var(--display);font-size:15px;padding:9px 12px;
+  }
+  .composer .f-url::placeholder{color:var(--ink-3)}
+  .composer-tag{
+    display:flex;align-items:center;gap:8px;
+    border:var(--rule);border-radius:var(--r-sm);background:var(--paper);
+    padding:4px 6px 4px 11px;
+  }
+  .composer-tag > span{
+    font-family:var(--mono);font-size:10px;text-transform:uppercase;
+    letter-spacing:.12em;color:var(--ink-3);
+  }
+  .composer .f-tag{
+    border:none;background:var(--paper);color:var(--ink);
+    font-family:var(--mono);font-size:13px;padding:6px 4px;
+    border-radius:var(--r-xs);appearance:none;min-width:104px;
+  }
+  .composer .f-tag:focus{outline:none}
+  .composer .btn{padding:11px 18px}
+
+  .lfilter{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0 0}
+  .chip{
+    display:inline-flex;align-items:center;gap:7px;
+    border:1px solid var(--line);background:transparent;color:var(--ink-2);
+    font-family:var(--mono);font-size:11.5px;text-transform:uppercase;
+    letter-spacing:.08em;padding:7px 11px;min-height:32px;border-radius:var(--r-sm);
+    transition:border-color .18s var(--ease),color .18s var(--ease),background .18s var(--ease);
+  }
+  .chip:hover{border-color:var(--ink-2);color:var(--ink)}
+  .chip.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+  .chip i{font-style:normal;font-variant-numeric:tabular-nums;opacity:.65}
+  @media (hover:none){.chip{min-height:38px;padding:9px 13px}}
+
+  /* превью ссылки */
+  .og{
+    display:flex;gap:12px;align-items:center;margin-top:11px;
+    padding:9px 11px;text-decoration:none;
+    background:var(--paper);border:var(--rule);border-radius:var(--r-sm);
+    transition:border-color .18s var(--ease);
+  }
+  .og:hover{border-color:var(--ink-2)}
+  .og-img{
+    flex:none;width:52px;height:52px;object-fit:cover;
+    border-radius:var(--r-xs);background:var(--surface-2);
+  }
+  .og-text{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .og-text b{
+    font-size:14px;font-weight:600;color:var(--ink);line-height:1.35;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  .og-desc{
+    font-size:12.5px;color:var(--ink-2);line-height:1.4;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  .og-site{
+    font-family:var(--mono);font-size:10.5px;text-transform:uppercase;
+    letter-spacing:.1em;color:var(--ink-3);
+  }
+
+  .llist{margin-top:22px}
   .lcard{
     background:var(--surface);border:var(--rule);border-left:2px solid var(--accent);
-    padding:13px 15px;margin-bottom:10px;
+    padding:13px 15px;margin-bottom:10px;border-radius:var(--r);
   }
   .lcard-head{display:flex;gap:12px;align-items:baseline;justify-content:space-between}
   .lcard-head b{font-size:15.5px;font-weight:600;letter-spacing:-.01em;flex:1 1 auto;min-width:8ch;overflow-wrap:break-word}
-  .lfields{display:grid;gap:1px 26px;margin:10px 0 0}
+  .ltag{
+    display:inline-block;margin-top:7px;
+    font-family:var(--mono);font-size:10px;text-transform:uppercase;
+    letter-spacing:.12em;color:var(--ink-3);
+    border:1px solid var(--line);padding:2px 8px;border-radius:var(--r-xs);
+  }
+  .lfields{display:grid;gap:1px 26px;margin:11px 0 0}
   @media (min-width:680px){.lfields{grid-template-columns:1fr 1fr}}
   .lfields > div{display:flex;gap:10px;align-items:baseline;padding:4px 0;min-width:0}
   .lfields dt{
@@ -335,23 +431,38 @@
   .lfields dd.mono{font-family:var(--mono);font-size:13.5px;font-variant-numeric:tabular-nums}
   .lfields a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
   .licon{margin-right:8px;font-size:17px;line-height:1;vertical-align:-1px}
-  .add.add-link{display:grid;gap:8px;align-items:start}
-  @media (min-width:680px){
-    .add.add-link{grid-template-columns:76px minmax(0,1fr) minmax(0,1.15fr) auto}
-  }
-  .add.add-link input{flex:none;width:100%}
-  .add.add-link .f-icon{text-align:center;font-size:16px}
-  .add.add-link .btn{align-self:stretch}
-
-  .lempty{
-    font-size:15px;color:var(--ink-2);margin:22px 0 0;max-width:62ch;
-    padding:14px 16px;background:var(--surface);border-left:2px solid var(--focus);
-  }
+  .lempty{margin:26px 0 0;max-width:60ch}
+  .lempty p{margin:0;font-size:15.5px;line-height:1.6;color:var(--ink-2)}
+  .lempty-hint{margin-top:10px!important;font-size:14px!important;color:var(--ink-3)!important}
 
   /* Приезд: содержимое отрезка появляется, когда точка тронулась. */
   @media (prefers-reduced-motion:no-preference){
     .arrive{animation:arrive .34s var(--ease) both}
     @keyframes arrive{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+    /* Появление лесенкой: только когда вид открывают, а не на каждой правке.
+       Класс .arrive снимается через секунду, поэтому повторно не проигрывается. */
+    .arrive .items li,
+    .arrive .check li,
+    .arrive .facts li,
+    .arrive .lcard,
+    .arrive .note,
+    .arrive .chip,
+    .arrive .hist-row{
+      animation:stepin .44s var(--ease) both;
+      animation-delay:calc(var(--i,0)*42ms + 60ms);
+    }
+    @keyframes stepin{
+      from{opacity:0;transform:translateY(10px) scale(.985)}
+      to{opacity:1;transform:none}
+    }
+
+    .lcard,.note{transition:transform .22s var(--ease),border-color .22s var(--ease)}
+    .lcard:hover,.note:hover{transform:translateY(-2px)}
+    .og{transition:transform .22s var(--ease),border-color .18s var(--ease)}
+    .og:hover{transform:translateY(-1px)}
+    .chip,.react{transition:transform .16s var(--ease),border-color .18s var(--ease),color .18s var(--ease),background .18s var(--ease)}
+    .chip:active,.react:active{transform:translateY(1px)}
   }
 
   /* ── секции ───────────────────────────────── */
@@ -382,7 +493,7 @@
   .check input[type=checkbox]{
     appearance:none;-webkit-appearance:none;flex:none;
     width:18px;height:18px;margin:2px 0 0;border:1.5px solid var(--ink-2);
-    background:transparent;cursor:pointer;position:relative;border-radius:0;
+    background:transparent;cursor:pointer;position:relative;border-radius:var(--r-xs);
     transition:background .16s var(--ease),border-color .16s var(--ease);
   }
   .tick:hover input[type=checkbox]{border-color:var(--ink)}
@@ -418,7 +529,7 @@
     font-family:var(--mono);font-size:11px;color:var(--ink-2);
     text-transform:uppercase;letter-spacing:.1em;
   }
-  .seg-rail .alt{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.06em}
+  .seg-rail .alt{font-family:var(--mono);font-size:11px;color:var(--sea);letter-spacing:.06em}
   .seg h3{
     font-family:var(--display);font-weight:700;
     font-size:clamp(1.5rem,3.4vw,2.1rem);line-height:1.02;letter-spacing:-.03em;
@@ -429,12 +540,13 @@
   .facts{
     list-style:none;margin:0 0 26px;padding:0;
     display:grid;gap:1px;background:var(--line-2);border:1px solid var(--line-2);
+    border-radius:var(--r);overflow:hidden;
   }
   @media (min-width:680px){.facts{grid-template-columns:1fr 1fr}}
   .facts li{display:block;background:var(--surface);padding:13px 15px;font-size:14.5px}
   .facts li span:first-child{
     display:block;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;
-    letter-spacing:.12em;color:var(--accent);margin-bottom:5px;
+    letter-spacing:.12em;color:var(--sea);margin-bottom:5px;
   }
   .facts li span:last-child{color:var(--ink-2);line-height:1.5}
 
@@ -455,7 +567,7 @@
   .add input,.add textarea,.editbox{
     font-family:var(--display);font-size:16px;color:var(--ink);
     border:var(--rule);background:var(--surface);padding:10px 13px;
-    flex:1 1 260px;min-width:0;border-radius:0;
+    flex:1 1 260px;min-width:0;border-radius:var(--r-sm);
     transition:border-color .18s var(--ease);
   }
   .add input:hover,.add textarea:hover{border-color:var(--ink-2)}
@@ -468,13 +580,14 @@
     font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.13em;
     text-transform:uppercase;color:var(--ink-3);margin:0 0 14px;
   }
-  .note{background:var(--surface);border-left:2px solid var(--focus);padding:12px 15px;margin-bottom:10px}
+  .note{background:var(--surface);border-left:2px solid var(--focus);padding:12px 15px;
+    margin-bottom:10px;border-radius:var(--r)}
   .note .head{
     display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;
     font-family:var(--mono);font-size:11px;color:var(--ink-3);
     text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;
   }
-  .note .head b{color:var(--accent);font-weight:600}
+  .note .head b{color:var(--sea);font-weight:600}
   .note .body{font-size:15px;white-space:pre-wrap;line-height:1.5;overflow-wrap:anywhere}
   .empty{font-size:14.5px;color:var(--ink-3);margin:0 0 12px}
 
@@ -485,7 +598,7 @@
     width:100%;height:170px;margin-top:14px;
     font-family:var(--mono);font-size:12px;line-height:1.5;
     border:var(--rule);background:var(--surface);padding:14px;display:none;
-    color:var(--ink);border-radius:0;
+    color:var(--ink);border-radius:var(--r-sm);
   }
 
   footer{
@@ -1191,6 +1304,7 @@
     {k:"more",    f:0.97}
   ];
   var road = {path:null,done:null,mark:null,len:0,at:null,to:null,raf:0};
+  var arriveTimer=0;
 
   function reduceMotion(){
     return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
@@ -1293,6 +1407,8 @@
       shown.classList.remove("arrive");
       void shown.offsetWidth;                     // перезапуск анимации
       shown.classList.add("arrive");
+      clearTimeout(arriveTimer);
+      arriveTimer=setTimeout(function(){ shown.classList.remove("arrive"); },1400);
     }
     // Дедлайн по билетам относится к сборам и поезду; после 13.09.2026 не относится ни к чему.
     var al = $("alarm");
@@ -1355,9 +1471,10 @@
   function renderCheck(){
     var ul=$("checklist"); ul.innerHTML="";
     var done=0;
-    state.checklist.forEach(function(it){
+    state.checklist.forEach(function(it,idx){
       if(it.done) done++;
       var li=document.createElement("li");
+      li.style.setProperty("--i",idx);
       if(it.done) li.className="done";
       li.innerHTML =
         '<label class="tick">'+
@@ -1542,109 +1659,202 @@
     return r;
   }
 
+  var linkFilter="all";   // "all" | "" (общее) | ключ отрезка
+  var ogCache=Object.create(null);   // что уже спрашивали у сервера
+
+  /* Карточку ссылки собирает сервер: браузеру чужую страницу читать не дают.
+     Многие сайты (Airbnb, Booking) закрыты — тогда просто остаётся ссылка. */
+  function paintOg(card,d){
+    // Заглушки вроде «Переход на ru.airbnb.com» — шум хуже, чем ничего.
+    // Карточку показываем, только если сайт дал картинку или описание.
+    if(!d || d.error || !d.title) return;
+    if(!d.image && !d.description) return;
+    if(card.querySelector(".og")) return;
+    var a=document.createElement("a");
+    a.className="og";
+    a.href=d.url; a.target="_blank"; a.rel="noopener noreferrer";
+    a.innerHTML=
+      (d.image?'<img class="og-img" src="'+esc(d.image)+'" width="72" height="72" loading="lazy" alt="">':'')+
+      '<span class="og-text">'+
+        '<b>'+esc(d.title)+'</b>'+
+        (d.description?'<span class="og-desc">'+esc(d.description)+'</span>':'')+
+        '<span class="og-site">'+esc(d.site||"")+'</span>'+
+      '</span>';
+    var img=a.querySelector(".og-img");
+    if(img) img.addEventListener("error",function(){ img.remove(); });
+    var fields=card.querySelector(".lfields");
+    if(fields) card.insertBefore(a,fields); else card.appendChild(a);
+  }
+
+  function loadOg(card,url){
+    if(!shared || !apiKey) return;
+    if(ogCache[url]!==undefined){ paintOg(card,ogCache[url]); return; }
+    ogCache[url]=null;
+    fetch(API+"/og?url="+encodeURIComponent(url),{headers:{"x-trip-key":apiKey}})
+      .then(function(r){ return r.ok?r.json():null; })
+      .then(function(d){ ogCache[url]=d||null; paintOg(card,d); })
+      .catch(function(){});
+  }
+
+  function tagTitle(k){
+    for(var i=0;i<LINK_GROUPS.length;i++) if(LINK_GROUPS[i].key===(k||null)) return LINK_GROUPS[i].title;
+    return "Общее";
+  }
+
   function renderLinks(){
     var host=$("links"); if(!host) return;
-    host.innerHTML="";
     var all=state.links||(state.links=[]);
-    $("linkcount").textContent = all.length ? all.length+" запис"+(all.length===1?"ь":(all.length<5?"и":"ей")) : "";
+    host.innerHTML="";
 
-    if(!all.length){
-      var inv=document.createElement("p");
-      inv.className="lempty";
-      inv.textContent="Сюда — номера броней, адреса и телефоны, чтобы не искать в переписке. Пока забронировано только жильё в Белграде.";
-      host.appendChild(inv);
+    $("linkcount").textContent = all.length
+      ? all.length+" запис"+(all.length===1?"ь":(all.length<5?"и":"ей")) : "";
+
+    /* Один составной блок: сначала имя, потом уточнения. Четыре поля
+       в ряд читались как четыре несвязанные штуки. */
+    var add=document.createElement("form");
+    add.className="composer";
+    var opts="";
+    for(var g=0;g<LINK_GROUPS.length;g++){
+      opts+='<option value="'+(LINK_GROUPS[g].key||"")+'">'+esc(LINK_GROUPS[g].title)+'</option>';
+    }
+    add.innerHTML=
+      '<input class="f-title" name="new-title" autocomplete="off" '+
+        'placeholder="Что сохраняем? Квартира, паром, статья…" aria-label="Название записи">'+
+      '<div class="composer-row">'+
+        '<input class="f-url" name="new-url" autocomplete="off" inputmode="url" '+
+          'placeholder="Ссылка, если есть" aria-label="Ссылка">'+
+        '<label class="composer-tag">'+
+          '<span>Тег</span>'+
+          '<select class="f-tag" aria-label="К какой части поездки относится">'+opts+'</select>'+
+        '</label>'+
+        '<button class="btn solid" type="submit">Добавить</button>'+
+      '</div>';
+
+    var fTitle=add.querySelector(".f-title"),
+        fUrl=add.querySelector(".f-url"),
+        fTag=add.querySelector(".f-tag");
+    if(linkFilter!=="all") fTag.value=linkFilter;
+
+    add.addEventListener("submit",function(e){
+      e.preventDefault();
+      var title=fTitle.value.trim(), url=safeUrl(fUrl.value), tag=fTag.value;
+      if(!title && !url) return;
+      var rec={id:uid(),segment:tag||null,title:title||shortUrl(url)};
+      if(url) rec.url=url;
+      state.links.push(touch(rec));
+      fTitle.value=""; fUrl.value="";
+      save(); renderLinks();
+      var next=$("links").querySelector(".f-title");
+      if(next) next.focus();
+    });
+    host.appendChild(add);
+
+    /* фильтр по тегу: показываем только те теги, где что-то есть */
+    var counts=Object.create(null),i;
+    for(i=0;i<all.length;i++){
+      var k=all[i].segment||"";
+      counts[k]=(counts[k]||0)+1;
+    }
+    if(all.length){
+      var bar=document.createElement("div");
+      bar.className="lfilter";
+      var chips='<button class="chip'+(linkFilter==="all"?" on":"")+'" data-tag="all">Все<i>'+all.length+'</i></button>';
+      for(i=0;i<LINK_GROUPS.length;i++){
+        var key=LINK_GROUPS[i].key||"";
+        if(!counts[key]) continue;
+        chips+='<button class="chip'+(linkFilter===key?" on":"")+'" data-tag="'+esc(key)+'">'+
+               esc(LINK_GROUPS[i].title)+'<i>'+counts[key]+'</i></button>';
+      }
+      bar.innerHTML=chips;
+      var bs=bar.querySelectorAll(".chip");
+      for(i=0;i<bs.length;i++){
+        (function(b){
+          b.addEventListener("click",function(){
+            linkFilter=b.getAttribute("data-tag");
+            renderLinks();
+          });
+        })(bs[i]);
+      }
+      host.appendChild(bar);
     }
 
-    LINK_GROUPS.forEach(function(g){
-      var mine=all.filter(function(r){
-        return g.key===null ? !r.segment : r.segment===g.key;
-      });
-
-      var box=document.createElement("div");
-      box.className="lgroup";
-      box.innerHTML='<h3>'+esc(g.title)+'</h3>';
-
-      mine.forEach(function(r){
-        var card=document.createElement("article");
-        card.className="lcard";
-        var rows="";
-        var url=safeUrl(r.url);
-        if(url) rows+='<div><dt>Ссылка</dt><dd><a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer" title="'+esc(url)+'">'+esc(shortUrl(esc(url)))+'</a></dd></div>';
-        if(r.phone) rows+='<div><dt>Телефон</dt><dd class="mono"><a href="tel:'+esc(String(r.phone).replace(/[^0-9+]/g,""))+'">'+esc(r.phone)+'</a></dd></div>';
-        if(r.address) rows+='<div><dt>Адрес</dt><dd>'+linkify(esc(r.address))+'</dd></div>';
-        if(r.ref) rows+='<div><dt>Бронь</dt><dd class="mono">'+esc(r.ref)+'</dd></div>';
-        if(r.note) rows+='<div><dt>Заметка</dt><dd>'+linkify(esc(r.note))+'</dd></div>';
-
-        card.innerHTML=
-          '<div class="lcard-head">'+
-            '<b class="ltitle">'+(r.icon?'<span class="licon">'+esc(r.icon)+'</span>':'')+
-              esc(r.title)+freshTag(r)+'</b>'+
-            '<span class="row-tools">'+
-              '<button class="mini" data-act="edit">Править</button>'+
-              '<button class="mini" data-act="del">Убрать</button>'+
-            '</span>'+
-          '</div>'+
-          (rows?'<dl class="lfields">'+rows+'</dl>':'');
-
-        card.querySelector('[data-act="del"]').addEventListener("click",function(){
-          var idx=state.links.indexOf(r);
-          tomb[r.id]=true;
-          state.links=state.links.filter(function(x){return x.id!==r.id});
-          save(); renderLinks();
-          offerUndo(r.title,function(){
-            delete tomb[r.id];
-            state.links.splice(idx<0?0:idx,0,r); save(); renderLinks();
-          });
-        });
-
-        card.querySelector('[data-act="edit"]').addEventListener("click",function(){
-          inlineEdit(card.querySelector(".ltitle"),recToText(r),function(v){
-            var next=touch(textToRec(v,r));
-            next.react=r.react;
-            var at=state.links.indexOf(r);
-            if(at>=0) state.links[at]=next;
-            save(); renderLinks();
-          },7);
-        });
-
-        box.appendChild(card);
-      });
-
-      var add=document.createElement("div");
-      add.className="add add-link";
-      add.innerHTML=
-        '<input class="f-icon" name="new-icon" autocomplete="off" maxlength="4" '+
-          'placeholder="значок" aria-label="Значок записи в «'+esc(g.title)+'»">'+
-        '<input class="f-title" name="new-title" autocomplete="off" '+
-          'placeholder="Название" aria-label="Название записи в «'+esc(g.title)+'»">'+
-        '<input class="f-url" name="new-url" autocomplete="off" inputmode="url" '+
-          'placeholder="Ссылка (необязательно)" aria-label="Ссылка записи в «'+esc(g.title)+'»">'+
-        '<button class="btn">Добавить</button>';
-
-      var fIcon=add.querySelector(".f-icon"),
-          fTitle=add.querySelector(".f-title"),
-          fUrl=add.querySelector(".f-url");
-
-      function addLink(){
-        var title=fTitle.value.trim(), url=safeUrl(fUrl.value), icon=cleanIcon(fIcon.value);
-        // Название важнее ссылки: без имени запись потом не найти глазами.
-        if(!title && !url) return;
-        var rec={id:uid(),segment:g.key,title:title||shortUrl(url)};
-        if(url) rec.url=url;
-        if(icon) rec.icon=icon;
-        state.links.push(touch(rec));
-        fIcon.value=""; fTitle.value=""; fUrl.value="";
-        save(); renderLinks();
-        fTitle.focus();
-      }
-      add.querySelector("button").addEventListener("click",addLink);
-      [fIcon,fTitle,fUrl].forEach(function(f){
-        f.addEventListener("keydown",function(e){if(e.key==="Enter")addLink()});
-      });
-      box.appendChild(add);
-
-      host.appendChild(box);
+    var shown=all.filter(function(r){
+      if(linkFilter==="all") return true;
+      return (r.segment||"")===linkFilter;
     });
+
+    if(!all.length){
+      var inv=document.createElement("div");
+      inv.className="lempty";
+      inv.innerHTML=
+        '<p>Пока пусто. Сюда кладут то, что иначе теряется в переписке: ссылку на жильё, '+
+        'номер брони, телефон хозяина, адрес парковки.</p>'+
+        '<p class="lempty-hint">Тег в форме выше говорит, к какой части поездки это относится — '+
+        'потом по нему можно отфильтровать.</p>';
+      host.appendChild(inv);
+      return;
+    }
+    if(!shown.length){
+      var no=document.createElement("p");
+      no.className="lempty";
+      no.textContent="В «"+tagTitle(linkFilter)+"» пока пусто. Добавьте запись или снимите фильтр.";
+      host.appendChild(no);
+      return;
+    }
+
+    var list=document.createElement("div");
+    list.className="llist";
+
+    shown.forEach(function(r,idx){
+      var card=document.createElement("article");
+      card.className="lcard";
+      card.style.setProperty("--i",idx);
+      var rows="";
+      var url=safeUrl(r.url);
+      if(url) rows+='<div><dt>Ссылка</dt><dd><a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer" title="'+esc(url)+'">'+esc(shortUrl(esc(url)))+'</a></dd></div>';
+      if(r.phone) rows+='<div><dt>Телефон</dt><dd class="mono"><a href="tel:'+esc(String(r.phone).replace(/[^0-9+]/g,""))+'">'+esc(r.phone)+'</a></dd></div>';
+      if(r.address) rows+='<div><dt>Адрес</dt><dd>'+linkify(esc(r.address))+'</dd></div>';
+      if(r.ref) rows+='<div><dt>Бронь</dt><dd class="mono">'+esc(r.ref)+'</dd></div>';
+      if(r.note) rows+='<div><dt>Заметка</dt><dd>'+linkify(esc(r.note))+'</dd></div>';
+
+      card.innerHTML=
+        '<div class="lcard-head">'+
+          '<b class="ltitle">'+(r.icon?'<span class="licon">'+esc(r.icon)+'</span>':'')+
+            esc(r.title)+freshTag(r)+'</b>'+
+          '<span class="row-tools">'+
+            '<button class="mini" data-act="edit">Править</button>'+
+            '<button class="mini" data-act="del">Убрать</button>'+
+          '</span>'+
+        '</div>'+
+        '<span class="ltag">'+esc(tagTitle(r.segment))+'</span>'+
+        (rows?'<dl class="lfields">'+rows+'</dl>':'');
+
+      card.querySelector('[data-act="del"]').addEventListener("click",function(){
+        var idx=state.links.indexOf(r);
+        tomb[r.id]=true;
+        state.links=state.links.filter(function(x){return x.id!==r.id});
+        save(); renderLinks();
+        offerUndo(r.title,function(){
+          delete tomb[r.id];
+          state.links.splice(idx<0?0:idx,0,r); save(); renderLinks();
+        });
+      });
+
+      card.querySelector('[data-act="edit"]').addEventListener("click",function(){
+        inlineEdit(card.querySelector(".ltitle"),recToText(r),function(v){
+          var next=touch(textToRec(v,r));
+          next.react=r.react;
+          var at=state.links.indexOf(r);
+          if(at>=0) state.links[at]=next;
+          save(); renderLinks();
+        },8);
+      });
+
+      if(url) loadOg(card,url);
+      list.appendChild(card);
+    });
+
+    host.appendChild(list);
   }
 
   /* ── рендер: сегменты ───────────────────── */
@@ -1689,6 +1899,7 @@
       var ul=wrap.querySelector(".items");
       items.forEach(function(it,i){
         var li=document.createElement("li");
+        li.style.setProperty("--i",i);
         li.innerHTML =
           '<span class="bullet">'+String(i+1).padStart(2,"0")+'</span>'+
           '<span class="txt">'+linkify(esc(it.text))+freshTag(it)+'</span>'+

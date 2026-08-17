@@ -24,6 +24,8 @@ const pool = new pg.Pool({
 });
 
 const KEEP_REVS = 50;
+const OG_TTL_MS = 7 * 24 * 3600 * 1000;
+const OG_MAX_BYTES = 512 * 1024;
 
 async function init() {
   await pool.query(`
@@ -36,6 +38,13 @@ async function init() {
   `);
   // Сервис деплоится в работающую базу, поэтому всё через if not exists.
   await pool.query("alter table plan add column if not exists author text");
+  await pool.query(`
+    create table if not exists og_cache (
+      url text primary key,
+      data jsonb not null,
+      fetched_at timestamptz not null default now()
+    )
+  `);
   await pool.query(`
     create table if not exists plan_rev (
       rev int primary key,
@@ -57,6 +66,81 @@ function cleanAuthor(v) {
   if (typeof v !== "string") return null;
   const s = v.trim().slice(0, 60);
   return s || null;
+}
+
+// Сервер ходит по ссылке, которую дал клиент. Значит, надо явно запретить
+// ему стучаться внутрь инфраструктуры: только http/https и только наружу.
+function safeTarget(raw) {
+  let u;
+  try { u = new URL(String(raw || "")); } catch { return null; }
+  if (u.protocol !== "http:" && u.protocol !== "https:") return null;
+  const h = u.hostname.toLowerCase();
+  if (!h || h.startsWith("[")) return null;                       // IPv6-литералы не пускаем
+  if (h === "localhost" || h.endsWith(".localhost")) return null;
+  if (h.endsWith(".internal") || h.endsWith(".local")) return null;
+  if (/^(0\.|127\.|10\.|192\.168\.|169\.254\.)/.test(h)) return null;
+  if (/^172\.(1[6-9]|2\d|3[01])\./.test(h)) return null;
+  return u;
+}
+
+function unescapeHtml(v) {
+  return String(v)
+    .replace(/&quot;/g, '"').replace(/&#0?39;/g, "'").replace(/&apos;/g, "'")
+    .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&").trim();
+}
+
+function metaMap(html) {
+  const out = {};
+  const tags = html.match(/<meta\b[^>]*>/gi) || [];
+  for (const tag of tags) {
+    const key = (/(?:property|name)\s*=\s*["']([^"']+)["']/i.exec(tag) || [])[1];
+    const val = (/content\s*=\s*["']([^"']*)["']/i.exec(tag) || [])[1];
+    if (key && val) out[key.toLowerCase()] = unescapeHtml(val);
+  }
+  const t = /<title[^>]*>([\s\S]{0,300}?)<\/title>/i.exec(html);
+  if (t) out.__title = unescapeHtml(t[1]);
+  return out;
+}
+
+async function fetchOg(target) {
+  const res = await fetch(target, {
+    redirect: "follow",
+    signal: AbortSignal.timeout(8000),
+    headers: {
+      // Без человеческого user-agent половина сайтов отдаёт заглушку
+      "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+      "accept": "text/html,application/xhtml+xml",
+      "accept-language": "ru,en;q=0.8"
+    }
+  });
+  if (!res.ok) return { url: target.toString(), error: "сайт ответил " + res.status };
+  const type = res.headers.get("content-type") || "";
+  if (!/text\/html|application\/xhtml/i.test(type)) return { url: target.toString(), error: "не страница" };
+
+  const reader = res.body.getReader();
+  const chunks = [];
+  let size = 0;
+  while (size < OG_MAX_BYTES) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.length;
+    chunks.push(value);
+  }
+  try { await reader.cancel(); } catch {}
+  const html = Buffer.concat(chunks.map(c => Buffer.from(c))).toString("utf8");
+
+  const m = metaMap(html);
+  const image = m["og:image"] || m["twitter:image"] || "";
+  const out = {
+    url: target.toString(),
+    title: (m["og:title"] || m["twitter:title"] || m.__title || "").slice(0, 180),
+    description: (m["og:description"] || m["twitter:description"] || m.description || "").slice(0, 300),
+    site: (m["og:site_name"] || target.hostname.replace(/^www\./, "")).slice(0, 80),
+    image: /^https:\/\//i.test(image) ? image.slice(0, 800) : ""
+  };
+  if (!out.title && !out.image) out.error = "нет карточки";
+  return out;
 }
 
 function authorized(req) {
@@ -116,11 +200,35 @@ const server = http.createServer(async (req, res) => {
 
   const isPlan = url.pathname === "/plan";
   const isHistory = url.pathname === "/history" || url.pathname.startsWith("/history/");
-  if (!isPlan && !isHistory) return send(res, 404, { error: "нет такого пути" });
+  const isOg = url.pathname === "/og";
+  if (!isPlan && !isHistory && !isOg) return send(res, 404, { error: "нет такого пути" });
 
   if (!authorized(req)) return send(res, 401, { error: "неверный пароль" });
 
   try {
+    if (isOg) {
+      if (req.method !== "GET") return send(res, 405, { error: "метод не поддерживается" });
+      const target = safeTarget(url.searchParams.get("url"));
+      if (!target) return send(res, 400, { error: "такую ссылку не открываем" });
+      const key = target.toString();
+
+      const hit = await pool.query("select data, fetched_at from og_cache where url = $1", [key]);
+      if (hit.rowCount && Date.now() - new Date(hit.rows[0].fetched_at).getTime() < OG_TTL_MS) {
+        return send(res, 200, hit.rows[0].data);
+      }
+
+      let data;
+      try { data = await fetchOg(target); }
+      catch (e) { data = { url: key, error: "не открылось" }; }
+
+      await pool.query(
+        "insert into og_cache (url, data, fetched_at) values ($1, $2, now()) " +
+        "on conflict (url) do update set data = $2, fetched_at = now()",
+        [key, data]
+      );
+      return send(res, 200, data);
+    }
+
     if (isHistory && req.method === "GET") {
       const tail = url.pathname.slice("/history".length).replace(/^\//, "");
       if (!tail) {
