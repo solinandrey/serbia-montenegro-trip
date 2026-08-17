@@ -1,8 +1,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Белград → Черногория · сентябрь 2026</title>
-<meta name="theme-color" content="#FBF4EC" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#181110" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0A0A0A" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
@@ -16,21 +16,21 @@
   :root{
     color-scheme:light dark;
 
-    --paper:#FBF4EC;
-    --surface:#FFFAF4;
-    --surface-2:#F3E7DA;
-    --ink:#231A16;
-    --ink-2:#5C4C44;
-    --ink-3:#8C7A70;
-    --line:rgba(35,26,22,.16);
-    --line-2:rgba(35,26,22,.08);
+    --paper:#FFFFFF;
+    --surface:#F5F5F5;
+    --surface-2:#E9E9E9;
+    --ink:#0D0D0D;
+    --ink-2:#4A4A4A;
+    --ink-3:#727272;   /* тёмнее, чтобы мелкие кнопки проходили AA на белом */
+    --line:rgba(13,13,13,.18);
+    --line-2:rgba(13,13,13,.09);
 
-    --accent:#DC4426;      /* действие */
-    --accent-2:#B93619;
-    --on-accent:#FFFAF4;
-    --sea:#0E7B78;         /* категория, метки, пройденный путь */
-    --alert:#B3261E;
-    --focus:#E8A317;
+    --accent:#E01B00;      /* действие и внимание */
+    --accent-2:#B31500;
+    --on-accent:#FFFFFF;
+    --quiet:#5A5A5A;       /* категория и метаданные: нейтральный, не цветной */
+    --alert:#C81200;
+    --focus:#E01B00;
 
     --display:"Geist","Helvetica Neue",Arial,sans-serif;
     --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -45,21 +45,21 @@
 
   @media (prefers-color-scheme:dark){
     :root{
-      --paper:#181110;
-      --surface:#221917;
-      --surface-2:#2E2320;
-      --ink:#F3E9E2;
-      --ink-2:#BFACA2;
-      --ink-3:#8E7C73;
-      --line:rgba(243,233,226,.18);
-      --line-2:rgba(243,233,226,.09);
+      --paper:#0A0A0A;
+      --surface:#161616;
+      --surface-2:#212121;
+      --ink:#F5F5F5;
+      --ink-2:#B0B0B0;
+      --ink-3:#828282;
+      --line:rgba(245,245,245,.20);
+      --line-2:rgba(245,245,245,.10);
 
-      --accent:#FF7C5C;
-      --accent-2:#FF9878;
-      --on-accent:#1A1210;
-      --sea:#4FC7BE;
-      --alert:#F2705C;
-      --focus:#FFC257;
+      --accent:#FF3B20;
+      --accent-2:#FF5C46;
+      --on-accent:#0A0A0A;   /* на ярко-красном чёрный текст читается лучше белого */
+      --quiet:#A8A8A8;
+      --alert:#FF6A55;
+      --focus:#FF3B20;
     }
   }
 
@@ -72,7 +72,7 @@
     font-family:var(--display);
     font-size:16px;
     line-height:1.55;
-    -webkit-tap-highlight-color:rgba(220,68,38,.16);
+    -webkit-tap-highlight-color:rgba(224,27,0,.16);
   }
   button,input,textarea,a{touch-action:manipulation}
   [hidden]{display:none!important}
@@ -155,7 +155,7 @@
   .undo{
     display:flex;gap:12px;align-items:center;flex-wrap:wrap;
     margin:8px 0 0;padding:11px 15px;
-    background:var(--surface);border:var(--rule);border-left:3px solid var(--focus);
+    background:var(--surface);border:var(--rule);border-left:3px solid var(--ink);
     border-radius:var(--r);
   }
   .undo .what{
@@ -194,7 +194,7 @@
     fill:none;stroke:var(--paper);stroke-width:1.5;
     stroke-dasharray:9 13;stroke-linecap:round;opacity:.9;
   }
-  .road-done{fill:none;stroke:var(--sea);stroke-width:12;stroke-linecap:round;opacity:.4}
+  .road-done{fill:none;stroke:var(--accent);stroke-width:12;stroke-linecap:round;opacity:.85}
   .road-mark circle:first-child{fill:var(--accent);opacity:.24}
   .road-mark circle:last-child{fill:var(--accent)}
 
@@ -529,7 +529,7 @@
     font-family:var(--mono);font-size:11px;color:var(--ink-2);
     text-transform:uppercase;letter-spacing:.1em;
   }
-  .seg-rail .alt{font-family:var(--mono);font-size:11px;color:var(--sea);letter-spacing:.06em}
+  .seg-rail .alt{font-family:var(--mono);font-size:11px;color:var(--quiet);letter-spacing:.06em}
   .seg h3{
     font-family:var(--display);font-weight:700;
     font-size:clamp(1.5rem,3.4vw,2.1rem);line-height:1.02;letter-spacing:-.03em;
@@ -546,7 +546,7 @@
   .facts li{display:block;background:var(--surface);padding:13px 15px;font-size:14.5px}
   .facts li span:first-child{
     display:block;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;
-    letter-spacing:.12em;color:var(--sea);margin-bottom:5px;
+    letter-spacing:.12em;color:var(--quiet);margin-bottom:5px;
   }
   .facts li span:last-child{color:var(--ink-2);line-height:1.5}
 
@@ -580,14 +580,14 @@
     font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.13em;
     text-transform:uppercase;color:var(--ink-3);margin:0 0 14px;
   }
-  .note{background:var(--surface);border-left:2px solid var(--focus);padding:12px 15px;
+  .note{background:var(--surface);border-left:2px solid var(--ink-3);padding:12px 15px;
     margin-bottom:10px;border-radius:var(--r)}
   .note .head{
     display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;
     font-family:var(--mono);font-size:11px;color:var(--ink-3);
     text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;
   }
-  .note .head b{color:var(--sea);font-weight:600}
+  .note .head b{color:var(--quiet);font-weight:600}
   .note .body{font-size:15px;white-space:pre-wrap;line-height:1.5;overflow-wrap:anywhere}
   .empty{font-size:14.5px;color:var(--ink-3);margin:0 0 12px}
 
