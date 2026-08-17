@@ -172,7 +172,8 @@
     flex:0 0 auto;width:198px;border:1.5px solid #000;border-radius:14px;
     padding:12px;background:#fff;text-align:left;
   }
-  .pincard-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .pincard-top{display:flex;align-items:center;gap:8px}
+  .pincard-top .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .pincard .t{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
   .pin-go{
     flex:none;width:24px;height:24px;display:flex;align-items:center;justify-content:center;
@@ -338,6 +339,16 @@
   }
   .f-frow input:focus{border-color:#000;outline:none}
   .f-quick{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}
+  .f-newtag{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;margin-top:8px}
+  .f-newtag input{
+    width:100%;min-width:0;border:1px solid var(--edge);border-radius:8px;
+    padding:7px 9px;font-size:13px;background:#fff;
+  }
+  .f-newtag input:focus{border-color:#000;outline:none}
+  .card-edit-acts{
+    display:flex;gap:8px;align-items:center;
+    margin-top:4px;padding-top:12px;border-top:1px solid var(--hair2);
+  }
   .f-newfield{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) auto;gap:6px}
   .f-newfield input{
     width:100%;min-width:0;border:1px solid var(--edge);border-radius:8px;
@@ -385,6 +396,12 @@
     border:1px solid rgba(0,0,0,.18);border-radius:16px;padding:13px 14px;
     background:#fff;margin-bottom:10px;
   }
+  .points-lab{
+    font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--dim2);margin:0 0 10px;
+  }
+  .points-lab.sep{margin-top:22px;padding-top:16px;border-top:1px solid var(--hair2)}
+  .tagrow .prow-t{font-size:17px}
   .prow-top{display:flex;align-items:center;gap:10px}
   .grip{
     flex:none;width:26px;height:26px;display:flex;align-items:center;justify-content:center;
@@ -1369,6 +1386,14 @@
     var box=el("div","pincard");
     var head=el("div","pincard-top");
     head.innerHTML='<span class="t">'+esc(ps.length?pointName(ps[0]):"Без точки")+'</span>';
+
+    var done=copied===v;
+    var cp=el("button","copybtn"+(done?" done":""),done?"✓":"⧉");
+    cp.title=done?"Скопировано":"Копировать значение";
+    cp.setAttribute("aria-label","Скопировать значение");
+    cp.addEventListener("click",function(e){ e.stopPropagation(); copyVal(v); });
+    head.appendChild(cp);
+
     if(url){
       var go=document.createElement("a");
       go.className="pin-go"; go.href=url; go.target="_blank"; go.rel="noopener noreferrer";
@@ -1380,11 +1405,10 @@
     box.appendChild(head);
 
     var val=el("button","pincard-val");
-    val.innerHTML='<span class="v'+(l.num?" num":"")+'">'+esc(v)+'</span>'+
-      '<span class="b"><span>'+esc((l.by||"—")+(l.ts?" · "+ago(l.ts):""))+'</span>'+
-      '<span class="copied'+(copied===v?" on":"")+'">скопировано</span></span>';
-    val.title="Нажми, чтобы скопировать";
-    val.addEventListener("click",function(){ copyVal(v); });
+    val.innerHTML='<span class="v">'+esc(v)+'</span>'+
+      '<span class="b">'+esc((l.by||"—")+(l.ts?" · "+ago(l.ts):""))+'</span>';
+    val.title="Открыть карточку целиком";
+    val.addEventListener("click",function(){ jumpToCard(l.id,true); });
     box.appendChild(val);
     return box;
   }
@@ -1493,7 +1517,7 @@
 
       var top=el("div","card-top");
       top.innerHTML='<span class="host'+(isLink?"":" note")+'">'+esc(isLink?hostOf(l):"заметка")+'</span>'+
-        (isNew(l)?'<span class="newtag">ново</span>':"");
+        (isNew(l)?'<span class="newtag" title="Появилось с твоего прошлого захода">новое</span>':"");
       if(isLink){
         var go=document.createElement("a");
         go.className="iconbtn go";
@@ -1555,7 +1579,12 @@
           '<textarea class="f-n" rows="2" placeholder="Чем полезно, что уточнить"></textarea></label>'+
         '<label class="fld"><span>Ссылка</span>'+
           '<input class="f-u" placeholder="https://…" inputmode="url"></label>'+
-        '<div class="fld"><span>Точки маршрута</span><div class="f-tags"></div></div>'+
+        '<div class="fld"><span>Теги</span><div class="f-tags"></div>'+
+          '<div class="f-newtag">'+
+            '<input class="f-tg" placeholder="Свой тег: жильё, еда, must see">'+
+            '<button class="who me f-tadd" type="button">Добавить</button>'+
+          '</div>'+
+        '</div>'+
         '<div class="fld"><span>Дополнительно</span>'+
           '<div class="f-fields"></div>'+
           '<div class="f-quick"></div>'+
@@ -1572,6 +1601,7 @@
       card.appendChild(editBox);
 
       var draftTags=linkPoints(l).slice();
+      var bornTags=[];
       var draftFields=(Array.isArray(l.fields)?l.fields:[]).map(function(f){
         return {id:f.id,label:f.label,value:f.value};
       });
@@ -1624,6 +1654,13 @@
         });
       }
 
+      function hideRest(on){
+        [bottom,talkRow,thread,details,moreRow].forEach(function(n){
+          if(n) n.hidden=on?true:(n===thread||n===details?n.hidden:false);
+        });
+        if(on){ if(thread) thread.hidden=true; if(details) details.hidden=true; }
+      }
+
       function openEdit(){
         draftTags=linkPoints(l).slice();
         draftFields=(Array.isArray(l.fields)?l.fields:[]).map(function(f){
@@ -1635,9 +1672,30 @@
         editBox.querySelector(".f-u").value=l.url||"";
         editBox.hidden=false;
         body.hidden=true;
+        hideRest(true);
         editBox.querySelector(".f-t").focus();
       }
       pen.addEventListener("click",openEdit);
+      function addCustomTag(){
+        var inp=editBox.querySelector(".f-tg"), v=inp.value.trim();
+        if(!v) return;
+        var found=(state.points||[]).filter(function(pt){
+          return pt.title.toLowerCase()===v.toLowerCase();
+        })[0];
+        if(!found){
+          found={id:"p"+uid(),title:v,dates:"",tag:true};
+          state.points.push(found);
+          bornTags.push(found.id);
+        }
+        if(draftTags.indexOf(found.id)<0) draftTags.push(found.id);
+        inp.value="";
+        paintEditTags();
+      }
+      editBox.querySelector(".f-tadd").addEventListener("click",addCustomTag);
+      editBox.querySelector(".f-tg").addEventListener("keydown",function(e){
+        if(e.key==="Enter"){ e.preventDefault(); addCustomTag(); }
+      });
+
       editBox.querySelector(".f-fadd").addEventListener("click",function(){
         var fl=editBox.querySelector(".f-fl"), fv=editBox.querySelector(".f-fv");
         var lab=fl.value.trim(), val=fv.value.trim();
@@ -1648,7 +1706,13 @@
       });
 
       editBox.querySelector(".f-cancel").addEventListener("click",function(){
-        editBox.hidden=true; body.hidden=false;
+        // Тег, заведённый в отменённой правке, никому не нужен
+        if(bornTags.length){
+          state.points=state.points.filter(function(pt){ return bornTags.indexOf(pt.id)<0; });
+          bornTags=[];
+        }
+        editBox.hidden=true; body.hidden=false; hideRest(false);
+        renderFeed();
       });
       editBox.querySelector(".f-save").addEventListener("click",function(){
         var t=editBox.querySelector(".f-t").value.trim();
@@ -1659,6 +1723,7 @@
         if(n) l.note=n; else delete l.note;
         if(u) l.url=u; else delete l.url;
         l.points=draftTags.slice();
+        bornTags=[];
         l.fields=draftFields
           .filter(function(f){ return (f.label||"").trim()||(f.value||"").trim(); })
           .map(function(f){ return {id:f.id||uid(),label:(f.label||"").trim(),value:(f.value||"").trim()}; });
@@ -1844,7 +1909,15 @@
 
   function renderPoints(){
     var host=$("pointRows"); host.innerHTML="";
-    (state.points||[]).forEach(function(p,i){
+    var all=state.points||[];
+    var route=all.filter(function(p){ return !p.tag; });
+    var tags=all.filter(function(p){ return p.tag; });
+
+    if(tags.length){
+      host.appendChild(el("div","points-lab","Отрезки маршрута"));
+    }
+
+    route.forEach(function(p,i){
       var row=el("div","prow");
       var top=el("div","prow-top");
       var grip=el("button","grip","≡");
@@ -1891,6 +1964,38 @@
       row.appendChild(b);
       host.appendChild(row);
     });
+
+    if(tags.length){
+      host.appendChild(el("div","points-lab sep","Свои теги"));
+      tags.forEach(function(p){
+        var row=el("div","prow tagrow");
+        var top=el("div","prow-top");
+        top.appendChild(el("span","prow-t",esc(p.title)));
+        top.appendChild(el("span","prow-c",String(countFor(p.id))));
+        var x=el("button","kill","×");
+        x.setAttribute("aria-label","Убрать тег «"+p.title+"»");
+        x.addEventListener("click",function(){
+          var idx=state.points.indexOf(p);
+          var moved=(state.links||[]).filter(function(l){return linkPoints(l).indexOf(p.id)>=0})
+            .map(function(l){return l.id});
+          state.points=state.points.filter(function(x2){return x2.id!==p.id});
+          state.links.forEach(function(l){
+            l.points=linkPoints(l).filter(function(id){return id!==p.id});
+          });
+          save(); renderAll();
+          showToast("Тег убран: "+p.title,function(){
+            state.points.splice(idx<0?0:idx,0,p);
+            state.links.forEach(function(l){
+              if(moved.indexOf(l.id)>=0) l.points=linkPoints(l).concat([p.id]);
+            });
+            save(); renderAll();
+          });
+        });
+        top.appendChild(x);
+        row.appendChild(top);
+        host.appendChild(row);
+      });
+    }
   }
 
   /* ── журнал ─────────────────────────────── */
@@ -2001,13 +2106,18 @@
     return out;
   }
 
-  function jumpToCard(id){
+  function jumpToCard(id,expand){
     filterPoint="all";
     if(currentScreen()!=="feed") location.hash="#feed";
     setTimeout(function(){
       renderFeed();
       var card=document.querySelector('#cards [data-id="'+id+'"]');
       if(!card) return;
+      if(expand){
+        var btn=card.querySelector(".card-more .talkbtn");
+        var det=card.querySelector(".details");
+        if(btn&&det&&det.hidden) btn.click();
+      }
       if(card.scrollIntoView) card.scrollIntoView({block:"center",behavior:"smooth"});
       card.classList.remove("fresh");
       void card.offsetWidth;
