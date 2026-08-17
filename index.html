@@ -172,7 +172,15 @@
     flex:0 0 auto;width:198px;border:1.5px solid #000;border-radius:14px;
     padding:12px;background:#fff;text-align:left;
   }
+  .pincard-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
   .pincard .t{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+  .pin-go{
+    flex:none;width:24px;height:24px;display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--acc);border-radius:999px;color:var(--acc);
+    font-size:11px;text-decoration:none;
+  }
+  .pin-go:hover{background:var(--acc);color:#fff}
+  .pincard-val{display:block;width:100%;text-align:left;background:none;border:none;padding:0}
   .pincard .v{font-family:var(--mono);font-size:13px;font-weight:500;margin-top:6px;line-height:1.3;word-break:break-word}
   .pincard .v.num{font-size:19px}
   .pincard .b{display:flex;justify-content:space-between;align-items:baseline;margin-top:8px;font-size:11px;color:var(--dim2)}
@@ -208,13 +216,16 @@
     font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
   }
   .iconbtn{
-    margin-left:auto;width:28px;height:28px;flex:none;
+    margin-left:8px;width:28px;height:28px;flex:none;
     display:flex;align-items:center;justify-content:center;
     border:1px solid var(--edge);border-radius:999px;color:var(--dim);
     font-size:12px;line-height:1;
     transition:border-color .16s,color .16s,background .16s;
   }
   .iconbtn:hover{border-color:#000;color:#000}
+  .iconbtn.go{margin-left:auto;text-decoration:none;color:var(--acc);border-color:var(--acc)}
+  .iconbtn.go:hover{background:var(--acc);color:#fff}
+  .card-top>.host+.iconbtn{margin-left:auto}
   .pin{
     margin-left:8px;padding:4px 10px;border-radius:999px;
     font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
@@ -229,7 +240,20 @@
   }
   .card-main{min-width:0;flex:1}
   .ogline{min-width:0}
-  .card-title{font-family:var(--disp);font-weight:600;font-size:18px;line-height:1.15;text-wrap:pretty;word-break:break-word}
+  /* Своё название — главный текст карточки, поэтому акцентом.
+     То, что притащили с сайта, ниже и мельче: это справка, а не заголовок. */
+  .card-title{
+    font-family:var(--disp);font-weight:600;font-size:18px;line-height:1.15;
+    color:var(--acc);text-wrap:pretty;word-break:break-word;
+  }
+  .og-title{
+    font-family:var(--body);font-weight:600;font-size:13.5px;line-height:1.35;
+    color:var(--ink);margin-top:6px;word-break:break-word;
+  }
+  .og-desc{
+    font-size:12.5px;line-height:1.4;color:var(--dim);margin-top:4px;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
   .card-note{font-size:14px;line-height:1.42;color:rgba(0,0,0,.72);margin-top:6px;text-wrap:pretty;word-break:break-word}
   .num{display:flex;align-items:baseline;gap:10px;margin-top:7px}
   .num b{font-family:var(--mono);font-size:20px;font-weight:500}
@@ -267,6 +291,7 @@
   .card-edit{display:grid;gap:10px;margin-top:10px}
   /* Подпись над полем видна всегда, в отличие от подсказки внутри. */
   .fld{display:block}
+  .f-tags{display:flex;flex-wrap:wrap;gap:6px}
   .fld>span{
     display:block;margin-bottom:4px;
     font-family:var(--mono);font-size:9.5px;font-weight:700;
@@ -283,6 +308,38 @@
     font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
   }
   .linkbtn:hover{color:var(--acc)}
+
+  .card-more{margin-top:10px;padding-top:10px;border-top:1px solid var(--hair2)}
+  .talkbtn.plain::before{display:none}
+
+  .details{display:grid;gap:1px;margin-top:10px;background:var(--hair2);border-radius:10px;overflow:hidden}
+  .fieldrow{
+    display:flex;gap:10px;align-items:baseline;
+    background:#fff;padding:9px 11px;min-width:0;
+  }
+  .fieldrow .fl{
+    flex:none;width:88px;font-family:var(--mono);font-size:9.5px;font-weight:700;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--dim2);
+  }
+  .fieldrow .fv{flex:1;min-width:0;font-size:13.5px;line-height:1.4;overflow-wrap:anywhere}
+  .copybtn{
+    flex:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--dim2);
+  }
+  .copybtn:hover{color:var(--acc)}
+
+  .f-frow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) auto;gap:6px;margin-bottom:6px;align-items:center}
+  .f-frow input{
+    width:100%;min-width:0;border:1px solid var(--edge);border-radius:8px;
+    padding:7px 9px;font-size:13px;background:#fff;
+  }
+  .f-frow input:focus{border-color:#000;outline:none}
+  .f-quick{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}
+  .f-newfield{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) auto;gap:6px}
+  .f-newfield input{
+    width:100%;min-width:0;border:1px solid var(--edge);border-radius:8px;
+    padding:7px 9px;font-size:13px;background:#fff;
+  }
 
   .card-talk{margin-top:10px;padding-top:10px;border-top:1px solid var(--hair2)}
   .talkbtn{
@@ -627,7 +684,7 @@
       lastAuthor=null, lastAt=null, fromFile=false, localSaved=false, dirty=false;
   var tomb=Object.create(null), mineIds=Object.create(null), seenAt=0, seenSaved=false;
   var ogCache=Object.create(null), copied="", popId="", popKind="";
-  var draftPoint=null, filterPoint="all", trash=null, trashTimer=0;
+  var draftPoints=[], filterPoint="all", trash=null, trashTimer=0;
 
   var SCREENS=["feed","points","log"];
   function isDesk(){ return !!(window.matchMedia&&window.matchMedia("(min-width:1040px)").matches); }
@@ -727,10 +784,30 @@
     return {version:2,points:DEFAULT_POINTS.slice(),links:[],checklist:[],segments:{},notes:[]};
   }
 
+  // Одна точка на карточку превратилась в список. Старые записи
+  // с полем point поднимаем в points при первом чтении.
+  function linkPoints(l){
+    if(Array.isArray(l.points)) return l.points;
+    return l.point?[l.point]:[];
+  }
+
   function normalize(p){
     if(!p) return p;
     if(!Array.isArray(p.people)) p.people=[];
     if(!Array.isArray(p.links)) p.links=[];
+    p.links.forEach(function(l){
+      if(!Array.isArray(l.points)) l.points=l.point?[l.point]:[];
+      delete l.point;
+      // Прежние отдельные поля поднимаем в общий список: дальше всё
+      // одинаково — подпись и значение, сколько угодно строк.
+      if(!Array.isArray(l.fields)){
+        l.fields=[];
+        if(l.address) l.fields.push({id:"f-a-"+l.id,label:"Адрес",value:l.address});
+        if(l.phone)   l.fields.push({id:"f-p-"+l.id,label:"Телефон",value:l.phone});
+        if(l.num)     l.fields.push({id:"f-n-"+l.id,label:"Бронь",value:l.num});
+        delete l.address; delete l.phone; delete l.num;
+      }
+    });
     if(!Array.isArray(p.points)) p.points=DEFAULT_POINTS.slice();
     if(!Array.isArray(p.notes)) p.notes=[];
     if(!Array.isArray(p.checklist)) p.checklist=[];
@@ -775,6 +852,7 @@
     if(srv.react||mine.react) out.react=mergeReact(srv.react,mine.react);
     // Комментарии тоже нельзя заменять целиком: двое пишут одновременно.
     if(srv.comments||mine.comments) out.comments=mergeById(srv.comments,mine.comments);
+    if(srv.fields||mine.fields) out.fields=mine.fields||srv.fields;
     if(srv.ts&&(!mine.ts||srv.ts>mine.ts)) out.ts=srv.ts;
     return out;
   }
@@ -1040,8 +1118,8 @@
     if(!d||d.error||genericOg(d)) return;
     if(!d.image&&!d.description) return;
     var box=el("div","ogline");
-    box.innerHTML='<div class="card-title">'+esc(d.title)+'</div>'+
-      (d.description?'<div class="card-note">'+esc(d.description)+'</div>':'');
+    box.innerHTML='<div class="og-title">'+esc(d.title)+'</div>'+
+      (d.description?'<div class="og-desc">'+esc(d.description)+'</div>':'');
     host.appendChild(box);
     if(d.image){
       var img=host.parentNode.querySelector(".thumb");
@@ -1169,7 +1247,10 @@
     return p?p.title:"Без точки";
   }
   function countFor(id){
-    return (state.links||[]).filter(function(l){return (l.point||null)===id}).length;
+    return (state.links||[]).filter(function(l){
+      var ps=linkPoints(l);
+      return id===null?!ps.length:ps.indexOf(id)>=0;
+    }).length;
   }
 
   /* ── рендер ─────────────────────────────── */
@@ -1231,10 +1312,19 @@
     }
 
     var picks=$("draftPicks"); picks.innerHTML="";
-    var all=[{id:null,title:"Без точки"}].concat(state.points||[]);
-    all.forEach(function(p){
-      var b=chip(p.title,draftPoint===p.id,{dash:p.id===null&&draftPoint!==null});
-      b.addEventListener("click",function(){ draftPoint=p.id; renderDraft(); });
+    var none=chip("Без точки",!draftPoints.length,{dash:!!draftPoints.length});
+    none.type="button";
+    none.addEventListener("click",function(){ draftPoints=[]; renderDraft(); });
+    picks.appendChild(none);
+
+    (state.points||[]).forEach(function(p){
+      var b=chip(p.title,draftPoints.indexOf(p.id)>=0);
+      b.type="button";
+      b.addEventListener("click",function(){
+        var at=draftPoints.indexOf(p.id);
+        if(at>=0) draftPoints.splice(at,1); else draftPoints.push(p.id);
+        renderDraft();
+      });
       picks.appendChild(b);
     });
     var inp=el("input","newpoint");
@@ -1243,10 +1333,37 @@
       if(e.key!=="Enter") return;
       var v=inp.value.trim(); if(!v) return;
       var p={id:"p"+uid(),title:v,dates:""};
-      state.points.push(p); draftPoint=p.id; inp.value="";
+      state.points.push(p); draftPoints.push(p.id); inp.value="";
       save(); renderAll();
     });
     picks.appendChild(inp);
+  }
+
+  /* Закреплённая карточка: нажатие копирует значение, стрелка открывает
+     ссылку. Без стрелки до ссылки приходилось идти в ленту. */
+  function pinCard(l){
+    var v=l.num||l.title, url=safeUrl(l.url), ps=linkPoints(l);
+    var box=el("div","pincard");
+    var head=el("div","pincard-top");
+    head.innerHTML='<span class="t">'+esc(ps.length?pointName(ps[0]):"Без точки")+'</span>';
+    if(url){
+      var go=document.createElement("a");
+      go.className="pin-go"; go.href=url; go.target="_blank"; go.rel="noopener noreferrer";
+      go.textContent="↗"; go.title="Открыть "+hostOf(l);
+      go.setAttribute("aria-label","Открыть ссылку: "+hostOf(l));
+      go.addEventListener("click",function(e){ e.stopPropagation(); });
+      head.appendChild(go);
+    }
+    box.appendChild(head);
+
+    var val=el("button","pincard-val");
+    val.innerHTML='<span class="v'+(l.num?" num":"")+'">'+esc(v)+'</span>'+
+      '<span class="b"><span>'+esc((l.by||"—")+(l.ts?" · "+ago(l.ts):""))+'</span>'+
+      '<span class="copied'+(copied===v?" on":"")+'">скопировано</span></span>';
+    val.title="Нажми, чтобы скопировать";
+    val.addEventListener("click",function(){ copyVal(v); });
+    box.appendChild(val);
+    return box;
   }
 
   function renderPinned(){
@@ -1256,16 +1373,7 @@
     if(deskHost){
       deskHost.innerHTML="";
       if(!pins.length) deskHost.appendChild(el("div","rail-empty","Ничего не закреплено. Жми «закрепить» на карточке с номером или кодом."));
-      pins.forEach(function(l){
-        var v=l.num||l.title;
-        var b=el("button","pincard");
-        b.innerHTML='<div class="t">'+esc(pointName(l.point))+'</div>'+
-          '<div class="v'+(l.num?" num":"")+'">'+esc(v)+'</div>'+
-          '<div class="b"><span>'+esc((l.by||"—")+(l.ts?" · "+ago(l.ts):""))+'</span>'+
-          '<span class="copied'+(copied===v?" on":"")+'">скопировано</span></div>';
-        b.addEventListener("click",function(){ copyVal(v); });
-        deskHost.appendChild(b);
-      });
+      pins.forEach(function(l){ deskHost.appendChild(pinCard(l)); });
     }
 
     var host=$("pinned"); host.innerHTML="";
@@ -1273,16 +1381,7 @@
     var box=el("div","pinned");
     box.appendChild(el("div","lab","Под рукой"));
     var row=el("div","pinrow");
-    pins.forEach(function(l){
-      var v=l.num||l.title;
-      var b=el("button","pincard");
-      b.innerHTML='<div class="t">'+esc(pointName(l.point))+'</div>'+
-        '<div class="v'+(l.num?" num":"")+'">'+esc(v)+'</div>'+
-        '<div class="b"><span>'+esc((l.by||"—")+" · "+(l.ts?ago(l.ts):""))+'</span>'+
-        '<span class="copied'+(copied===v?" on":"")+'">скопировано</span></div>';
-      b.addEventListener("click",function(){ copyVal(v); });
-      row.appendChild(b);
-    });
+    pins.forEach(function(l){ row.appendChild(pinCard(l)); });
     box.appendChild(row);
     host.appendChild(box);
   }
@@ -1318,7 +1417,9 @@
   function renderCards(){
     var host=$("cards"); host.innerHTML="";
     var list=(state.links||[]).filter(function(l){
-      return filterPoint==="all"?true:((l.point||null)===filterPoint);
+      if(filterPoint==="all") return true;
+      var ps=linkPoints(l);
+      return filterPoint===null?!ps.length:ps.indexOf(filterPoint)>=0;
     });
 
     // Порядок задаём здесь, а не порядком в массиве: слияние с сервером
@@ -1342,7 +1443,7 @@
       var acts=el("div","empty-acts");
       var addBtn=chip(total?("Добавить в «"+pointName(filterPoint)+"»"):"Добавить первую",true);
       addBtn.addEventListener("click",function(){
-        if(filterPoint!=="all") draftPoint=filterPoint;   // куда смотрим, туда и кладём
+        if(filterPoint!=="all"&&filterPoint!==null) draftPoints=[filterPoint];
         focusDraft();
       });
       acts.appendChild(addBtn);
@@ -1365,6 +1466,16 @@
       var top=el("div","card-top");
       top.innerHTML='<span class="host'+(isLink?"":" note")+'">'+esc(isLink?hostOf(l):"заметка")+'</span>'+
         (isNew(l)?'<span class="newtag">ново</span>':"");
+      if(isLink){
+        var go=document.createElement("a");
+        go.className="iconbtn go";
+        go.href=url; go.target="_blank"; go.rel="noopener noreferrer";
+        go.textContent="↗";
+        go.title="Открыть "+hostOf(l);
+        go.setAttribute("aria-label","Открыть ссылку: "+hostOf(l));
+        top.appendChild(go);
+      }
+
       var pen=el("button","iconbtn","✎");
       pen.setAttribute("aria-label","Править карточку «"+l.title+"»");
       pen.title="Править";
@@ -1381,28 +1492,30 @@
       if(isLink) body.appendChild(el("div","thumb"));
       var main=el("div","card-main");
       main.innerHTML='<div class="card-title">'+linkify(esc(l.title))+'</div>';
-      if(l.num){
-        var num=el("div","num");
-        num.innerHTML='<b>'+esc(l.num)+'</b><span class="copied'+(copied===l.num?" on":"")+'">скопировано</span>';
-        num.style.cursor="pointer";
-        num.addEventListener("click",function(){ copyVal(l.num); });
-        main.appendChild(num);
-      }
       if(l.note) main.appendChild(el("div","card-note",linkify(esc(l.note))));
-      if(l.phone) main.appendChild(el("div","card-note",'<a href="tel:'+esc(String(l.phone).replace(/[^0-9+]/g,""))+'">'+esc(l.phone)+'</a>'));
-      if(l.address) main.appendChild(el("div","card-note",linkify(esc(l.address))));
       body.appendChild(main);
       card.appendChild(body);
       if(isLink) loadOg(main,url);
 
       var tags=el("div","card-tags");
-      var tag=chip(pointName(l.point),!!l.point,{sm:true,dash:!l.point});
-      tag.addEventListener("click",function(){
-        var order=[null].concat((state.points||[]).map(function(p){return p.id}));
-        var next=order[(order.indexOf(l.point||null)+1)%order.length];
-        l.point=next; popId=l.id; popKind="point"; save(); renderFeed();
-      });
-      tags.appendChild(tag);
+      var ps=linkPoints(l);
+      if(!ps.length){
+        var none=chip("Без точки",false,{sm:true,dash:true});
+        none.addEventListener("click",function(){ openEdit(); });
+        tags.appendChild(none);
+      }else{
+        ps.slice(0,3).forEach(function(pid){
+          var t=chip(pointName(pid),true,{sm:true});
+          t.addEventListener("click",function(){ filterPoint=pid; renderFeed(); });
+          tags.appendChild(t);
+        });
+        if(ps.length>3){
+          var more=chip("+"+(ps.length-3),false,{sm:true});
+          more.title=ps.slice(3).map(pointName).join(", ");
+          more.addEventListener("click",function(){ openEdit(); });
+          tags.appendChild(more);
+        }
+      }
 
       // правка карточки
       var editBox=el("div","card-edit");
@@ -1414,13 +1527,81 @@
           '<textarea class="f-n" rows="2" placeholder="Чем полезно, что уточнить"></textarea></label>'+
         '<label class="fld"><span>Ссылка</span>'+
           '<input class="f-u" placeholder="https://…" inputmode="url"></label>'+
+        '<div class="fld"><span>Точки маршрута</span><div class="f-tags"></div></div>'+
+        '<div class="fld"><span>Дополнительно</span>'+
+          '<div class="f-fields"></div>'+
+          '<div class="f-quick"></div>'+
+          '<div class="f-newfield">'+
+            '<input class="f-fl" placeholder="Название поля">'+
+            '<input class="f-fv" placeholder="Значение">'+
+            '<button class="who me f-fadd" type="button">Добавить</button>'+
+          '</div>'+
+        '</div>'+
         '<div class="card-edit-acts">'+
           '<button class="who me f-save" type="button">Сохранить</button>'+
           '<button class="linkbtn f-cancel" type="button">Отмена</button>'+
         '</div>';
       card.appendChild(editBox);
 
+      var draftTags=linkPoints(l).slice();
+      var draftFields=(Array.isArray(l.fields)?l.fields:[]).map(function(f){
+        return {id:f.id,label:f.label,value:f.value};
+      });
+
+      function paintEditFields(){
+        var host=editBox.querySelector(".f-fields");
+        host.innerHTML="";
+        draftFields.forEach(function(f,i){
+          var row=el("div","f-frow");
+          row.innerHTML='<input class="fl-in" value="'+esc(f.label||"")+'" placeholder="Название">'+
+            '<input class="fv-in" value="'+esc(f.value||"")+'" placeholder="Значение">';
+          var x=el("button","kill","×");
+          x.type="button";
+          x.setAttribute("aria-label","Убрать поле «"+(f.label||"")+"»");
+          x.addEventListener("click",function(){ draftFields.splice(i,1); paintEditFields(); });
+          row.querySelector(".fl-in").addEventListener("input",function(e){ f.label=e.target.value; });
+          row.querySelector(".fv-in").addEventListener("input",function(e){ f.value=e.target.value; });
+          row.appendChild(x);
+          host.appendChild(row);
+        });
+
+        var quick=editBox.querySelector(".f-quick");
+        quick.innerHTML="";
+        ["Адрес","Wi-Fi","Телефон","Бронь","Код от подъезда"].forEach(function(name){
+          if(draftFields.some(function(f){return f.label===name})) return;
+          var b=chip("+ "+name,false,{sm:true});
+          b.type="button";
+          b.addEventListener("click",function(){
+            draftFields.push({id:uid(),label:name,value:""});
+            paintEditFields();
+            var last=editBox.querySelectorAll(".f-frow .fv-in");
+            if(last.length) last[last.length-1].focus();
+          });
+          quick.appendChild(b);
+        });
+      }
+
+      function paintEditTags(){
+        var host=editBox.querySelector(".f-tags");
+        host.innerHTML="";
+        (state.points||[]).forEach(function(pt){
+          var b=chip(pt.title,draftTags.indexOf(pt.id)>=0,{sm:true});
+          b.type="button";
+          b.addEventListener("click",function(){
+            var at=draftTags.indexOf(pt.id);
+            if(at>=0) draftTags.splice(at,1); else draftTags.push(pt.id);
+            paintEditTags();
+          });
+          host.appendChild(b);
+        });
+      }
+
       function openEdit(){
+        draftTags=linkPoints(l).slice();
+        draftFields=(Array.isArray(l.fields)?l.fields:[]).map(function(f){
+          return {id:f.id,label:f.label,value:f.value};
+        });
+        paintEditTags(); paintEditFields();
         editBox.querySelector(".f-t").value=l.title||"";
         editBox.querySelector(".f-n").value=l.note||"";
         editBox.querySelector(".f-u").value=l.url||"";
@@ -1429,6 +1610,15 @@
         editBox.querySelector(".f-t").focus();
       }
       pen.addEventListener("click",openEdit);
+      editBox.querySelector(".f-fadd").addEventListener("click",function(){
+        var fl=editBox.querySelector(".f-fl"), fv=editBox.querySelector(".f-fv");
+        var lab=fl.value.trim(), val=fv.value.trim();
+        if(!lab&&!val) return;
+        draftFields.push({id:uid(),label:lab||"поле",value:val});
+        fl.value=""; fv.value="";
+        paintEditFields(); fl.focus();
+      });
+
       editBox.querySelector(".f-cancel").addEventListener("click",function(){
         editBox.hidden=true; body.hidden=false;
       });
@@ -1440,6 +1630,10 @@
         l.title=t||shortUrl(u);
         if(n) l.note=n; else delete l.note;
         if(u) l.url=u; else delete l.url;
+        l.points=draftTags.slice();
+        l.fields=draftFields
+          .filter(function(f){ return (f.label||"").trim()||(f.value||"").trim(); })
+          .map(function(f){ return {id:f.id||uid(),label:(f.label||"").trim(),value:(f.value||"").trim()}; });
         touch(l); save(); renderFeed();
       });
 
@@ -1499,6 +1693,41 @@
       bottom.appendChild(tags);
       bottom.appendChild(foot);
       card.appendChild(bottom);
+
+      var fields=Array.isArray(l.fields)?l.fields:[];
+      var details=el("div","details");
+      details.hidden=true;
+      fields.forEach(function(f){
+        var row=el("div","fieldrow");
+        var isTel=/^\+?[0-9()\-\s]{5,}$/.test(String(f.value||""));
+        var val=safeUrl(f.value)
+          ? '<a href="'+esc(f.value)+'" target="_blank" rel="noopener noreferrer">'+esc(shortUrl(f.value))+'</a>'
+          : (isTel?'<a href="tel:'+esc(String(f.value).replace(/[^0-9+]/g,""))+'">'+esc(f.value)+'</a>'
+                  :linkify(esc(f.value)));
+        row.innerHTML='<span class="fl">'+esc(f.label||"поле")+'</span>'+
+          '<span class="fv">'+val+'</span>';
+        var cp=el("button","copybtn","копировать");
+        cp.addEventListener("click",function(){ copyVal(f.value); });
+        row.appendChild(cp);
+        details.appendChild(row);
+      });
+      card.appendChild(details);
+
+      if(fields.length){
+        var moreRow=el("div","card-more");
+        var moreBtn=el("button","talkbtn plain",
+          "Подробнее · "+fields.length+" "+plural(fields.length,["поле","поля","полей"]));
+        moreBtn.setAttribute("aria-expanded","false");
+        moreBtn.addEventListener("click",function(){
+          var open=details.hidden;
+          details.hidden=!open;
+          moreBtn.setAttribute("aria-expanded",open?"true":"false");
+          moreBtn.textContent=(open?"Свернуть":"Подробнее · "+fields.length+" "+
+            plural(fields.length,["поле","поля","полей"]));
+        });
+        moreRow.appendChild(moreBtn);
+        card.appendChild(moreRow);
+      }
 
       var talkRow=el("div","card-talk");
       var talk=el("button","talkbtn",
@@ -1713,7 +1942,7 @@
       var d=diffPlans(older,snaps[i].plan);
       var who=list[i].author||"без имени", when=list[i].updated_at;
 
-      d.joined.forEach(function(n){ out.push({kind:"join",who:who,when:when,text:n}); });
+
       // Пачку однотипных правок сворачиваем в одну строку: иначе одно
       // действие человека растекается на десяток одинаковых событий.
       function push(kind,items,label){
@@ -1776,6 +2005,15 @@
       }));
 
       var events=eventsFrom(list,snaps);
+
+      // Участники берутся из плана, а не из истории: иначе «Женя теперь
+      // в поездке» вытесняется новыми правками и пропадает совсем.
+      (state.people||[]).forEach(function(pp){
+        events.push({kind:"join",who:pp.name||"без имени",when:pp.ts||0});
+      });
+      events.sort(function(a,b){
+        return (Date.parse(b.when)||b.when||0)-(Date.parse(a.when)||a.when||0);
+      });
       if(!events.length){
         host.innerHTML='<p class="intro">Пока ничего не происходило.</p>';
         return;
@@ -1825,7 +2063,7 @@
       var lines=t.split("\n");
       var title=lines[0].trim(), note=lines.slice(1).join("\n").trim();
       var url=grabUrl(t);
-      var rec=touch({id:uid(),point:draftPoint,title:title||shortUrl(url),by:myName()});
+      var rec=touch({id:uid(),points:draftPoints.slice(),title:title||shortUrl(url),by:myName()});
       if(note) rec.note=note;
       if(url) rec.url=url;
       state.links.unshift(rec);
