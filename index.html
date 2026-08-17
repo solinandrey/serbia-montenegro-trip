@@ -192,6 +192,7 @@
   .card{
     margin:12px 16px;border:1px solid rgba(0,0,0,.18);border-radius:16px;
     padding:13px 14px 12px;background:#fff;
+    display:flex;flex-direction:column;
   }
   .cardwrap.fresh .card{animation:flash 1.5s ease-out}
   .card-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -225,10 +226,13 @@
   .copied{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);opacity:0;transition:opacity .2s}
   .copied.on{opacity:1}
   .card-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+  /* Голосовалка прижата к низу: в сетке карточки одной строки разной
+     высоты, и без этого подвал болтался бы по середине. */
   .card-foot{
-    display:flex;align-items:center;gap:8px;margin-top:12px;
-    padding-top:11px;border-top:1px solid var(--hair2);
+    display:flex;align-items:center;gap:8px;margin-top:auto;
+    padding-top:12px;border-top:1px solid var(--hair2);
   }
+  .card-tags{margin-bottom:2px}
   .react{
     display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;
     border:1px solid var(--edge);background:#fff;color:rgba(0,0,0,.62);
@@ -241,6 +245,36 @@
   .byline{font-size:11px;color:var(--dim2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .kill{margin-left:auto;font-size:17px;color:var(--dim2);padding:0 4px;line-height:1}
   .kill:hover{color:var(--acc)}
+
+  .card-edit{display:grid;gap:8px;margin-top:10px}
+  .card-edit input,.card-edit textarea{
+    width:100%;border:1px solid var(--edge);border-radius:10px;
+    padding:9px 11px;font-size:14px;background:#fff;resize:vertical;
+  }
+  .card-edit input:focus,.card-edit textarea:focus{border-color:#000;outline:none}
+  .card-edit-acts{display:flex;gap:8px;align-items:center}
+  .linkbtn{
+    background:none;border:none;padding:0;color:var(--dim);
+    font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  }
+  .linkbtn:hover{color:var(--acc)}
+
+  .thread{margin-top:10px;padding-top:10px;border-top:1px solid var(--hair2)}
+  .thread-list{display:grid;gap:8px}
+  .comment{background:var(--surf);border-radius:10px;padding:8px 10px}
+  .comment-head{
+    font-family:var(--mono);font-size:10px;text-transform:uppercase;
+    letter-spacing:.1em;color:var(--dim);
+  }
+  .comment-head span{color:var(--dim2)}
+  .comment-body{font-size:13.5px;line-height:1.4;margin-top:3px;overflow-wrap:anywhere}
+  .thread-add{display:flex;gap:8px;margin-top:9px}
+  .thread-add input{
+    flex:1;min-width:0;border:1px solid var(--edge);border-radius:10px;
+    padding:8px 11px;font-size:14px;background:#fff;
+  }
+  .thread-add input:focus{border-color:#000;outline:none}
+  .react.talk{border-style:dashed}
 
   .empty{margin:18px 16px;border:1px dashed var(--dim2);border-radius:14px;padding:20px}
   .empty h3{font-family:var(--disp);font-weight:600;font-size:19px;text-transform:uppercase;margin:0}
@@ -292,17 +326,28 @@
 
   /* ── журнал ───────────────────────────────── */
   .log{padding:14px 16px 40px}
-  .logrow{border-bottom:1px solid var(--hair2);padding:12px 2px}
-  .logrow-top{display:flex;gap:12px;align-items:baseline;width:100%;text-align:left;flex-wrap:wrap}
-  .logrow .when{font-family:var(--mono);font-size:11px;color:var(--dim2);flex:none;min-width:104px}
-  .logrow .author{font-family:var(--disp);font-weight:600;font-size:16px;text-transform:uppercase;flex:1 1 auto}
-  .logrow .sum{font-family:var(--mono);font-size:11px;color:var(--dim)}
-  .logbody{padding:6px 0 4px}
-  .logbody h4{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--dim2);margin:10px 0 5px}
-  .logbody p{margin:0 0 5px;font-size:13.5px;line-height:1.4;padding-left:11px;border-left:2px solid var(--hair);word-break:break-word}
-  .logbody p.add{border-left-color:var(--acc)}
-  .logbody p.del{border-left-color:#000}
-  .logbody p span{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--dim2);margin-right:8px}
+  .logrow{
+    display:block;width:100%;text-align:left;
+    border:none;border-bottom:1px solid var(--hair2);
+    padding:11px 16px;background:none;
+  }
+  .logrow.tap{cursor:pointer;transition:background .16s}
+  .logrow.tap:hover{background:var(--surf)}
+  .logrow-head{display:flex;gap:10px;align-items:baseline;justify-content:space-between}
+  .logrow .when{font-family:var(--mono);font-size:10.5px;color:var(--dim2);flex:none}
+  .logrow .what{
+    font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--acc);flex:none;
+  }
+  .logrow-text{
+    font-size:13.5px;line-height:1.35;margin-top:5px;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  .logrow-who{
+    font-family:var(--disp);font-weight:600;font-size:12px;text-transform:uppercase;
+    letter-spacing:.04em;color:var(--dim);margin-top:4px;
+  }
+  .log .logrow{padding-left:2px;padding-right:2px}
 
   /* ── тост отмены ──────────────────────────── */
   .toast{
@@ -681,10 +726,22 @@
     }
     return out;
   }
+  function mergeById(a,b){
+    var out=[],seen=Object.create(null),both=(a||[]).concat(b||[]),i,x;
+    for(i=0;i<both.length;i++){
+      x=both[i]; if(!x||!x.id||seen[x.id]) continue;
+      seen[x.id]=1; out.push(x);
+    }
+    out.sort(function(p,q){ return (p.ts||0)-(q.ts||0); });
+    return out;
+  }
+
   function mergeItem(srv,mine){
     var out={},k;
     for(k in mine) out[k]=mine[k];
     if(srv.react||mine.react) out.react=mergeReact(srv.react,mine.react);
+    // Комментарии тоже нельзя заменять целиком: двое пишут одновременно.
+    if(srv.comments||mine.comments) out.comments=mergeById(srv.comments,mine.comments);
     if(srv.ts&&(!mine.ts||srv.ts>mine.ts)) out.ts=srv.ts;
     return out;
   }
@@ -1268,6 +1325,7 @@
 
     list.forEach(function(l){
       var wrap=el("div","cardwrap"+(isNew(l)?" fresh":""));
+      wrap.setAttribute("data-id",l.id);
       var card=el("div","card");
       var url=safeUrl(l.url), isLink=!!url, v=l.num||l.title;
 
@@ -1309,6 +1367,69 @@
       tags.appendChild(tag);
       card.appendChild(tags);
 
+      // правка карточки
+      var editBox=el("div","card-edit");
+      editBox.hidden=true;
+      editBox.innerHTML=
+        '<input class="f-t" placeholder="Название" aria-label="Название карточки">'+
+        '<textarea class="f-n" rows="2" placeholder="Примечание: чем полезно, что уточнить" aria-label="Примечание"></textarea>'+
+        '<input class="f-u" placeholder="Ссылка" inputmode="url" aria-label="Ссылка">'+
+        '<div class="card-edit-acts">'+
+          '<button class="who me f-save" type="button">Сохранить</button>'+
+          '<button class="linkbtn f-cancel" type="button">Отмена</button>'+
+        '</div>';
+      card.appendChild(editBox);
+
+      function openEdit(){
+        editBox.querySelector(".f-t").value=l.title||"";
+        editBox.querySelector(".f-n").value=l.note||"";
+        editBox.querySelector(".f-u").value=l.url||"";
+        editBox.hidden=false;
+        body.hidden=true;
+        editBox.querySelector(".f-t").focus();
+      }
+      editBox.querySelector(".f-cancel").addEventListener("click",function(){
+        editBox.hidden=true; body.hidden=false;
+      });
+      editBox.querySelector(".f-save").addEventListener("click",function(){
+        var t=editBox.querySelector(".f-t").value.trim();
+        var n=editBox.querySelector(".f-n").value.trim();
+        var u=safeUrl(editBox.querySelector(".f-u").value);
+        if(!t&&!u) return;
+        l.title=t||shortUrl(u);
+        if(n) l.note=n; else delete l.note;
+        if(u) l.url=u; else delete l.url;
+        touch(l); save(); renderFeed();
+      });
+
+      // обсуждение
+      var comments=Array.isArray(l.comments)?l.comments:[];
+      var thread=el("div","thread");
+      thread.hidden=true;
+      var list=el("div","thread-list");
+      comments.forEach(function(c){
+        var item=el("div","comment");
+        item.innerHTML='<div class="comment-head">'+esc(c.who||"без имени")+
+          ' <span>'+esc(c.ts?ago(c.ts):"")+'</span></div>'+
+          '<div class="comment-body">'+linkify(esc(c.text))+'</div>';
+        list.appendChild(item);
+      });
+      thread.appendChild(list);
+      var addC=el("form","thread-add");
+      addC.innerHTML='<input placeholder="Написать остальным…" aria-label="Комментарий">'+
+        '<button class="who me" type="submit">Ответить</button>';
+      addC.addEventListener("submit",function(e){
+        e.preventDefault();
+        var inp=addC.querySelector("input"), v=inp.value.trim();
+        if(!v) return;
+        l.comments=(Array.isArray(l.comments)?l.comments:[]).concat([
+          {id:uid(),who:myName(),text:v,ts:Date.now()}
+        ]);
+        touch(l); inp.value=""; save(); renderFeed();
+      });
+      thread.appendChild(addC);
+      card.appendChild(thread);
+
       var foot=el("div","card-foot");
       [["+1","✓","agree"],["?","?","doubt"]].forEach(function(r){
         var on=hasMine(l,r[0]);
@@ -1322,7 +1443,22 @@
         });
         foot.appendChild(b);
       });
+      var talk=el("button","react talk",'✎<span>'+comments.length+'</span>');
+      talk.title=comments.length?"Обсуждение":"Написать остальным";
+      talk.setAttribute("aria-expanded","false");
+      talk.addEventListener("click",function(){
+        var open=thread.hidden;
+        thread.hidden=!open;
+        talk.setAttribute("aria-expanded",open?"true":"false");
+        if(open){ var i2=addC.querySelector("input"); if(i2) i2.focus(); }
+      });
+      foot.appendChild(talk);
+
       foot.appendChild(el("span","byline",esc((l.by||"—")+(l.ts?" · "+ago(l.ts):""))));
+
+      var pen=el("button","linkbtn","править");
+      pen.addEventListener("click",openEdit);
+      foot.appendChild(pen);
       var kill=el("button","kill","×");
       kill.setAttribute("aria-label","Убрать «"+l.title+"»");
       kill.addEventListener("click",function(){
@@ -1456,8 +1592,8 @@
   /* ── журнал ─────────────────────────────── */
   function planItems(p){
     var out=Object.create(null);
-    (p.links||[]).forEach(function(o){ out["l:"+o.id]={kind:"карточка",text:o.title||""}; });
-    (p.points||[]).forEach(function(o){ out["p:"+o.id]={kind:"точка",text:o.title||""}; });
+    (p.links||[]).forEach(function(o){ out["l:"+o.id]={id:o.id,kind:"link",text:o.title||""}; });
+    (p.points||[]).forEach(function(o){ out["p:"+o.id]={id:o.id,kind:"point",text:o.title||""}; });
     return out;
   }
   function diffPlans(older,newer){
@@ -1472,68 +1608,88 @@
 
     return {add:add,del:del,chg:chg,joined:joined};
   }
-  function diffSummary(d){
-    var bits=[];
-    if(d.joined&&d.joined.length) bits.push(d.joined.length===1?"новый участник":"новых: "+d.joined.length);
-    if(d.add.length) bits.push("+"+d.add.length);
-    if(d.del.length) bits.push("−"+d.del.length);
-    if(d.chg.length) bits.push("правок "+d.chg.length);
-    return bits.length?bits.join(" · "):"без изменений в содержимом";
-  }
-  function diffBlocks(d){
-    var h="";
-    function block(title,arr,cls){
-      if(!arr.length) return "";
-      var s='<h4>'+esc(title)+'</h4>';
-      arr.forEach(function(x){ s+='<p class="'+cls+'"><span>'+esc(x.kind)+'</span>'+esc(x.text.slice(0,140))+'</p>'; });
-      return s;
-    }
-    if(d.joined&&d.joined.length){
-      h+='<h4>В поездку добавились</h4>';
-      d.joined.forEach(function(n){
-        h+='<p class="add"><span>участник</span>'+esc(n)+'</p>';
+  var EVENT_LABEL={
+    join:"новый участник",
+    add:"новая ссылка",
+    del:"убрано",
+    chg:"поправлено",
+    point:"точка маршрута"
+  };
+
+  /* Из соседних снимков делаем понятные события. Ревизии, где менялись
+     только реакции или порядок, в журнал не попадают вовсе. */
+  function eventsFrom(list,snaps){
+    var out=[];
+    for(var i=0;i<Math.min(12,snaps.length);i++){
+      if(!snaps[i]) continue;
+      var older=snaps[i+1]?snaps[i+1].plan:null;
+      if(!older) continue;
+      var d=diffPlans(older,snaps[i].plan);
+      var who=list[i].author||"без имени", when=list[i].updated_at;
+
+      d.joined.forEach(function(n){ out.push({kind:"join",who:who,when:when,text:n}); });
+      d.add.forEach(function(x){
+        out.push({kind:x.kind==="point"?"point":"add",who:who,when:when,text:x.text,id:x.id});
+      });
+      d.del.forEach(function(x){ out.push({kind:"del",who:who,when:when,text:x.text}); });
+      d.chg.forEach(function(x){
+        out.push({kind:"chg",who:who,when:when,text:x.text,id:x.kind==="link"?x.id:null});
       });
     }
-    h+=block("Добавлено",d.add,"add");
-    h+=block("Убрано",d.del,"del");
-    h+=block("Поправлено",d.chg,"chg");
-    return h||'<p>Изменились только реакции или порядок.</p>';
+    return out;
+  }
+
+  function jumpToCard(id){
+    filterPoint="all";
+    if(currentScreen()!=="feed") location.hash="#feed";
+    setTimeout(function(){
+      renderFeed();
+      var card=document.querySelector('#cards [data-id="'+id+'"]');
+      if(!card) return;
+      if(card.scrollIntoView) card.scrollIntoView({block:"center",behavior:"smooth"});
+      card.classList.remove("fresh");
+      void card.offsetWidth;
+      card.classList.add("fresh");
+    },currentScreen()==="feed"?0:140);
   }
 
   async function renderLog(){
     var host=isDesk()&&$("logDesk")?$("logDesk"):$("logRows");
-    if(!shared||!apiKey){ host.innerHTML='<p class="intro">Журнал живёт на сервере. Подключи общий план, чтобы его увидеть.</p>'; return; }
+    if(!shared||!apiKey){
+      host.innerHTML='<p class="intro">Журнал живёт на сервере. Введи ключ, чтобы его увидеть.</p>';
+      return;
+    }
     host.innerHTML='<p class="intro">Загружаю…</p>';
     try{
       var r=await apiReq("GET",null,"/history");
       if(r.status!==200||!r.data) throw new Error("нет истории");
-      var list=r.data.history||[];
-      if(!list.length){ host.innerHTML='<p class="intro">Правок пока не было.</p>'; return; }
-      var take=list.slice(0,13);
-      var snaps=await Promise.all(take.map(function(h){
-        return apiReq("GET",null,"/history/"+h.rev).then(function(x){return x.status===200?x.data:null}).catch(function(){return null});
+      var list=(r.data.history||[]).slice(0,13);
+      if(!list.length){ host.innerHTML='<p class="intro">Пока ничего не происходило.</p>'; return; }
+
+      var snaps=await Promise.all(list.map(function(h){
+        return apiReq("GET",null,"/history/"+h.rev)
+          .then(function(x){return x.status===200?x.data:null}).catch(function(){return null});
       }));
-      host.innerHTML="";
-      for(var i=0;i<Math.min(12,snaps.length);i++){
-        if(!snaps[i]) continue;
-        var older=snaps[i+1]?snaps[i+1].plan:null;
-        var d=diffPlans(older,snaps[i].plan);
-        var row=el("div","logrow");
-        row.innerHTML='<button class="logrow-top" aria-expanded="false">'+
-            '<span class="when">'+esc(ago(take[i].updated_at))+'</span>'+
-            '<span class="author">'+esc(take[i].author||"без имени")+'</span>'+
-            '<span class="sum">'+esc(older?diffSummary(d):"первый снимок")+'</span>'+
-          '</button>'+
-          '<div class="logbody" hidden>'+(older?diffBlocks(d):'<p>Самый старый сохранённый снимок.</p>')+'</div>';
-        (function(row){
-          var head=row.querySelector(".logrow-top"), body=row.querySelector(".logbody");
-          head.addEventListener("click",function(){
-            var open=body.hidden; body.hidden=!open;
-            head.setAttribute("aria-expanded",open?"true":"false");
-          });
-        })(row);
-        host.appendChild(row);
+
+      var events=eventsFrom(list,snaps);
+      if(!events.length){
+        host.innerHTML='<p class="intro">Пока ничего не происходило.</p>';
+        return;
       }
+
+      host.innerHTML="";
+      events.slice(0,20).forEach(function(ev){
+        var row=el(ev.id?"button":"div","logrow"+(ev.id?" tap":""));
+        row.innerHTML=
+          '<div class="logrow-head">'+
+            '<span class="when">'+esc(ago(ev.when))+'</span>'+
+            '<span class="what">'+esc(EVENT_LABEL[ev.kind]||"правка")+'</span>'+
+          '</div>'+
+          '<div class="logrow-text">'+esc(/^https?:\/\//i.test(ev.text)?shortUrl(ev.text):ev.text)+'</div>'+
+          '<div class="logrow-who">'+esc(ev.who)+'</div>';
+        if(ev.id) row.addEventListener("click",function(){ jumpToCard(ev.id); });
+        host.appendChild(row);
+      });
     }catch(e){
       host.innerHTML='<p class="intro">Журнал не загрузился. Похоже, сервис недоступен.</p>';
     }

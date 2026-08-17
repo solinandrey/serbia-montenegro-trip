@@ -239,8 +239,12 @@ const server = http.createServer(async (req, res) => {
     if (isHistory && req.method === "GET") {
       const tail = url.pathname.slice("/history".length).replace(/^\//, "");
       if (!tail) {
+        // Только подписанные правки: неподписанная запись в журнале
+        // ничего не сообщает, кроме того, что кто-то что-то сделал.
         const { rows } = await pool.query(
-          "select rev, author, updated_at from plan_rev order by rev desc limit $1", [KEEP_REVS]
+          "select rev, author, updated_at from plan_rev " +
+          "where author is not null and btrim(author) <> '' order by rev desc limit $1",
+          [KEEP_REVS]
         );
         return send(res, 200, { history: rows });
       }
