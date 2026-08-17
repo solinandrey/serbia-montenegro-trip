@@ -241,6 +241,14 @@
     width:78px;height:78px;flex:none;border-radius:12px;border:1px solid rgba(0,0,0,.16);
     object-fit:cover;background:repeating-linear-gradient(135deg,#f2f0ee 0 5px,#e7e4e1 5px 10px);
   }
+  .thumb.maptile{position:relative;overflow:hidden;padding:0}
+  .thumb.maptile img{width:100%;height:100%;object-fit:cover;display:block}
+  .mapdot{
+    position:absolute;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;
+    border-radius:50%;background:var(--acc);border:2px solid #fff;
+    box-shadow:0 0 0 1px rgba(0,0,0,.25);
+  }
+  .thumb.maptile.failed .mapdot{display:none}
   .card-main{min-width:0;flex:1}
   .ogline{min-width:0}
   /* Своё название — главный текст карточки, поэтому акцентом.
@@ -1146,6 +1154,31 @@
     if(!h||!MAP_HOSTS.test(h)) return false;
     return /\/maps|maps\.|\/map|openstreetmap|osm\.org|2gis/i.test(String(u));
   }
+  /* Google картинку места не отдаёт, но координаты лежат прямо в адресе.
+     Берём тайл OpenStreetMap и ставим на него точку — карта настоящая. */
+  function mapCoords(u){
+    var s2=String(u||"");
+    var m=/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/.exec(s2);      // точные координаты места
+    if(!m) m=/@(-?\d+\.\d+),(-?\d+\.\d+)/.exec(s2);       // центр карты
+    if(!m) m=/[?&](?:ll|center)=(-?\d+\.\d+),(-?\d+\.\d+)/.exec(s2);
+    if(!m) return null;
+    var lat=parseFloat(m[1]), lon=parseFloat(m[2]);
+    if(isNaN(lat)||isNaN(lon)||Math.abs(lat)>85||Math.abs(lon)>180) return null;
+    return {lat:lat,lon:lon};
+  }
+
+  function mapTile(c,z){
+    var n=Math.pow(2,z);
+    var xf=(c.lon+180)/360*n;
+    var rad=c.lat*Math.PI/180;
+    var yf=(1-Math.log(Math.tan(rad)+1/Math.cos(rad))/Math.PI)/2*n;
+    var x=Math.floor(xf), y=Math.floor(yf);
+    return {
+      url:"https://tile.openstreetmap.org/"+z+"/"+x+"/"+y+".png",
+      dx:(xf-x)*100, dy:(yf-y)*100
+    };
+  }
+
   function mapPlace(u){
     var s2=String(u||"");
     var m=/\/maps\/place\/([^\/?#]+)/.exec(s2);
@@ -1173,6 +1206,24 @@
     var src=(d&&d.final)||url||"";
     if(isMapLink(src)||isMapLink(url)){
       var place=mapPlace(src)||mapPlace(url);
+      // подменяем штриховку настоящим куском карты
+      var coords=mapCoords(src)||mapCoords(url);
+      if(coords){
+        var t=mapTile(coords,16);
+        var thumb=host.parentNode?host.parentNode.querySelector(".thumb"):null;
+        if(thumb&&thumb.tagName==="DIV"){
+          var wrapT=el("div","thumb maptile");
+          var img=el("img");
+          img.src=t.url; img.width=78; img.height=78; img.loading="lazy"; img.alt="";
+          img.addEventListener("error",function(){ wrapT.classList.add("failed"); img.remove(); });
+          wrapT.appendChild(img);
+          var dot=el("i","mapdot");
+          dot.style.left=t.dx+"%"; dot.style.top=t.dy+"%";
+          wrapT.appendChild(dot);
+          thumb.parentNode.replaceChild(wrapT,thumb);
+        }
+      }
+
       var mbox=el("div","ogline map");
       if(place){
         mbox.innerHTML='<div class="og-title">Точка на карте</div>'+
