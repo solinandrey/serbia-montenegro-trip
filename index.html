@@ -386,6 +386,7 @@
     <div class="rail-live">
       <span class="bulb" aria-hidden="true"><span></span><span></span></span>
       <span id="lastline">—</span>
+      <button class="who" id="connectBtn" hidden>Подключить</button>
       <button class="who" id="whoBtn">Кто я</button>
     </div>
 
@@ -807,16 +808,72 @@
     if(LS){ try{ LS.setItem(NAMEKEY,v); }catch(e){} }
     if(hasStore){ try{ await window.storage.set(NAMEKEY,v,false); }catch(e){} }
   }
+  function askKey(){
+    var v=window.prompt("Общий пароль плана (один на троих):","");
+    if(!v||!v.trim()) return false;
+    apiKey=v.trim();
+    if(LS){ try{ LS.setItem(PASSKEY,apiKey); }catch(e){} }
+    return true;
+  }
+
   function askName(){
     var v=window.prompt("Как тебя подписывать?",me||"");
     if(v&&v.trim()){ setName(v.trim()); renderAll(); }
   }
 
   /* ── превью ссылок ──────────────────────── */
-  function paintOg(host,d){
-    if(!d||d.error||!d.title) return;
-    if(!d.image&&!d.description) return;
+
+  /* Карты не отдают карточку места: Google на любую ссылку возвращает
+     одну и ту же «Google Maps · Find local businesses». Поэтому название
+     точки достаём из самого адреса, а шаблонное превью глушим. */
+  var MAP_HOSTS=/(^|\.)(google\.[a-z.]+|goo\.gl|openstreetmap\.org|osm\.org|yandex\.[a-z]+|2gis\.[a-z]+)$/i;
+
+  function hostName(u){
+    var m=/^https?:\/\/([^\/?#]+)/.exec(String(u||""));
+    return m?m[1].replace(/^www\./,""):"";
+  }
+  function isMapLink(u){
+    var h=hostName(u);
+    if(!h||!MAP_HOSTS.test(h)) return false;
+    return /\/maps|maps\.|\/map|openstreetmap|osm\.org|2gis/i.test(String(u));
+  }
+  function mapPlace(u){
+    var s2=String(u||"");
+    var m=/\/maps\/place\/([^\/?#]+)/.exec(s2);
+    if(!m) m=/[?&](?:q|query|text)=([^&#]+)/.exec(s2);
+    if(!m) return "";
+    var name="";
+    try{ name=decodeURIComponent(m[1].replace(/\+/g," ")); }catch(e){ name=m[1].replace(/\+/g," "); }
+    name=name.replace(/@.*$/,"").replace(/\s+/g," ").trim();
+    if(/^-?\d+\.\d+,\s*-?\d+\.\d+$/.test(name)) return "";
+    return name.length>90?name.slice(0,90)+"…":name;
+  }
+
+  // Заголовок, равный названию сайта, ничего не добавляет к домену.
+  function genericOg(d){
+    if(!d||!d.title) return true;
+    var t=d.title.toLowerCase().replace(/[^a-zа-яё0-9]/gi,"");
+    var host=(d.site||"").toLowerCase().replace(/[^a-zа-яё0-9]/gi,"");
+    if(!t) return true;
+    if(host&&(t===host||host.indexOf(t)===0||t.indexOf(host)===0)) return true;
+    return ["googlemaps","openstreetmap","яндекскарты","2гис"].indexOf(t)>=0;
+  }
+  function paintOg(host,d,url){
     if(host.querySelector(".ogline")) return;
+
+    var src=(d&&d.final)||url||"";
+    if(isMapLink(src)||isMapLink(url)){
+      var place=mapPlace(src)||mapPlace(url);
+      if(place){
+        var mbox=el("div","ogline map");
+        mbox.innerHTML='<div class="card-note"><b>Точка на карте:</b> '+esc(place)+'</div>';
+        host.appendChild(mbox);
+      }
+      return;
+    }
+
+    if(!d||d.error||genericOg(d)) return;
+    if(!d.image&&!d.description) return;
     var box=el("div","ogline");
     box.innerHTML='<div class="card-title">'+esc(d.title)+'</div>'+
       (d.description?'<div class="card-note">'+esc(d.description)+'</div>':'');
@@ -832,12 +889,14 @@
     }
   }
   function loadOg(host,url){
+    // Полный адрес карты разбираем без сети
+    if(isMapLink(url)&&mapPlace(url)){ paintOg(host,null,url); return; }
     if(!shared||!apiKey) return;
-    if(ogCache[url]!==undefined){ paintOg(host,ogCache[url]); return; }
+    if(ogCache[url]!==undefined){ paintOg(host,ogCache[url],url); return; }
     ogCache[url]=null;
     fetch(API+"/og?url="+encodeURIComponent(url),{headers:{"x-trip-key":apiKey}})
       .then(function(r){return r.ok?r.json():null})
-      .then(function(d){ ogCache[url]=d||null; paintOg(host,d); })
+      .then(function(d){ ogCache[url]=d||null; paintOg(host,d,url); })
       .catch(function(){});
   }
 
@@ -960,15 +1019,16 @@
   }
 
   function renderStatus(){
-    var t=$("status");
+    var t=$("status"), c=$("connectBtn");
+    if(c) c.hidden = shared || hasStore;
     if(shared){
       t.innerHTML="<b>Общий план.</b> Правки видят все трое, чужие подтягиваются сами. Ты подписан как <b>"+esc(myName())+"</b>.";
       return;
     }
     if(hasStore&&live){ t.innerHTML="<b>Общая память включена.</b> Ты подписан как <b>"+esc(myName())+"</b>."; return; }
     if(!fromFile&&!localSaved){ t.innerHTML="<b>Файл не прочитался.</b> Открывай через GitHub&nbsp;Pages или локальный сервер."; return; }
-    if(localSaved){ t.innerHTML="<b>Правки сохранены в этом браузере.</b> Остальные их не видят — подключи общий план."; return; }
-    t.innerHTML="<b>План из plan.json.</b> Правки сохранятся в этом браузере, общими станут только через общий план.";
+    if(localSaved){ t.innerHTML="<b>Правки сохранены в этом браузере.</b> Остальные их не видят — нажми «Подключить» и введи общий пароль."; return; }
+    t.innerHTML="<b>План из plan.json.</b> Правки сохранятся в этом браузере. Чтобы их видели все трое — «Подключить» и общий пароль.";
   }
 
   function chip(label,on,opts){
@@ -1084,6 +1144,17 @@
     var list=(state.links||[]).filter(function(l){
       return filterPoint==="all"?true:((l.point||null)===filterPoint);
     });
+
+    // Порядок задаём здесь, а не порядком в массиве: слияние с сервером
+    // дописывает чужое и своё в хвост, и свежая карточка уезжала вниз.
+    // Старое (без ts — то, что переехало из прежней структуры) идёт следом.
+    list=list.map(function(l,i){return {l:l,i:i}}).sort(function(a,b){
+      var ta=a.l.ts||0, tb=b.l.ts||0;
+      if(ta&&tb) return tb-ta;
+      if(ta) return -1;
+      if(tb) return 1;
+      return a.i-b.i;
+    }).map(function(x){return x.l});
 
     if(!list.length){
       var e=el("div","empty");
@@ -1329,6 +1400,12 @@
     });
 
     $("whoBtn").addEventListener("click",askName);
+
+    $("connectBtn").addEventListener("click",async function(){
+      if(!askKey()) return;
+      await load();
+      route(); renderAll();
+    });
 
     $("addPointBtn").addEventListener("click",function(){
       var inp=$("newPoint"), v=inp.value.trim(); if(!v) return;

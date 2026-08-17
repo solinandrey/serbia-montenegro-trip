@@ -134,6 +134,9 @@ async function fetchOg(target) {
   const image = m["og:image"] || m["twitter:image"] || "";
   const out = {
     url: target.toString(),
+    // Короткие ссылки (maps.app.goo.gl и прочие) разворачиваем: клиенту
+    // нужен конечный адрес, чтобы достать из него название места.
+    final: res.url || target.toString(),
     title: (m["og:title"] || m["twitter:title"] || m.__title || "").slice(0, 180),
     description: (m["og:description"] || m["twitter:description"] || m.description || "").slice(0, 300),
     site: (m["og:site_name"] || target.hostname.replace(/^www\./, "")).slice(0, 80),
@@ -214,9 +217,11 @@ const server = http.createServer(async (req, res) => {
       const key = target.toString();
 
       const hit = await pool.query("select data, fetched_at from og_cache where url = $1", [key]);
-      if (hit.rowCount && Date.now() - new Date(hit.rows[0].fetched_at).getTime() < OG_TTL_MS) {
-        return send(res, 200, hit.rows[0].data);
-      }
+      const fresh = hit.rowCount && Date.now() - new Date(hit.rows[0].fetched_at).getTime() < OG_TTL_MS;
+      // Кэш живёт неделю и переживает деплой. Если форма ответа изменилась,
+      // старую запись надо перечитать, иначе клиент неделю видит прошлый формат.
+      const sameShape = hit.rowCount && hit.rows[0].data && (hit.rows[0].data.final || hit.rows[0].data.error);
+      if (fresh && sameShape) return send(res, 200, hit.rows[0].data);
 
       let data;
       try { data = await fetchOg(target); }
