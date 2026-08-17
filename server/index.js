@@ -190,7 +190,8 @@ function validPlan(p) {
     // links появился позже: в базе есть планы без него, поэтому проверяем,
     // только если поле вообще пришло
     && (p.links === undefined || Array.isArray(p.links))
-    && (p.points === undefined || Array.isArray(p.points));
+    && (p.points === undefined || Array.isArray(p.points))
+    && (p.people === undefined || Array.isArray(p.people));
 }
 
 const server = http.createServer(async (req, res) => {

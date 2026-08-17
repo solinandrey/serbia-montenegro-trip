@@ -68,6 +68,7 @@
   .gate-h{font-family:var(--disp);font-weight:700;font-size:19px;text-transform:uppercase;line-height:1}
   .gate-p{margin:7px 0 0;font-size:12.5px;line-height:1.45;color:var(--dim)}
   .gate-known{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .gate-err{margin:9px 0 0;font-size:12.5px;color:var(--acc);font-weight:600}
   .gate-known .chip{padding:6px 11px;font-size:12px}
 
   /* Пока не представился — трогать нечего: имя проставляется в каждую
@@ -244,7 +245,7 @@
   .empty{margin:18px 16px;border:1px dashed var(--dim2);border-radius:14px;padding:20px}
   .empty h3{font-family:var(--disp);font-weight:600;font-size:19px;text-transform:uppercase;margin:0}
   .empty p{font-size:13px;color:var(--dim);margin:7px 0 0;line-height:1.45}
-  .empty .chip{margin-top:14px}
+  .empty-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
 
   /* ── точки ────────────────────────────────── */
   .points{padding:14px 16px 40px}
@@ -253,10 +254,27 @@
     border:1px solid rgba(0,0,0,.18);border-radius:16px;padding:13px 14px;
     background:#fff;margin-bottom:10px;
   }
-  .prow-top{display:flex;align-items:baseline;gap:10px}
+  .prow-top{display:flex;align-items:center;gap:10px}
+  .grip{
+    flex:none;width:26px;height:26px;display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--edge);border-radius:8px;color:var(--dim2);
+    font-size:13px;line-height:1;cursor:grab;touch-action:none;
+    transition:border-color .16s,color .16s;
+  }
+  .grip:hover{border-color:#000;color:#000}
+  .prow.dragging{position:relative;z-index:5;box-shadow:0 8px 24px rgba(0,0,0,.14)}
+  .prow.dragging .grip{cursor:grabbing}
+  .prow{transition:transform .16s var(--ease)}
+  .prow.dragging{transition:none}
   .prow-n{font-family:var(--mono);font-size:11px;color:var(--dim2)}
   .prow-t{font-family:var(--disp);font-weight:700;font-size:22px;text-transform:uppercase;line-height:1;text-align:left}
-  .prow-c{margin-left:auto;font-family:var(--disp);font-weight:700;font-size:24px;line-height:1}
+  .prow-c{
+    margin-left:auto;font-family:var(--disp);font-weight:700;font-size:24px;line-height:1;
+    min-width:2.5ch;text-align:right;font-variant-numeric:tabular-nums;
+  }
+  /* У крестика тоже был margin-left:auto, и два auto делили свободное место
+     между собой — счётчик уезжал вслед за длиной названия. */
+  .prow-top .kill{margin-left:12px}
   .prow-b{display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap}
   .prow-b input{
     width:118px;border:1px solid var(--hair);border-radius:999px;padding:6px 11px;
@@ -415,6 +433,16 @@
       <span class="bulb" aria-hidden="true"><span></span><span></span></span>
       <span id="lastline"></span>
     </div>
+    <div class="gate" id="keyGate" hidden>
+      <div class="gate-h">Нужен ключ</div>
+      <p class="gate-p">Копилка общая и закрыта ключом. Обычно его вводить не надо: открой ссылку, которую прислал Андрей, — ключ в ней, и браузер запомнит его сам.</p>
+      <form class="rail-ask" id="keyAsk">
+        <input id="keyInput" type="password" placeholder="Ключ" aria-label="Общий ключ" autocomplete="current-password">
+        <button class="who" type="submit">Войти</button>
+      </form>
+      <p class="gate-err" id="keyErr" hidden>Ключ не подошёл. Проверь по ссылке от Андрея.</p>
+    </div>
+
     <div class="gate" id="gate" hidden>
       <div class="gate-h">Кто ты?</div>
       <p class="gate-p">Чтобы в дороге было видно, чья это правка. Имя сохранится в браузере — второй раз вводить не придётся.</p>
@@ -434,7 +462,6 @@
       <a href="#points" class="rail-edit">Править</a>
     </div>
     <div class="rail-filters" id="filtersDesk"></div>
-    <input class="newpoint rail-new" id="railNewPoint" placeholder="+ новая точка" autocomplete="off" aria-label="Новая точка маршрута">
   </aside>
 
   <div class="col-main">
@@ -527,35 +554,9 @@
   var SCREENS=["feed","points","log"];
   function isDesk(){ return !!(window.matchMedia&&window.matchMedia("(min-width:1040px)").matches); }
 
-  /* Точки по умолчанию — бывшие отрезки маршрута. */
-  var DEFAULT_POINTS=[
-    {id:"check",   title:"Сборы",     dates:"до отъезда"},
-    {id:"beograd", title:"Белград",   dates:"2 — 13 сен"},
-    {id:"voz",     title:"Поезд",     dates:"13 сен"},
-    {id:"sever",   title:"Север",     dates:"14 — 20 сен"},
-    {id:"more",    title:"Побережье", dates:"21 — 27 сен"}
-  ];
-
-  /* Справочные факты из прежних блоков по отрезкам. Это проверенные числа,
-     терять их при переезде на ленту нельзя — они становятся карточками. */
-  var FACTS=[
-    ["beograd","Валюта","Динары. Евро в Черногории — не меняйте лишнего перед выездом."],
-    ["beograd","Такси","CarGo — местный аналог Uber, им пользуются все."],
-    ["beograd","Связь","A1 или Yettel. Роуминга с Черногорией нет, симка едет с вами."],
-    ["beograd","Билеты","Международные онлайн не продаются, только касса на Прокопе."],
-    ["voz","Цена","2 класс 23,80 € · 1 класс 35,60 € · резервация места 3 €"],
-    ["voz","Ночной","«Ловчен» 19:54 с Прокопа. Кушет 4-местный 12 €, 6-местный 8 €."],
-    ["voz","Ради чего","Виадук Мала-Риека и спуск к морю — вторая половина дня. Ночной это проспит."],
-    ["voz","Реальность","Опоздания на час-два — норма. Кондиционер и чистота — лотерея."],
-    ["sever","Машина","Местные конторы 25–40 €/сут, подгоняют куда скажете. Видео по кругу при выдаче и возврате."],
-    ["sever","Дороги","60 км по карте = два часа. Магистраль на Матешево платная, ~3–4 €, экономит час."],
-    ["sever","Регистрация","Туристичка в течение 24 ч в каждом городе ночёвки. Booking делает автоматически."],
-    ["sever","Наличные","На севере карты часто не принимают вообще."],
-    ["more","Интернет","Главное узкое место. Оптика 100–300 Мбит, радио на склоне — 20 и пляшет."],
-    ["more","Коворкинги","Их почти нет. Работаем из квартиры, поэтому канал проверяем до брони."],
-    ["more","Не селиться","Внутри старого Котора: акустика колодца, бары до трёх, машину девать некуда."],
-    ["more","Рестораны","Рыба по весу. Спрашивать цену за кг и вес до того, как унесли на кухню."]
-  ];
+  /* Точки приходят с сервера вместе с планом. В публичном исходнике
+     их держать незачем: даты и города — тоже содержимое поездки. */
+  var DEFAULT_POINTS=[];
 
   /* ── мелочи ─────────────────────────────── */
   function $(id){return document.getElementById(id)}
@@ -648,40 +649,9 @@
     return {version:2,points:DEFAULT_POINTS.slice(),links:[],checklist:[],segments:{},notes:[]};
   }
 
-  /* Переезд на ленту: отрезки становятся точками, пункты плана, чеклист,
-     заметки и справочные факты — карточками. Старые ключи не трогаем,
-     чтобы можно было откатиться. */
-  function migrate(p){
-    if(!p||p.points) return p;
-    p.points=DEFAULT_POINTS.slice();
-    var out=[];
-    (p.links||[]).forEach(function(l){
-      var r={}; for(var k in l) r[k]=l[k];
-      r.point=(l.segment===undefined?null:l.segment)||null;
-      delete r.segment;
-      if(l.ref&&!r.num) r.num=l.ref;
-      out.push(r);
-    });
-    (p.checklist||[]).forEach(function(it){
-      out.push({id:it.id,point:"check",title:it.text,by:"",ts:it.ts,react:it.react,done:it.done});
-    });
-    Object.keys(p.segments||{}).forEach(function(k){
-      (p.segments[k]||[]).forEach(function(it){
-        out.push({id:it.id,point:k,title:it.text,by:"",ts:it.ts,react:it.react});
-      });
-    });
-    (p.notes||[]).forEach(function(n){
-      out.push({id:n.id,point:n.segment||null,title:n.text,by:n.author||"",ts:n.ts,react:n.react});
-    });
-    FACTS.forEach(function(f,i){
-      out.push({id:"fact"+i,point:f[0],title:f[1],note:f[2],by:""});
-    });
-    p.links=out;
-    return p;
-  }
-
   function normalize(p){
     if(!p) return p;
+    if(!Array.isArray(p.people)) p.people=[];
     if(!Array.isArray(p.links)) p.links=[];
     if(!Array.isArray(p.points)) p.points=DEFAULT_POINTS.slice();
     if(!Array.isArray(p.notes)) p.notes=[];
@@ -689,19 +659,7 @@
     if(!p.segments||typeof p.segments!=="object") p.segments={};
     return p;
   }
-  // Порядок важен: normalize() подставляет points, и если пустить его первым,
-  // migrate() решит, что переезд уже сделан, и потеряет всё содержимое.
-  function prep(p){ return normalize(migrate(p)); }
-
-  async function fetchPlan(){
-    try{
-      var res=await fetch("plan.json",{cache:"no-store"});
-      if(!res.ok) throw new Error("HTTP "+res.status);
-      var data=await res.json();
-      if(data&&typeof data==="object"){ fromFile=true; return data; }
-    }catch(e){}
-    return null;
-  }
+  function prep(p){ return normalize(p); }
 
   async function apiReq(method,body,path){
     var opts={method:method,headers:{"x-trip-key":apiKey}};
@@ -745,6 +703,7 @@
     return {
       version:srv.version||mine.version||2,
       points:mergeList(srv.points||[],mine.points||[]),
+      people:mergeList(srv.people||[],mine.people||[]),
       links:mergeList(srv.links||[],mine.links||[]),
       checklist:mergeList(srv.checklist||[],mine.checklist||[]),
       notes:mergeList(srv.notes||[],mine.notes||[]),
@@ -767,28 +726,37 @@
   async function load(){
     if(!hasStore){
       if(!apiKey&&LS){ try{ apiKey=LS.getItem(PASSKEY); }catch(e){} }
-      if(apiKey){
-        try{
-          var r=await apiReq("GET");
-          if(r.status===200&&r.data){
-            state=prep(r.data.plan); rev=r.data.rev; shared=true; live=true; localSaved=false;
-            noteMeta(r.data); return;
-          }
-          if(r.status===401){ apiKey=null; if(LS){try{LS.removeItem(PASSKEY);}catch(e){}} }
-        }catch(e){}
-      }
+
+      // Без ключа не грузим вообще ничего: ни с сервера, ни из кэша,
+      // ни из plan.json. Чего нет в браузере, того не увидеть и в инспекторе.
+      if(!apiKey){ shared=false; live=false; state=prep(seed()); localSaved=false; return; }
+
+      try{
+        var r=await apiReq("GET");
+        if(r.status===200&&r.data){
+          state=prep(r.data.plan); rev=r.data.rev; shared=true; live=true; localSaved=false;
+          noteMeta(r.data); return;
+        }
+        if(r.status===401){
+          apiKey=null;
+          if(LS){ try{ LS.removeItem(PASSKEY); LS.removeItem(KEY); }catch(e){} }
+          shared=false; live=false; state=prep(seed()); return;
+        }
+      }catch(e){}
+
+      // Ключ есть, но сервис не ответил — поднимаем свой последний слепок.
       shared=false; live=false;
       var mine=readLocal();
-      if(mine){ state=prep(mine); localSaved=true; fromFile=false; return; }
-      state=prep((await fetchPlan())||seed()); localSaved=false;
+      state=prep(mine||seed());
+      localSaved=!!mine;
       return;
     }
     try{
       var g=await window.storage.get(KEY,true);
-      state=prep(g&&g.value?JSON.parse(g.value):((await fetchPlan())||seed()));
+      state=prep(g&&g.value?JSON.parse(g.value):seed());
       live=true;
     }catch(e){
-      state=prep((await fetchPlan())||seed()); live=true;
+      state=prep(seed()); live=true;
       try{ await save(); }catch(e2){ live=false; }
     }
     try{ var n=await window.storage.get(NAMEKEY,false); if(n&&n.value) me=n.value; }catch(e){}
@@ -842,8 +810,20 @@
     }catch(e){}
   }
 
+  function personId(n){ return "u-"+String(n).trim().toLowerCase().replace(/\s+/g,"-"); }
+
   async function setName(v){
+    var first=!me;
     me=v;
+    // Первое представление — событие для журнала: видно, кто присоединился.
+    if(state&&Array.isArray(state.people)){
+      var id=personId(v);
+      if(!state.people.some(function(x){return x.id===id})){
+        state.people.push({id:id,name:v,ts:Date.now()});
+        markMine(id);
+        save();
+      }
+    }
     if(LS){ try{ LS.setItem(NAMEKEY,v); }catch(e){} }
     if(hasStore){ try{ await window.storage.set(NAMEKEY,v,false); }catch(e){} }
   }
@@ -877,13 +857,23 @@
     return out.slice(0,6);
   }
 
+  function needKey(){ return !hasStore && !shared; }
+
   function renderGate(){
-    var gate=$("gate"), acts=$("railActs");
-    if(!gate||!acts) return;
-    var need=!me;
-    gate.hidden=!need;
+    var gate=$("gate"), acts=$("railActs"), kg=$("keyGate");
+    if(!gate||!acts||!kg) return;
+
+    // Сначала ключ, потом имя: без ключа показывать нечего.
+    var wantKey=needKey();
+    kg.hidden=!wantKey;
+    var need=wantKey||!me;
+    gate.hidden=wantKey||!need;
     acts.hidden=need;
     document.body.classList.toggle("locked",need);
+    if(wantKey){
+      if($("keyInput")&&document.activeElement!==$("keyInput")) $("keyInput").focus();
+      return;
+    }
 
     var host=$("knownNames");
     if(host){
@@ -1074,6 +1064,15 @@
     renderHead();
   }
 
+  function focusDraft(){
+    if(currentScreen()!=="feed") location.hash="#feed";
+    setTimeout(function(){
+      var box=$("draft"); if(!box) return;
+      if(box.scrollIntoView) box.scrollIntoView({block:"center",behavior:"smooth"});
+      box.focus(); renderDraft();
+    },80);
+  }
+
   function pointName(id){
     if(!id) return "Без точки";
     var p=(state.points||[]).find(function(x){return x.id===id});
@@ -1114,10 +1113,8 @@
       return;
     }
     if(hasStore&&live){ t.innerHTML="<b>Общая память включена.</b> Ты подписан как <b>"+esc(myName())+"</b>."; return; }
-    if(!fromFile&&!localSaved){ t.innerHTML="<b>Файл не прочитался.</b> Открывай через GitHub&nbsp;Pages или локальный сервер."; return; }
-    t.innerHTML="<b>Пока только у тебя.</b> Правки лежат в этом браузере, остальные их не видят. "+
-      "Чтобы копилка стала общей, открой ссылку с ключом от Андрея "+
-      '<button class="keylink" id="keyBtn">или введи ключ вручную</button>.';
+    if(!apiKey){ t.innerHTML="<b>Копилка закрыта ключом.</b> Введи его слева или открой ссылку с ключом."; return; }
+    t.innerHTML="<b>Сервис не отвечает.</b> Правки пока лежат в этом браузере и уедут в общий план, когда связь вернётся.";
   }
 
   function chip(label,on,opts){
@@ -1252,11 +1249,19 @@
         '<p>'+(total
           ? "В этой точке пока ничего не лежит. Кинь ссылку или заметку — или посмотри всё сразу."
           : "Кидай сюда ссылки на жильё, точки в карте, статьи, номера броней и телефоны. Первая строка станет заголовком.")+'</p>';
+      var acts=el("div","empty-acts");
+      var addBtn=chip(total?("Добавить в «"+pointName(filterPoint)+"»"):"Добавить первую",true);
+      addBtn.addEventListener("click",function(){
+        if(filterPoint!=="all") draftPoint=filterPoint;   // куда смотрим, туда и кладём
+        focusDraft();
+      });
+      acts.appendChild(addBtn);
       if(total){
         var b=chip("Показать всё",false);
         b.addEventListener("click",function(){ filterPoint="all"; renderFeed(); });
-        e.appendChild(b);
+        acts.appendChild(b);
       }
+      e.appendChild(acts);
       host.appendChild(e);
       return;
     }
@@ -1339,12 +1344,81 @@
     renderDraft(); renderPinned(); renderFilters(); renderCards(); renderHead();
   }
 
+  /* Перетаскивание точек. HTML5 drag&drop не работает пальцем, поэтому
+     на указателях: они одинаково приходят и от мыши, и от касания. */
+  var drag=null;
+
+  function movePoint(from,to){
+    if(from===to||from<0||to<0||to>=state.points.length) return;
+    var arr=state.points.slice();
+    arr.splice(to,0,arr.splice(from,1)[0]);
+    state.points=arr;
+    save(); renderAll();
+    var grips=document.querySelectorAll("#pointRows .grip");
+    if(grips[to]) grips[to].focus();
+  }
+
+  function startDrag(e,idx,row){
+    if(e.button&&e.button!==0) return;
+    e.preventDefault();
+    var host=$("pointRows");
+    var rows=[].slice.call(host.children);
+    drag={
+      idx:idx,row:row,rows:rows,
+      mids:rows.map(function(r){var b=r.getBoundingClientRect();return b.top+b.height/2}),
+      startY:e.clientY,to:idx
+    };
+    row.classList.add("dragging");
+    document.addEventListener("pointermove",onDrag);
+    document.addEventListener("pointerup",endDrag,{once:true});
+    document.addEventListener("pointercancel",endDrag,{once:true});
+  }
+
+  function onDrag(e){
+    if(!drag) return;
+    var dy=e.clientY-drag.startY;
+    drag.row.style.transform="translateY("+dy+"px)";
+    var y=e.clientY, to=0;
+    for(var i=0;i<drag.mids.length;i++) if(y>drag.mids[i]) to=i;
+    if(y<drag.mids[0]) to=0;
+    if(to!==drag.to){
+      drag.to=to;
+      drag.rows.forEach(function(r,i){
+        if(r===drag.row) return;
+        var shift=0;
+        if(drag.idx<to && i>drag.idx && i<=to) shift=-1;
+        if(drag.idx>to && i>=to && i<drag.idx) shift=1;
+        r.style.transform=shift?("translateY("+(shift*r.getBoundingClientRect().height)+"px)"):"";
+      });
+    }
+  }
+
+  function endDrag(){
+    if(!drag) return;
+    document.removeEventListener("pointermove",onDrag);
+    var from=drag.idx,to=drag.to;
+    drag.rows.forEach(function(r){ r.style.transform=""; r.classList.remove("dragging"); });
+    drag=null;
+    if(from!==to) movePoint(from,to);
+  }
+
   function renderPoints(){
     var host=$("pointRows"); host.innerHTML="";
     (state.points||[]).forEach(function(p,i){
       var row=el("div","prow");
       var top=el("div","prow-top");
-      top.innerHTML='<span class="prow-n">'+String(i+1).padStart(2,"0")+'</span>';
+      var grip=el("button","grip","≡");
+      grip.type="button";
+      grip.setAttribute("aria-label","Переставить точку «"+p.title+"». Стрелки вверх и вниз тоже работают");
+      grip.addEventListener("pointerdown",function(e){ startDrag(e,i,row); });
+      grip.addEventListener("keydown",function(e){
+        var to=e.key==="ArrowUp"?i-1:(e.key==="ArrowDown"?i+1:-1);
+        if(to<0||to>=state.points.length) return;
+        e.preventDefault();
+        movePoint(i,to);
+      });
+      top.appendChild(grip);
+      top.appendChild(el("span","prow-n",String(i+1).padStart(2,"0")));
       var t=el("button","prow-t",esc(p.title));
       t.addEventListener("click",function(){ filterPoint=p.id; location.hash="#feed"; });
       top.appendChild(t);
@@ -1390,10 +1464,17 @@
     var a=planItems(older||{}),b=planItems(newer||{}),add=[],del=[],chg=[],k;
     for(k in b){ if(!a[k]) add.push(b[k]); else if(a[k].text!==b[k].text) chg.push(b[k]); }
     for(k in a) if(!b[k]) del.push(a[k]);
-    return {add:add,del:del,chg:chg};
+
+    var had=Object.create(null);
+    ((older||{}).people||[]).forEach(function(x){ had[x.id]=1; });
+    var joined=((newer||{}).people||[]).filter(function(x){ return !had[x.id]; })
+      .map(function(x){ return x.name||"без имени"; });
+
+    return {add:add,del:del,chg:chg,joined:joined};
   }
   function diffSummary(d){
     var bits=[];
+    if(d.joined&&d.joined.length) bits.push(d.joined.length===1?"новый участник":"новых: "+d.joined.length);
     if(d.add.length) bits.push("+"+d.add.length);
     if(d.del.length) bits.push("−"+d.del.length);
     if(d.chg.length) bits.push("правок "+d.chg.length);
@@ -1406,6 +1487,12 @@
       var s='<h4>'+esc(title)+'</h4>';
       arr.forEach(function(x){ s+='<p class="'+cls+'"><span>'+esc(x.kind)+'</span>'+esc(x.text.slice(0,140))+'</p>'; });
       return s;
+    }
+    if(d.joined&&d.joined.length){
+      h+='<h4>В поездку добавились</h4>';
+      d.joined.forEach(function(n){
+        h+='<p class="add"><span>участник</span>'+esc(n)+'</p>';
+      });
     }
     h+=block("Добавлено",d.add,"add");
     h+=block("Убрано",d.del,"del");
@@ -1501,10 +1588,22 @@
       if(e.key==="Escape"&&me){ renderGate(); }
     });
 
-    document.addEventListener("click",async function(e){
-      if(!e.target||e.target.id!=="keyBtn") return;
-      if(!askKey()) return;
+    $("keyAsk").addEventListener("submit",async function(e){
+      e.preventDefault();
+      var v=$("keyInput").value.trim();
+      if(!v) return;
+      apiKey=v;
+      $("keyErr").hidden=true;
       await load();
+      if(!shared){
+        apiKey=null;
+        if(LS){ try{ LS.removeItem(PASSKEY); }catch(e2){} }
+        $("keyErr").hidden=false;
+        $("keyInput").select();
+        return;
+      }
+      if(LS){ try{ LS.setItem(PASSKEY,apiKey); }catch(e2){} }
+      $("keyInput").value="";
       route(); renderAll();
     });
 
@@ -1520,13 +1619,6 @@
       if(e.key==="Enter") $("addPointBtn").click();
     });
 
-    var railNew=$("railNewPoint");
-    if(railNew) railNew.addEventListener("keydown",function(e){
-      if(e.key!=="Enter") return;
-      var v=railNew.value.trim(); if(!v) return;
-      state.points.push({id:"p"+uid(),title:v,dates:""});
-      railNew.value=""; save(); renderAll();
-    });
     if($("clearFilter")) $("clearFilter").addEventListener("click",function(){
       filterPoint="all"; renderFeed();
     });
