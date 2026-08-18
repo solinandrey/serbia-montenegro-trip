@@ -1609,6 +1609,9 @@
 
   function anim(){
     if(reduceMotion()) return null;
+    // В фоновой вкладке кадры не запрашиваются: твин стартует с нуля
+    // и застревает — содержимое висит невидимым. Лучше без анимации.
+    if(document.hidden) return null;
     return (typeof window.gsap!=="undefined")?window.gsap:null;
   }
 
