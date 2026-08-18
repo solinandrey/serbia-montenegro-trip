@@ -1358,6 +1358,12 @@
     $("screenTitle").textContent={feed:"Копилка",points:"Точки",log:"Кто что менял"}[k];
     if(k==="log") renderLog();
     renderHead();
+
+    var shown=document.querySelector('section[data-screen="'+k+'"]');
+    if(shown&&!shown.hidden){
+      var kids=[].slice.call(shown.children).filter(function(n){ return !n.hidden; });
+      animateIn(kids.length?kids:[shown],{y:10,stagger:0.05});
+    }
   }
 
   function focusDraft(){
@@ -1613,13 +1619,13 @@
     g.killTweensOf(nodes);
     g.fromTo(nodes,
       {opacity:0,y:o.y===undefined?10:o.y},
-      {opacity:1,y:0,duration:o.duration||0.42,ease:"power3.out",
-       stagger:o.stagger===undefined?0.035:o.stagger,clearProps:"transform,opacity"});
+      {opacity:1,y:0,duration:o.duration||0.45,ease:"power3.out",
+       stagger:o.stagger===undefined?0.04:o.stagger,clearProps:"transform,opacity"});
   }
 
   // Анимируем только когда набор на экране действительно изменился,
   // а не на каждую перерисовку от сохранения или опроса.
-  var lastSig="";
+  var lastSig="", lastIds=[], lastCols="";
 
   function renderCards(){
     renderActiveFilter();
@@ -1674,10 +1680,16 @@
       return;
     }
 
-    var sig=feedCols+"|"+filterPoint+"|"+filterTags.join(",")+"|"+
-      list.map(function(l){return l.id}).join(",");
+    var ids=list.map(function(l){return l.id});
+    var sig=feedCols+"|"+filterPoint+"|"+filterTags.join(",")+"|"+ids.join(",");
     var changed=sig!==lastSig;
-    lastSig=sig;
+    // Карточки, которые и так были на экране, дёргать незачем: анимируем
+    // только те, что появились. Смена раскладки — исключение, там едут все.
+    var colsChanged=feedCols!==lastCols;
+    var wasThere=Object.create(null);
+    lastIds.forEach(function(id){ wasThere[id]=1; });
+    var freshNodes=[];
+    lastSig=sig; lastIds=ids; lastCols=feedCols;
 
     list.forEach(function(l){
       var fresh=isNew(l)&&!flashed[l.id];
@@ -1892,7 +1904,7 @@
           bornTags=[];
         }
         editBox.hidden=true; body.hidden=false; hideRest(false);
-        animateIn([body],{y:6,stagger:0,duration:0.28});
+        animateIn([body,bottom,talkRow].filter(Boolean),{y:6,stagger:0.04,duration:0.3});
         renderFeed();
       });
       editBox.querySelector(".f-save").addEventListener("click",function(){
@@ -1905,6 +1917,8 @@
         if(u) l.url=u; else delete l.url;
         l.points=draftTags.slice();
         bornTags=[];
+        editBox.hidden=true; body.hidden=false; hideRest(false);
+        animateIn([body,bottom,talkRow].filter(Boolean),{y:6,stagger:0.04,duration:0.3});
         l.fields=draftFields
           .filter(function(f){ return (f.label||"").trim()||(f.value||"").trim(); })
           .map(function(f){ return {id:f.id||uid(),label:(f.label||"").trim(),value:(f.value||"").trim()}; });
@@ -2022,9 +2036,13 @@
 
       wrap.appendChild(card);
       host.appendChild(wrap);
+      if(!wasThere[l.id]) freshNodes.push(wrap);
     });
 
-    if(changed) animateIn([].slice.call(host.children),{y:12});
+    if(changed){
+      if(colsChanged) animateIn([].slice.call(host.children),{y:10});
+      else if(freshNodes.length) animateIn(freshNodes,{y:12});
+    }
 
     popId=""; popKind="";
   }
@@ -2268,6 +2286,14 @@
     del:" — убрано"
   };
 
+  /* Мои технические карточки времён отладки. Удалять ревизии нельзя —
+     журнал считается разницей соседних снимков, выбитое звено превращает
+     всё, что было до него, в «добавлено заново». Поэтому прячем на выводе. */
+  var TECHNICAL=/ПРОВЕРКА/i;
+  function technical(ev){
+    return TECHNICAL.test(ev.text||"");
+  }
+
   /* Из соседних снимков делаем понятные события. Ревизии, где менялись
      только реакции или порядок, в журнал не попадают вовсе. */
   function eventsFrom(list,snaps){
@@ -2308,7 +2334,7 @@
         return {text:x.text+" — "+x.title,id:x.id};
       }));
     }
-    return out;
+    return out.filter(function(ev){ return !technical(ev); });
   }
 
   function jumpToCard(id,expand){
