@@ -1597,6 +1597,10 @@
      GSAP подключён с CDN и может не доехать (горы, плохая связь),
      поэтому каждое обращение под проверкой. Двигаем только transform
      и opacity, reduced-motion уважаем. */
+  function reduceMotion(){
+    return !!(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  }
+
   function anim(){
     if(reduceMotion()) return null;
     return (typeof window.gsap!=="undefined")?window.gsap:null;
@@ -1848,6 +1852,7 @@
         editBox.hidden=false;
         body.hidden=true;
         hideRest(true);
+        animateIn([].slice.call(editBox.children),{y:8,stagger:0.03,duration:0.34});
         editBox.querySelector(".f-t").focus();
       }
       pen.addEventListener("click",openEdit);
@@ -1887,6 +1892,7 @@
           bornTags=[];
         }
         editBox.hidden=true; body.hidden=false; hideRest(false);
+        animateIn([body],{y:6,stagger:0,duration:0.28});
         renderFeed();
       });
       editBox.querySelector(".f-save").addEventListener("click",function(){
