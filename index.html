@@ -452,6 +452,11 @@
   .daterange input:focus{border-color:#000;outline:none}
   .daterange .dash{color:var(--dim2);font-family:var(--mono);font-size:12px}
   .prow-b .sample{font-size:12px;color:var(--dim);text-align:left}
+  .namein{
+    width:100%;border:1.5px solid #000;border-radius:12px;padding:11px 13px;
+    font-size:15px;font-family:inherit;background:#fff;margin-bottom:4px;
+  }
+  .namein:focus{outline:none;box-shadow:0 0 0 3px rgba(0,0,0,.12)}
   .addpoint{display:flex;gap:8px;margin-top:14px}
   .addpoint input{flex:1;min-width:0;border:1.5px solid #000;border-radius:12px;padding:12px 14px;font-size:15px;background:#fff}
   .addpoint button{
@@ -681,9 +686,11 @@
         <div class="more" id="more">
           <div class="more-in">
             <div id="draftPreview"></div>
+            <div class="lab" id="draftNameLab" hidden>Название</div>
+            <input id="draftName" class="namein" placeholder="Как назовём" aria-label="Название карточки" autocomplete="off" hidden>
             <div class="lab">К какой точке</div>
             <div class="picks" id="draftPicks"></div>
-            <p class="hint">Первая строка станет заголовком, остальное — примечанием. Не относится ни к чему конкретному — жми «Без точки».</p>
+            <p class="hint" id="draftHint">Первая строка станет заголовком, остальное — примечанием. Не относится ни к чему конкретному — жми «Без точки».</p>
           </div>
         </div>
       </div>
@@ -1243,12 +1250,18 @@
       return;
     }
 
-    if(!d||d.error||genericOg(d)) return;
+    if(!d||d.error) return;
     if(!d.image&&!d.description) return;
-    var box=el("div","ogline");
-    box.innerHTML='<div class="og-title">'+esc(d.title)+'</div>'+
-      (d.description?'<div class="og-desc">'+esc(d.description)+'</div>':'');
-    host.appendChild(box);
+    // Заголовок, равный названию сайта, ничего не добавляет — но это не повод
+    // выбрасывать картинку и описание: раньше из-за этого превью пропадало
+    // у всех страниц, чей og:title совпал с доменом.
+    var useful=!genericOg(d);
+    if(useful||d.description){
+      var box=el("div","ogline");
+      box.innerHTML=(useful?'<div class="og-title">'+esc(d.title)+'</div>':'')+
+        (d.description?'<div class="og-desc">'+esc(d.description)+'</div>':'');
+      host.appendChild(box);
+    }
     if(d.image){
       var img=host.parentNode.querySelector(".thumb");
       if(img&&img.tagName==="DIV"){
@@ -1259,15 +1272,24 @@
       }
     }
   }
-  function loadOg(host,url){
+  /* Что можно предложить как название: у карты — имя места, у сайта —
+     заголовок страницы. Пусто, если ни того ни другого нет. */
+  function nameGuess(d,url){
+    var src=(d&&d.final)||url||"";
+    if(isMapLink(src)||isMapLink(url)) return mapPlace(src)||mapPlace(url)||"";
+    if(!d||d.error||genericOg(d)) return "";
+    return d.title||"";
+  }
+  function loadOg(host,url,onGuess){
+    function done(d){ if(onGuess) onGuess(nameGuess(d,url)); }
     // Полный адрес карты разбираем без сети
-    if(isMapLink(url)&&mapPlace(url)){ paintOg(host,null,url); return; }
+    if(isMapLink(url)&&mapPlace(url)){ paintOg(host,null,url); done(null); return; }
     if(!shared||!apiKey) return;
-    if(ogCache[url]!==undefined){ paintOg(host,ogCache[url],url); return; }
+    if(ogCache[url]!==undefined){ paintOg(host,ogCache[url],url); done(ogCache[url]); return; }
     ogCache[url]=null;
     fetch(API+"/og?url="+encodeURIComponent(url),{headers:{"x-trip-key":apiKey}})
       .then(function(r){return r.ok?r.json():null})
-      .then(function(d){ ogCache[url]=d||null; paintOg(host,d,url); })
+      .then(function(d){ ogCache[url]=d||null; paintOg(host,d,url); done(d); })
       .catch(function(){});
   }
 
@@ -1440,12 +1462,20 @@
     return b;
   }
 
+  var draftNameTouched=false;
   function renderDraft(){
     var t=$("draft").value.trim();
     $("saveBtn").classList.toggle("armed",!!t);
     $("more").classList.toggle("open",!!t||document.activeElement===$("draft"));
 
     var url=grabUrl(t), prev=$("draftPreview");
+    var nameIn=$("draftName"), nameLab=$("draftNameLab");
+    // Ссылка сама по себе — плохой заголовок, поэтому спрашиваем имя сразу.
+    nameIn.hidden=nameLab.hidden=!url;
+    if(!url){ nameIn.value=""; draftNameTouched=false; }
+    $("draftHint").textContent=url
+      ? "Название можно оставить пустым — подставим то, что вернёт сайт. Остальные строки станут примечанием."
+      : "Первая строка станет заголовком, остальное — примечанием. Не относится ни к чему конкретному — жми «Без точки».";
     prev.innerHTML="";
     if(url){
       var box=el("div","card-body");
@@ -1454,7 +1484,11 @@
         '<div class="host">'+esc(shortUrl(url))+'</div>'+
         '<div class="card-note" style="margin-top:6px">Тянем превью: заголовок, описание, картинка</div></div>';
       prev.appendChild(box);
-      loadOg(box.querySelector(".card-main"),url);
+      loadOg(box.querySelector(".card-main"),url,function(guess){
+        if(draftNameTouched||nameIn.value.trim()||!guess) return;
+        if(grabUrl(String($("draft").value))!==url) return;   // ввод уже сменился
+        nameIn.value=guess;
+      });
     }
 
     var picks=$("draftPicks"); picks.innerHTML="";
@@ -2120,11 +2154,6 @@
     var host=$("pointRows"); host.innerHTML="";
     var all=state.points||[];
     var route=all.filter(function(p){ return !p.tag; });
-    var tags=all.filter(function(p){ return p.tag; });
-
-    if(tags.length){
-      host.appendChild(el("div","points-lab","Отрезки маршрута"));
-    }
 
     route.forEach(function(p,i){
       var row=el("div","prow");
@@ -2171,13 +2200,11 @@
       dFrom.value=p.from||""; dTo.value=p.to||"";
       function applyDates(){
         p.from=dFrom.value||""; p.to=dTo.value||"";
-        p.dates=fmtRange(p.from,p.to);
         save(); renderAll();
       }
       dFrom.addEventListener("change",applyDates);
       dTo.addEventListener("change",applyDates);
       b.appendChild(range);
-      if(p.dates&&!p.from&&!p.to) b.appendChild(el("span","sample",esc(p.dates)));
       var s=el("button","sample",esc(countFor(p.id)?"смотреть "+countFor(p.id):"пока пусто"));
       s.addEventListener("click",function(){ filterPoint=p.id; location.hash="#feed"; });
       b.appendChild(s);
@@ -2185,37 +2212,6 @@
       host.appendChild(row);
     });
 
-    if(tags.length){
-      host.appendChild(el("div","points-lab sep","Свои теги"));
-      tags.forEach(function(p){
-        var row=el("div","prow tagrow");
-        var top=el("div","prow-top");
-        top.appendChild(el("span","prow-t",esc(p.title)));
-        top.appendChild(el("span","prow-c",String(countFor(p.id))));
-        var x=el("button","kill","×");
-        x.setAttribute("aria-label","Убрать тег «"+p.title+"»");
-        x.addEventListener("click",function(){
-          var idx=state.points.indexOf(p);
-          var moved=(state.links||[]).filter(function(l){return linkPoints(l).indexOf(p.id)>=0})
-            .map(function(l){return l.id});
-          state.points=state.points.filter(function(x2){return x2.id!==p.id});
-          state.links.forEach(function(l){
-            l.points=linkPoints(l).filter(function(id){return id!==p.id});
-          });
-          save(); renderAll();
-          showToast("Тег убран: "+p.title,function(){
-            state.points.splice(idx<0?0:idx,0,p);
-            state.links.forEach(function(l){
-              if(moved.indexOf(l.id)>=0) l.points=linkPoints(l).concat([p.id]);
-            });
-            save(); renderAll();
-          });
-        });
-        top.appendChild(x);
-        row.appendChild(top);
-        host.appendChild(row);
-      });
-    }
   }
 
   /* ── журнал ─────────────────────────────── */
@@ -2444,14 +2440,26 @@
       var lines=t.split("\n");
       var title=lines[0].trim(), note=lines.slice(1).join("\n").trim();
       var url=grabUrl(t);
+      var given=$("draftName").value.trim();
+      // Введённое имя главнее: первая строка у ссылки — это сам адрес.
+      if(given){
+        if(title===url) note=lines.slice(1).join("\n").trim();
+        else note=t.replace(url,"").trim();
+        title=given;
+      }
       var rec=touch({id:uid(),points:draftPoints.slice(),title:title||shortUrl(url),by:myName()});
       if(note) rec.note=note;
       if(url) rec.url=url;
       state.links.unshift(rec);
-      draft.value=""; autoGrow();
+      draft.value=""; $("draftName").value=""; draftNameTouched=false; autoGrow();
       save(); renderAll(); draft.focus();
     }
     $("saveBtn").addEventListener("click",saveDraft);
+    // Своё имя не затираем подсказкой с сайта, даже если она придёт позже.
+    $("draftName").addEventListener("input",function(){ draftNameTouched=true; });
+    $("draftName").addEventListener("keydown",function(e){
+      if(e.key==="Enter"){ e.preventDefault(); saveDraft(); }
+    });
     draft.addEventListener("keydown",function(e){
       if(e.key==="Enter"&&(e.metaKey||e.ctrlKey)){ e.preventDefault(); saveDraft(); }
     });

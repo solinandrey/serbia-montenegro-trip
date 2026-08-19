@@ -103,6 +103,8 @@ function metaMap(html) {
   return out;
 }
 
+const SHORTENERS = /(^|\.)(goo\.gl|g\.co|bit\.ly|t\.co|tinyurl\.com|clck\.ru|vk\.cc|is\.gd|ow\.ly)$/i;
+
 async function fetchOg(target) {
   const res = await fetch(target, {
     redirect: "follow",
@@ -130,15 +132,19 @@ async function fetchOg(target) {
   try { await reader.cancel(); } catch {}
   const html = Buffer.concat(chunks.map(c => Buffer.from(c))).toString("utf8");
 
-  // Короткие ссылки Google отдают не редирект, а страницу с переходом
-  // внутри. Настоящий адрес достаём из тела — иначе места не узнать.
+  // Короткие ссылки отдают не редирект, а страницу с переходом внутри:
+  // настоящий адрес достаём из тела. Только для них — на обычном сайте
+  // любая ссылка в теле не имеет отношения к тому, что человек добавил.
+  // Так и вышло: у summit.co.me в разметке лежит карта их офиса, и она
+  // подменяла карточку страницы точкой на карте.
   let finalUrl = res.url || target.toString();
-  const hop = /<meta[^>]+http-equiv=["']refresh["'][^>]+content=["'][^"']*url=([^"']+)["']/i.exec(html)
-    || /location\.replace\(\s*["']([^"']+)["']/i.exec(html)
-    || /<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i.exec(html)
-    || /(https:\/\/www\.google\.[a-z.]+\/maps\/[^"'<\s\\]+)/i.exec(html);
-  if (hop && hop[1]) {
-    try { finalUrl = new URL(hop[1].replace(/&amp;/g, "&"), finalUrl).toString(); } catch {}
+  if (SHORTENERS.test(target.hostname)) {
+    const hop = /<meta[^>]+http-equiv=["']refresh["'][^>]+content=["'][^"']*url=([^"']+)["']/i.exec(html)
+      || /location\.replace\(\s*["']([^"']+)["']/i.exec(html)
+      || /<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i.exec(html);
+    if (hop && hop[1]) {
+      try { finalUrl = new URL(hop[1].replace(/&amp;/g, "&"), finalUrl).toString(); } catch {}
+    }
   }
 
   const m = metaMap(html);
